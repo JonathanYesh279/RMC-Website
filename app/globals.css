@@ -189,7 +189,7 @@ p {
 .brand-logo {
   display: block;
   flex: none;
-  height: 34px;
+  height: 42px;
   width: auto;
   object-fit: contain;
 }
