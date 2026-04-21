@@ -37,7 +37,7 @@ export default function Header() {
         <Link
           href="/"
           className="brand"
-          aria-label="מרכז המוסיקה רעננה — דף הבית"
+          aria-label="מרכז פיס למוסיקה רעננה — דף הבית"
         >
           <Image
             src="/logo-raanana-music-center.png"
@@ -48,7 +48,7 @@ export default function Header() {
             className="brand-logo"
           />
           <span className="brand-wordmark">
-            מרכז המוסיקה רעננה
+            מרכז פיס למוסיקה רעננה
             <small>RAANANA PAIS MUSIC CENTER</small>
           </span>
         </Link>

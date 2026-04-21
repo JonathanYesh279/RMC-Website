@@ -80,7 +80,7 @@ export default function Home() {
 
       <div className="hl-inner">
         <div className="hl-top">
-          <span className="hl-eyebrow">רעננה · מרכז פיס למוסיקה</span>
+          <span className="hl-eyebrow">מרכז פיס למוסיקה רעננה</span>
           <h1 className="hl-title">
             חינוך מוסיקלי
             <br />
