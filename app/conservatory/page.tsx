@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
@@ -12,15 +13,20 @@ import {
   articles,
   catLabels,
   departments,
+  deptDetails,
+  deptTeachers,
+  ensembleInstructors,
   ensembles,
   forms,
   programs,
+  smallEnsembles,
   staff,
 } from "./conservatory-data";
 
 const tabLabels = [
   "מחלקות",
-  "תזמורות, מקהלות והרכבים",
+  "תזמורות ומקהלות",
+  "הרכבים",
   "תוכניות ייחודיות",
   "טפסים",
   "הנהלה, מינהל ונציגות הורים",
@@ -35,6 +41,10 @@ export default function ConservatoryPage() {
   const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
   const navRef = useRef<HTMLElement | null>(null);
   const stickyRef = useRef<HTMLDivElement | null>(null);
+
+  const [openDeptKey, setOpenDeptKey] = useState<string | null>(null);
+  const [teacherIdx, setTeacherIdx] = useState(0);
+  const [activeProg, setActiveProg] = useState(0);
 
   const positionIndicator = useCallback((idx: number) => {
     const btn = buttonsRef.current[idx];
@@ -126,6 +136,65 @@ export default function ConservatoryPage() {
     }
   };
 
+  // ===== Department overlay =====
+  const openDept = openDeptKey
+    ? departments.find((d) => d.key === openDeptKey) ?? null
+    : null;
+  const openDetail = openDeptKey ? deptDetails[openDeptKey] ?? null : null;
+  const openTeachers = useMemo(
+    () => (openDeptKey ? deptTeachers[openDeptKey] ?? [] : []),
+    [openDeptKey]
+  );
+  const [autoPause, setAutoPause] = useState(false);
+
+  const handleOpenDept = useCallback((key: string) => {
+    setOpenDeptKey(key);
+    setTeacherIdx(0);
+    setAutoPause(false);
+  }, []);
+  const handleCloseDept = useCallback(() => {
+    setOpenDeptKey(null);
+  }, []);
+
+  useEffect(() => {
+    if (!openDeptKey) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [openDeptKey]);
+
+  useEffect(() => {
+    if (!openDeptKey) return;
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Escape") handleCloseDept();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [openDeptKey, handleCloseDept]);
+
+  useEffect(() => {
+    if (!openDeptKey || !openTeachers.length || autoPause) return;
+    const t = setInterval(() => {
+      setTeacherIdx((i) => (i + 1) % openTeachers.length);
+    }, 2800);
+    return () => clearInterval(t);
+  }, [openDeptKey, openTeachers.length, autoPause]);
+
+  const stepTeacher = (dir: number) => {
+    if (!openTeachers.length) return;
+    setTeacherIdx((i) => (i + dir + openTeachers.length) % openTeachers.length);
+  };
+
+  const trackPercent =
+    openTeachers.length > 0
+      ? teacherIdx * (100 / Math.min(openTeachers.length, 3))
+      : 0;
+
+  // ===== Programs carousel =====
+  const progCount = programs.length;
+  const setProg = (i: number) => setActiveProg(((i % progCount) + progCount) % progCount);
+
   const [feature, ...rest] = articles;
   const sideList = rest.slice(0, 3);
   const bottomGrid = rest.slice(3);
@@ -189,28 +258,20 @@ export default function ConservatoryPage() {
       </div>
 
       <div className="container">
+        {/* Panel 0: מחלקות */}
         <div
           className={`tab-panel ${active === 0 ? "active" : ""}`}
           id="panel-0"
           role="tabpanel"
         >
-          <div className="panel-head">
-            <div>
-              <div className="eyebrow">עשר מחלקות</div>
-              <h2>ששת הכלים ועוד.</h2>
-            </div>
-            <p className="trail">
-              כל מחלקה מתנהלת בידי סגל מוביל, עם מסלול אישי מגיל 5 ועד מסלול
-              המצוינות. המחלקות מעבירות תלמידים לתזמורות ולהרכבים הייצוגיים של
-              המרכז.
-            </p>
-          </div>
           <div className="dept-grid">
             {departments.map((d, i) => (
               <article
-                key={d.name}
+                key={d.key}
                 className="dept-card reveal"
+                data-dept={d.key}
                 style={{ transitionDelay: `${Math.min(i * 40, 320)}ms` }}
+                onClick={() => handleOpenDept(d.key)}
               >
                 <span className="count">{d.count}</span>
                 <div
@@ -224,12 +285,16 @@ export default function ConservatoryPage() {
                   </span>
                   <h3>{d.name}</h3>
                   <p>{d.desc}</p>
+                  <span className="dept-more">
+                    פרטים ומורים <span className="arrow">←</span>
+                  </span>
                 </div>
               </article>
             ))}
           </div>
         </div>
 
+        {/* Panel 1: תזמורות ומקהלות */}
         <div
           className={`tab-panel ${active === 1 ? "active" : ""}`}
           id="panel-1"
@@ -237,13 +302,13 @@ export default function ConservatoryPage() {
         >
           <div className="panel-head">
             <div>
-              <div className="eyebrow">תזמורות, מקהלות והרכבים</div>
+              <div className="eyebrow">תזמורות ומקהלות</div>
               <h2>חמישה גופים ייצוגיים.</h2>
             </div>
             <p className="trail">
               לצד הלימוד הפרטני, התלמידים נקלטים בהרכבים המרכזיים של המרכז —
               התזמורת הסימפונית, תזמורת הנוער, תזמורת כלי קשת, המקהלה העירונית
-              וההרכבים הקאמריים.
+              והמקהלות.
             </p>
           </div>
           <div className="ensemble-list">
@@ -271,6 +336,7 @@ export default function ConservatoryPage() {
           </div>
         </div>
 
+        {/* Panel 2: הרכבים */}
         <div
           className={`tab-panel ${active === 2 ? "active" : ""}`}
           id="panel-2"
@@ -278,34 +344,294 @@ export default function ConservatoryPage() {
         >
           <div className="panel-head">
             <div>
-              <div className="eyebrow">מסלולים ייחודיים</div>
-              <h2>מעבר לשיעור הפרטני.</h2>
+              <div className="eyebrow">ארבעה-עשר הרכבים</div>
+              <h2>
+                נגינה
+                <br />
+                בצוותא.
+              </h2>
             </div>
             <p className="trail">
-              ארבע תוכניות שמעמיקות את החוויה המוסיקלית — מסלולי מצוינות, בגרות,
-              סדנאות קיץ וחילופי נוער עם קונסרבטוריונים באירופה.
+              השתתפות בהרכב משנה לחלוטין את חוויית הלימוד — המוטיבציה גדלה,
+              האימון האישי משתפר, והתלמיד פוגש אנשים בעלי עניין משותף. במרכז
+              פועלים ארבעה-עשר הרכבים בסגנונות מגוונים, בהתאם לרמה ולגיל.
             </p>
           </div>
-          <div className="programs-grid">
-            {programs.map((p) => (
-              <a key={p.cls} href="#" className={`program ${p.cls} reveal`}>
+
+          <div className="ens-intro">
+            <div className="ens-intro-item">
+              <span className="n">14</span>
+              <span className="l">הרכבים פעילים</span>
+            </div>
+            <div className="ens-intro-item">
+              <span className="n">6</span>
+              <span className="l">סגנונות מוסיקליים</span>
+            </div>
+            <div className="ens-intro-item">
+              <span className="n">10</span>
+              <span className="l">מנחים מקצועיים</span>
+            </div>
+            <div className="ens-intro-item">
+              <span className="n">280+</span>
+              <span className="l">נגנים בעונה</span>
+            </div>
+          </div>
+
+          <div className="ens-grid">
+            {smallEnsembles.map((e, i) => (
+              <article
+                key={e.name}
+                className="ens-card reveal"
+                style={{ transitionDelay: `${Math.min(i * 50, 300)}ms` }}
+              >
                 <div
-                  className="img"
+                  className="ens-img"
+                  style={{ backgroundImage: `url('${e.img}')` }}
+                >
+                  <span className={`ens-cat ens-cat-${e.color}`}>
+                    {e.catLabel}
+                  </span>
+                </div>
+                <div className="ens-body">
+                  <h3>{e.name}</h3>
+                  <dl className="ens-meta">
+                    <div>
+                      <dt>מנחה</dt>
+                      <dd>{e.lead}</dd>
+                    </div>
+                    <div>
+                      <dt>רמה</dt>
+                      <dd>{e.level}</dd>
+                    </div>
+                    <div>
+                      <dt>מסגרת</dt>
+                      <dd>{e.members}</dd>
+                    </div>
+                  </dl>
+                  <p>{e.desc}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="ens-instr-head">
+            <div className="eyebrow">
+              <span className="eyebrow-dot" />
+              הסגל
+            </div>
+            <h3>
+              עשרה מנחים
+              <br />
+              <em>מקצועיים.</em>
+            </h3>
+            <p>
+              סגל מלא של נגנים ומלחינים בעלי ניסיון בימתי — מלווים את ההרכבים
+              בחזרות שבועיות ובהכנה למופעים.
+            </p>
+          </div>
+          <div className="ens-instructors">
+            {ensembleInstructors.map((p, i) => (
+              <figure
+                key={p.name}
+                className="ens-instr reveal"
+                style={{ transitionDelay: `${Math.min(i * 30, 240)}ms` }}
+              >
+                <div
+                  className="portrait"
                   style={{ backgroundImage: `url('${p.img}')` }}
                 />
-                <div className="body">
-                  <span className="tag">{p.tag}</span>
-                  <h3>{p.title}</h3>
-                  <p>{p.desc}</p>
-                </div>
-              </a>
+                <figcaption>
+                  <strong>{p.name}</strong>
+                  <span>{p.role}</span>
+                </figcaption>
+              </figure>
             ))}
+          </div>
+
+          <div className="ens-enroll">
+            <div className="ens-enroll-head">
+              <div>
+                <div className="eyebrow" style={{ color: "var(--amber)" }}>
+                  <span
+                    className="eyebrow-dot"
+                    style={{ background: "var(--amber)" }}
+                  />
+                  הרשמה להרכבים
+                </div>
+                <h3>
+                  הקדימו להירשם —
+                  <br />
+                  <em>מספר המקומות מוגבל.</em>
+                </h3>
+              </div>
+              <p className="trail">
+                תהליך ההרשמה פתוח לתלמידי המרכז ולחיצוניים כאחד. הרשמה להרכבים
+                הייצוגיים נעשית בטופס מקוון, לאחריה אודישן קצר ושיבוץ לפי רמה.
+              </p>
+            </div>
+            <div className="ens-steps">
+              <div className="ens-step">
+                <span className="num">01</span>
+                <h4>מילוי טופס</h4>
+                <p>
+                  טופס מקוון להרכב המבוקש — פרטים אישיים, גיל, שנות ניסיון
+                  והמלצת מורה כלי.
+                </p>
+              </div>
+              <div className="ens-step">
+                <span className="num">02</span>
+                <h4>אודישן קצר</h4>
+                <p>
+                  פגישת היכרות של 15 דקות עם מנחה ההרכב — קטע מוכן ובדיקת יכולת
+                  הקשבה.
+                </p>
+              </div>
+              <div className="ens-step">
+                <span className="num">03</span>
+                <h4>שיבוץ והתחלה</h4>
+                <p>
+                  שיבוץ להרכב המתאים לרמה ולגיל. חזרה ראשונה בשבוע שלאחר מכן.
+                </p>
+              </div>
+            </div>
+            <div className="ens-cta-row">
+              <a href="#" className="btn btn--coral">
+                טופס הרשמה להרכב ייצוגי
+              </a>
+              <a href="#" className="btn btn--outline">
+                טופס הרשמה להרכב רגיל
+              </a>
+              <span className="ens-note">
+                שאלות?{" "}
+                <a href="mailto:ensembles@music-raanana.org.il">
+                  ensembles@music-raanana.org.il
+                </a>{" "}
+                · 09-7711330
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Panel 3: תוכניות ייחודיות */}
         <div
           className={`tab-panel ${active === 3 ? "active" : ""}`}
           id="panel-3"
+          role="tabpanel"
+        >
+          <div className="prog-carousel">
+            <div className="prog-layout">
+              <aside className="prog-index" aria-label="ניווט תוכניות">
+                <div className="prog-index-label">
+                  <span>תוכניות</span>
+                  <span className="prog-counter">
+                    {activeProg + 1} / {progCount}
+                  </span>
+                </div>
+                <ol className="prog-index-list" role="tablist">
+                  {programs.map((p, i) => (
+                    <li key={p.key}>
+                      <button
+                        type="button"
+                        className={`prog-tab ${activeProg === i ? "is-active" : ""}`}
+                        role="tab"
+                        aria-selected={activeProg === i}
+                        onClick={() => setProg(i)}
+                      >
+                        <span className="prog-tab-num">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="prog-tab-body">
+                          <span className="prog-tab-title">{p.title}</span>
+                          <span className="prog-tab-sub">{p.kicker}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+                <div className="prog-index-nav">
+                  <button
+                    type="button"
+                    className="prog-nav"
+                    aria-label="תוכנית קודמת"
+                    onClick={() => setProg(activeProg - 1)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M15 6l-6 6 6 6"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    className="prog-nav"
+                    aria-label="תוכנית הבאה"
+                    onClick={() => setProg(activeProg + 1)}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M9 6l6 6-6 6"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </aside>
+              <div className="prog-stage">
+                {programs.map((p, i) => (
+                  <article
+                    key={p.key}
+                    className={`prog-slide ${activeProg === i ? "is-active" : ""}`}
+                  >
+                    <div
+                      className="prog-hero"
+                      style={{ backgroundImage: `url('${p.img}')` }}
+                    >
+                      <div className="prog-hero-scrim" />
+                      <div className="prog-hero-body">
+                        <span className="prog-kicker">{p.kicker}</span>
+                        <h3 className="prog-title">{p.title}</h3>
+                        <div className="prog-sub">{p.subtitle}</div>
+                      </div>
+                    </div>
+                    <div className="prog-content">
+                      <p className="prog-lede">{p.lede}</p>
+                      <div className="prog-blocks">
+                        {p.blocks.map((b) => (
+                          <div key={b.h} className="prog-block">
+                            <h4>{b.h}</h4>
+                            <ul>
+                              {b.list.map((li) => (
+                                <li key={li}>{li}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                      {p.note && <div className="prog-note">{p.note}</div>}
+                      {p.cta && (
+                        <a href="#" className="btn btn--coral prog-cta">
+                          {p.cta}
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Panel 4: טפסים */}
+        <div
+          className={`tab-panel ${active === 4 ? "active" : ""}`}
+          id="panel-4"
           role="tabpanel"
         >
           <div className="panel-head">
@@ -359,9 +685,10 @@ export default function ConservatoryPage() {
           </div>
         </div>
 
+        {/* Panel 5: הנהלה */}
         <div
-          className={`tab-panel ${active === 4 ? "active" : ""}`}
-          id="panel-4"
+          className={`tab-panel ${active === 5 ? "active" : ""}`}
+          id="panel-5"
           role="tabpanel"
         >
           <div className="panel-head">
@@ -398,9 +725,10 @@ export default function ConservatoryPage() {
           </div>
         </div>
 
+        {/* Panel 6: העשרה */}
         <div
-          className={`tab-panel ${active === 5 ? "active" : ""}`}
-          id="panel-5"
+          className={`tab-panel ${active === 6 ? "active" : ""}`}
+          id="panel-6"
           role="tabpanel"
         >
           <div className="panel-head">
@@ -472,6 +800,174 @@ export default function ConservatoryPage() {
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Department detail overlay */}
+      <div
+        className={`dept-overlay ${openDeptKey ? "is-open" : ""}`}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) handleCloseDept();
+        }}
+      >
+        <button
+          type="button"
+          className="dept-close"
+          aria-label="סגירה"
+          onClick={handleCloseDept}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <div className="dept-sheet" role="dialog" aria-modal="true">
+          <div className="dept-hero">
+            <div
+              className="dept-hero-img"
+              style={
+                openDept ? { backgroundImage: `url('${openDept.img}')` } : undefined
+              }
+            />
+            <div className="dept-hero-scrim" />
+            <div className="dept-hero-body">
+              <span className="eyebrow" style={{ color: "#fcbc40" }}>
+                <span
+                  className="eyebrow-dot"
+                  style={{ background: "#fcbc40" }}
+                />
+                מחלקה
+              </span>
+              <h2 className="dept-hero-title">{openDept?.name}</h2>
+              <p className="dept-hero-desc">{openDept?.desc}</p>
+              <dl className="dept-facts">
+                <div>
+                  <dt>ראש המחלקה</dt>
+                  <dd>{openDetail?.lead || "—"}</dd>
+                </div>
+                <div>
+                  <dt>גילאים</dt>
+                  <dd>{openDetail?.ages || "—"}</dd>
+                </div>
+                <div>
+                  <dt>חללי אימון</dt>
+                  <dd>{openDetail?.rooms || "—"}</dd>
+                </div>
+                <div>
+                  <dt>תלמידים</dt>
+                  <dd>{openDept?.count || "—"}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <div className="dept-section">
+            <div className="dept-section-head">
+              <div>
+                <div className="eyebrow">
+                  <span className="eyebrow-dot" />
+                  הסגל
+                </div>
+                <h3>המורים של המחלקה</h3>
+              </div>
+              <div className="dept-carousel-ctrl">
+                <button
+                  type="button"
+                  className="dept-nav"
+                  aria-label="הקודם"
+                  onClick={() => {
+                    stepTeacher(-1);
+                    setAutoPause(false);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M15 6l-6 6 6 6"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="dept-nav"
+                  aria-label="הבא"
+                  onClick={() => {
+                    stepTeacher(1);
+                    setAutoPause(false);
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M9 6l6 6-6 6"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div
+              className="dept-carousel"
+              onMouseEnter={() => setAutoPause(true)}
+              onMouseLeave={() => setAutoPause(false)}
+            >
+              <div
+                className="dept-track"
+                style={{ transform: `translateX(${trackPercent}%)` }}
+              >
+                {openTeachers.map((t, i) => (
+                  <article
+                    key={`${t.name}-${i}`}
+                    className={`dept-card-t ${i === teacherIdx ? "is-center" : ""}`}
+                  >
+                    <div
+                      className="dept-card-img"
+                      style={{ backgroundImage: `url('${t.img}')` }}
+                    />
+                    <div className="dept-card-body">
+                      <h4>{t.name}</h4>
+                      <span className="dept-card-role">{t.role}</span>
+                      <p>{t.bio}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <div className="dept-dots">
+              {openTeachers.map((t, i) => (
+                <button
+                  key={`${t.name}-dot-${i}`}
+                  type="button"
+                  className={`dept-dot ${i === teacherIdx ? "is-active" : ""}`}
+                  aria-label={`מורה ${i + 1}`}
+                  onClick={() => {
+                    setTeacherIdx(i);
+                    setAutoPause(false);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="dept-section dept-highlights-wrap">
+            <div className="eyebrow">
+              <span className="eyebrow-dot" />
+              מאפיינים
+            </div>
+            <h3>מה מייחד את המחלקה</h3>
+            <ul className="dept-highlights">
+              {(openDetail?.highlights ?? []).map((h) => (
+                <li key={h}>{h}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
