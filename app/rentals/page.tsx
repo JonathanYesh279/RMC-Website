@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function RentalsPage() {
   return (
-    <Container className="py-12">
+    <Container className="pt-[140px] pb-16">
       <h1 className="text-3xl font-bold mb-4">השכרות והקלטות</h1>
       <p className="text-neutral-700">
         תוכן מציין מקום עבור עמוד ההשכרות וההקלטות.

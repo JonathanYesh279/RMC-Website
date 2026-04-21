@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function ConcertsPage() {
   return (
-    <Container className="py-12">
+    <Container className="pt-[140px] pb-16">
       <h1 className="text-3xl font-bold mb-4">קונצרטים</h1>
       {/* TODO: concerts data will be fetched here — API or CMS integration pending */}
       <p className="text-neutral-700">
