@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -38,11 +39,14 @@ export default function Header() {
           className="brand"
           aria-label="מרכז המוסיקה רעננה — דף הבית"
         >
-          <span className="brand-mark" role="img" aria-hidden="true" />
-          <span className="brand-wordmark">
-            מרכז המוסיקה רעננה
-            <small>RAANANA PAIS MUSIC CENTER</small>
-          </span>
+          <Image
+            src="/logo-raanana-music-center.png"
+            alt="מרכז המוסיקה רעננה"
+            width={630}
+            height={417}
+            priority
+            className="brand-logo"
+          />
         </Link>
         <nav className="nav" aria-label="ניווט ראשי">
           {navItems.map((item) => {
