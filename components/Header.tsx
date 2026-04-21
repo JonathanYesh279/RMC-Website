@@ -41,12 +41,16 @@ export default function Header() {
         >
           <Image
             src="/logo-raanana-music-center.png"
-            alt="מרכז המוסיקה רעננה"
+            alt=""
             width={630}
             height={417}
             priority
             className="brand-logo"
           />
+          <span className="brand-wordmark">
+            מרכז המוסיקה רעננה
+            <small>RAANANA PAIS MUSIC CENTER</small>
+          </span>
         </Link>
         <nav className="nav" aria-label="ניווט ראשי">
           {navItems.map((item) => {

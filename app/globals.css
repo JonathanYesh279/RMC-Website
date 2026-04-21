@@ -172,10 +172,8 @@ p {
 .brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   text-decoration: none;
-  transition: background 0.3s var(--ease-out),
-    backdrop-filter 0.3s var(--ease-out), padding 0.3s var(--ease-out);
 }
 .brand-mark {
   width: 46px;
@@ -191,16 +189,13 @@ p {
 .brand-logo {
   display: block;
   flex: none;
-  height: 52px;
+  height: 34px;
   width: auto;
   object-fit: contain;
 }
-.site-header.transparent .brand {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
-  padding: 6px 16px;
-  border-radius: 999px;
+.site-header.transparent .brand-logo {
+  filter: drop-shadow(0 1px 3px rgba(255, 255, 255, 0.85))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.55));
 }
 .brand-wordmark {
   font-family: var(--serif);
