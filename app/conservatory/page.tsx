@@ -45,7 +45,6 @@ export default function ConservatoryPage() {
   const [openDeptKey, setOpenDeptKey] = useState<string | null>(null);
   const [teacherIdx, setTeacherIdx] = useState(0);
   const [activeProg, setActiveProg] = useState(0);
-  const [progModal, setProgModal] = useState<number | null>(null);
 
   const positionIndicator = useCallback((idx: number) => {
     const btn = buttonsRef.current[idx];
@@ -195,20 +194,6 @@ export default function ConservatoryPage() {
   // ===== Programs carousel =====
   const progCount = programs.length;
   const setProg = (i: number) => setActiveProg(((i % progCount) + progCount) % progCount);
-
-  useEffect(() => {
-    if (progModal === null) return;
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") setProgModal(null);
-    };
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [progModal]);
 
   const [feature, ...rest] = articles;
   const sideList = rest.slice(0, 3);
@@ -617,20 +602,24 @@ export default function ConservatoryPage() {
                     </div>
                     <div className="prog-content">
                       <p className="prog-lede">{p.lede}</p>
-                      <div className="prog-actions">
-                        <button
-                          type="button"
-                          className="btn btn--outline prog-more"
-                          onClick={() => setProgModal(i)}
-                        >
-                          מידע נוסף
-                        </button>
-                        {p.cta && (
-                          <a href="#" className="btn btn--coral prog-cta">
-                            {p.cta}
-                          </a>
-                        )}
+                      <div className="prog-blocks">
+                        {p.blocks.map((b) => (
+                          <div key={b.h} className="prog-block">
+                            <h4>{b.h}</h4>
+                            <ul>
+                              {b.list.map((li) => (
+                                <li key={li}>{li}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
                       </div>
+                      {p.note && <div className="prog-note">{p.note}</div>}
+                      {p.cta && (
+                        <a href="#" className="btn btn--coral prog-cta">
+                          {p.cta}
+                        </a>
+                      )}
                     </div>
                   </article>
                 ))}
@@ -982,67 +971,6 @@ export default function ConservatoryPage() {
           </div>
         </div>
       </div>
-
-      {progModal !== null && (
-        <div
-          className="prog-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="prog-modal-title"
-          onClick={() => setProgModal(null)}
-        >
-          <div
-            className="prog-modal-card"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              className="prog-modal-close"
-              aria-label="סגירת חלון"
-              onClick={() => setProgModal(null)}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M6 6l12 12M18 6L6 18"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-            <header className="prog-modal-head">
-              <span className="prog-kicker">{programs[progModal].kicker}</span>
-              <h3 id="prog-modal-title" className="prog-modal-title">
-                {programs[progModal].title}
-              </h3>
-              <div className="prog-modal-sub">{programs[progModal].subtitle}</div>
-            </header>
-            <div className="prog-modal-body">
-              <p className="prog-lede">{programs[progModal].lede}</p>
-              <div className="prog-blocks">
-                {programs[progModal].blocks.map((b) => (
-                  <div key={b.h} className="prog-block">
-                    <h4>{b.h}</h4>
-                    <ul>
-                      {b.list.map((li) => (
-                        <li key={li}>{li}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-              {programs[progModal].note && (
-                <div className="prog-note">{programs[progModal].note}</div>
-              )}
-              {programs[progModal].cta && (
-                <a href="#" className="btn btn--coral prog-cta">
-                  {programs[progModal].cta}
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
