@@ -1,25 +1,105 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import Container from "./Container";
+import { usePathname } from "next/navigation";
+
+const navItems = [
+  { key: "conservatory", label: "קונסרבטוריון", href: "/conservatory" },
+  { key: "rentals", label: "שכירויות והקלטות", href: "/rentals" },
+  { key: "concerts", label: "מופעים וקונצרטים", href: "/concerts" },
+  { key: "contact", label: "צור קשר", href: "#" },
+];
 
 export default function Header() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [solid, setSolid] = useState(!isHome);
+
+  useEffect(() => {
+    if (!isHome) {
+      setSolid(true);
+      return;
+    }
+    const onScroll = () => setSolid(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
   return (
-    <header className="border-b border-neutral-200 py-4">
-      <Container className="flex items-center justify-between gap-6">
-        <Link href="/" className="text-lg font-semibold">
-          Raanana Music Center
+    <header
+      className={`site-header ${solid ? "solid" : "transparent"}`}
+      id="siteHeader"
+    >
+      <div className="header-inner">
+        <Link
+          href="/"
+          className="brand"
+          aria-label="מרכז המוסיקה רעננה — דף הבית"
+        >
+          <span className="brand-mark" role="img" aria-hidden="true" />
+          <span className="brand-wordmark">
+            מרכז המוסיקה רעננה
+            <small>RAANANA PAIS MUSIC CENTER</small>
+          </span>
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
-          <Link href="/conservatory" className="hover:underline">
-            קונסרבטוריון
-          </Link>
-          <Link href="/rentals" className="hover:underline">
-            השכרות והקלטות
-          </Link>
-          <Link href="/concerts" className="hover:underline">
-            קונצרטים
-          </Link>
+        <nav className="nav" aria-label="ניווט ראשי">
+          {navItems.map((item) => {
+            const current =
+              item.href !== "#" &&
+              (pathname === item.href || pathname.startsWith(`${item.href}/`));
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                className="nav-link"
+                aria-current={current ? "page" : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
-      </Container>
+        <a className="header-cta" href="#">
+          הרשמה לשנה״ל
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M9 3L4 7l5 4"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </a>
+        <button
+          className="icon-btn mobile-toggle"
+          aria-label="פתיחת תפריט"
+          type="button"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 7h16M4 12h16M4 17h16"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
     </header>
   );
 }
