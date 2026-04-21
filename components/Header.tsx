@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { key: "conservatory", label: "קונסרבטוריון", href: "/conservatory" },
+  { key: "conservatory", label: "מרכז פיס למוסיקה רעננה", href: "/conservatory" },
   { key: "rentals", label: "שכירויות והקלטות", href: "/rentals" },
   { key: "concerts", label: "מופעים וקונצרטים", href: "/concerts" },
   { key: "contact", label: "צור קשר", href: "#" },
