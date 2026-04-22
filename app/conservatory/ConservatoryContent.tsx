@@ -18,9 +18,23 @@ import {
   ensembleInstructors,
   ensembles,
   programs,
+  smallEnsembles,
   staff,
 } from "./conservatory-data";
 import type { EnsemblePreview, FormDoc } from "@/sanity/queries";
+
+type EnsembleCard = {
+  key: string;
+  imageUrl: string;
+  imageAlt: string | null;
+  category: string | null;
+  accent: "teal" | "amber" | "coral";
+  name: string;
+  instructor: string;
+  level: string;
+  framework: string;
+  description: string;
+};
 
 const tabLabels = [
   "מחלקות",
@@ -204,6 +218,32 @@ export default function ConservatoryContent({
   const sideList = rest.slice(0, 3);
   const bottomGrid = rest.slice(3);
 
+  const ensembleCards: EnsembleCard[] = ensemblePreviews.length
+    ? ensemblePreviews.map((e) => ({
+        key: e._id,
+        imageUrl: `${e.imageUrl}?w=1200&q=80&auto=format&fit=crop`,
+        imageAlt: e.imageAlt,
+        category: e.category,
+        accent: e.accent ?? "teal",
+        name: e.name,
+        instructor: e.instructor,
+        level: e.level,
+        framework: e.framework,
+        description: e.description,
+      }))
+    : smallEnsembles.map((e) => ({
+        key: e.name,
+        imageUrl: e.img,
+        imageAlt: null,
+        category: e.catLabel,
+        accent: e.color,
+        name: e.name,
+        instructor: e.lead,
+        level: e.level,
+        framework: e.members,
+        description: e.desc,
+      }));
+
   return (
     <>
       <section className="page-hero">
@@ -383,9 +423,9 @@ export default function ConservatoryContent({
           </div>
 
           <div className="ens-grid">
-            {ensemblePreviews.map((e, i) => (
+            {ensembleCards.map((e, i) => (
               <article
-                key={e._id}
+                key={e.key}
                 className="ens-card reveal"
                 style={{ transitionDelay: `${Math.min(i * 50, 300)}ms` }}
               >
@@ -393,12 +433,10 @@ export default function ConservatoryContent({
                   className="ens-img"
                   role={e.imageAlt ? "img" : undefined}
                   aria-label={e.imageAlt ?? undefined}
-                  style={{
-                    backgroundImage: `url('${e.imageUrl}?w=1200&q=80&auto=format&fit=crop')`,
-                  }}
+                  style={{ backgroundImage: `url('${e.imageUrl}')` }}
                 >
                   {e.category && (
-                    <span className={`ens-cat ens-cat-${e.accent ?? "teal"}`}>
+                    <span className={`ens-cat ens-cat-${e.accent}`}>
                       {e.category}
                     </span>
                   )}
