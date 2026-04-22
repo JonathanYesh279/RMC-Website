@@ -15,13 +15,28 @@ import {
   departments,
   deptDetails,
   deptTeachers,
-  ensembleInstructors,
+  ensembleInstructors as fallbackEnsembleInstructors,
   ensembles,
   programs,
   smallEnsembles,
   staff,
 } from "./conservatory-data";
-import type { EnsemblePreview, FormDoc } from "@/sanity/queries";
+import type {
+  EnsembleInstructorDoc,
+  EnsemblePreview,
+  FormDoc,
+} from "@/sanity/queries";
+
+const DEFAULT_INSTRUCTOR_IMAGE =
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80&auto=format&fit=crop";
+
+type InstructorCard = {
+  key: string;
+  name: string;
+  role: string;
+  image: string;
+  imageAlt: string | null;
+};
 
 type EnsembleCard = {
   key: string;
@@ -50,9 +65,11 @@ const STORAGE_KEY = "conservatoryTab";
 export default function ConservatoryContent({
   forms,
   ensemblePreviews,
+  ensembleInstructorDocs,
 }: {
   forms: FormDoc[];
   ensemblePreviews: EnsemblePreview[];
+  ensembleInstructorDocs: EnsembleInstructorDoc[];
 }) {
   const [active, setActive] = useState(0);
   const [indicator, setIndicator] = useState({ width: 0, tx: 0 });
@@ -239,6 +256,24 @@ export default function ConservatoryContent({
         instructor: e.lead,
         level: e.level,
         description: e.desc,
+      }));
+
+  const instructorCards: InstructorCard[] = ensembleInstructorDocs.length
+    ? ensembleInstructorDocs.map((p) => ({
+        key: p._id,
+        name: p.name,
+        role: p.role,
+        image: p.imageUrl
+          ? `${p.imageUrl}?w=600&q=80&auto=format&fit=crop`
+          : DEFAULT_INSTRUCTOR_IMAGE,
+        imageAlt: p.imageAlt,
+      }))
+    : fallbackEnsembleInstructors.map((p) => ({
+        key: p.name,
+        name: p.name,
+        role: p.role,
+        image: p.img,
+        imageAlt: null,
       }));
 
   return (
@@ -472,15 +507,17 @@ export default function ConservatoryContent({
             </p>
           </div>
           <div className="ens-instructors">
-            {ensembleInstructors.map((p, i) => (
+            {instructorCards.map((p, i) => (
               <figure
-                key={p.name}
+                key={p.key}
                 className="ens-instr reveal"
                 style={{ transitionDelay: `${Math.min(i * 30, 240)}ms` }}
               >
                 <div
                   className="portrait"
-                  style={{ backgroundImage: `url('${p.img}')` }}
+                  role={p.imageAlt ? "img" : undefined}
+                  aria-label={p.imageAlt ?? undefined}
+                  style={{ backgroundImage: `url('${p.image}')` }}
                 />
                 <figcaption>
                   <strong>{p.name}</strong>

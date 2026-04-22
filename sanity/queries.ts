@@ -41,3 +41,21 @@ export type EnsemblePreview = {
   imageUrl: string;
   imageAlt: string | null;
 };
+
+export const ENSEMBLE_INSTRUCTORS_QUERY = defineQuery(`
+  *[_type == "ensembleInstructor"] | order(displayOrder asc, name asc) {
+    _id,
+    name,
+    role,
+    "imageUrl": image.asset->url,
+    "imageAlt": image.alt
+  }
+`);
+
+export type EnsembleInstructorDoc = {
+  _id: string;
+  name: string;
+  role: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
+};
