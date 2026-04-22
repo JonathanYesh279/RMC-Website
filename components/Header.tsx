@@ -28,6 +28,8 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
+  if (pathname.startsWith("/studio")) return null;
+
   return (
     <header
       className={`site-header ${solid ? "solid" : "transparent"}`}
