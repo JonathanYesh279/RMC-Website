@@ -27,10 +27,11 @@ export default defineType({
     }),
     defineField({
       name: "displayOrder",
-      title: "סדר תצוגה",
+      title: "סדר תצוגה (אופציונלי)",
+      description:
+        "מספר נמוך יותר = גבוה יותר ברשימה. טפסים ללא סדר תצוגה יופיעו בסוף.",
       type: "number",
-      initialValue: 99,
-      validation: (r) => r.required().integer().min(1).max(99),
+      validation: (r) => r.integer().min(1).max(99),
     }),
   ],
   orderings: [
