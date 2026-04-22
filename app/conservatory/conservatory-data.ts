@@ -32,18 +32,6 @@ export type Ensemble = {
   img: string;
 };
 
-export type SmallEnsemble = {
-  cat: string;
-  catLabel: string;
-  name: string;
-  lead: string;
-  level: string;
-  members: string;
-  desc: string;
-  img: string;
-  color: "teal" | "amber" | "coral";
-};
-
 export type EnsembleInstructor = {
   name: string;
   role: string;
@@ -297,75 +285,6 @@ export const ensembles: Ensemble[] = [
     badgeText: "הרכבים קאמריים",
     desc: "ההרכב הג׳אזי ורביעיית כלי הנשיפה פועלים לצד מסגרות ההוראה הפרטניות, ומאפשרים לתלמידים מתקדמים להרחיב אופקים סגנוניים ולהתמודד עם רפרטואר קאמרי מורכב. ההרכבים מופיעים בערבי הגמר של הקונסרבטוריון ובאירועים מיוחדים בעיר.",
     img: "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=1400&q=80&auto=format&fit=crop",
-  },
-];
-
-export const smallEnsembles: SmallEnsemble[] = [
-  {
-    cat: "workshop",
-    catLabel: "סדנאות הרכבים",
-    name: "סדנאות הרכבים",
-    lead: "משה בן-יוחנה",
-    level: "מתחילים · שנה ואילך",
-    members: "שתי קבוצות",
-    desc: "שתי סדנאות המאפשרות לנגנים צעירים, חסרי ניסיון בנגינה בצוותא, להתנסות לראשונה. תלמידים שלמדו לפחות שנה מוזמנים להצטרף בהמלצת מורה הכלי. לצד ההתרגשות מנגינה בצוותא — הקשבה, הבנת קטע כתוב, נגינת סולו ושמירה על מבנה.",
-    img: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=1200&q=80&auto=format&fit=crop",
-    color: "teal",
-  },
-  {
-    cat: "jazz",
-    catLabel: "הרכבי ג׳אז",
-    name: "הרכבי ג׳אז",
-    lead: "יובל כהן · גיל פקר · מתן ורדי · רז קרוגמן",
-    level: "מתחילים עד מתקדמים (16–18)",
-    members: "4 הרכבים",
-    desc: "הרכבים מגוונים בסגנונם וברמתם — ממתחילים שמתנסים באלתור ובנגינת הרמוניות ג׳אז, ועד למתקדמים החוברים במטרה לחפש אחר החופש היצירתי. רפרטואר מ-Real Book עד ג׳אז עכשווי.",
-    img: "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=1200&q=80&auto=format&fit=crop",
-    color: "amber",
-  },
-  {
-    cat: "rock",
-    catLabel: "להקות רוק",
-    name: "להקות רוק, פאנק ופופ",
-    lead: "בן לביא · אלון ברק · הדס טריינין",
-    level: "מתחלק לפי גיל ורמה",
-    members: "6 להקות",
-    desc: "להקות שמנגנות מגוון רחב של סגנונות — רוק קלאסי, פאנק, פופ ואלטרנטיב. נחלקות לפי גיל ורמת נגינה, עם דגש על כתיבה ואלתור משותף, נגינה חיה והופעות סיום.",
-    img: "https://images.unsplash.com/photo-1485579149621-3123dd979885?w=1200&q=80&auto=format&fit=crop",
-    color: "coral",
-  },
-  {
-    cat: "vocal",
-    catLabel: "הרכב ווקאלי",
-    name: "״אוקטבה מוגדלת״ · הרכב ווקאלי",
-    lead: "אלה תדמור",
-    level: "כיתות ח׳–י״ב",
-    members: "ללא ניסיון קודם נדרש",
-    desc: "הרכב ווקאלי למוסיקה קלה בסגנונות ג׳אז ומוסיקה ישראלית. לומדים לשיר בקולות ביחד, לשיר מתָווים, להתייחס לזמרים נוספים ששרים באותו הזמן, לטקסט ולהופעה על במה.",
-    img: "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=1200&q=80&auto=format&fit=crop",
-    color: "teal",
-  },
-  {
-    cat: "drums",
-    catLabel: "הרכב מתופפים",
-    name: "״דרם ליין״ · הרכב מתופפים",
-    lead: "יהושע לימוני",
-    level: "מתקדמים",
-    members: "גיבוש לפי אודישן",
-    desc: "הרכב מתופפים המיועד לנגנים ברמה מתקדמת — עבודה על פוליריתמים, גרוב־פאנק, סמבה ואנסמבל פרקושן. מופיעים בקונצרטי הגמר ובאירועים מיוחדים של המרכז.",
-    img: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=1200&q=80&auto=format&fit=crop",
-    color: "amber",
-  },
-  {
-    cat: "adults",
-    catLabel: "הרכבי מבוגרים",
-    name: "הרכבי מבוגרים",
-    lead: "רז קרוגמן · הדס טריינין",
-    level: "גילאי 18+",
-    members: "מספר הרכבים",
-    desc: "הרכבים שמיועדים למבוגרים — חובבי מוסיקה ונגנים עם רקע קודם — החוברים לחוויית נגינה בצוותא. סגנונות מגוונים, חזרות שבועיות ומופעי סיום עונה.",
-    img: "https://images.unsplash.com/photo-1514119412350-e174d90d280e?w=1200&q=80&auto=format&fit=crop",
-    color: "coral",
   },
 ];
 

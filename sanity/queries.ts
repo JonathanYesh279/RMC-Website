@@ -15,3 +15,31 @@ export type FormDoc = {
   description: string | null;
   fileUrl: string;
 };
+
+export const ENSEMBLE_PREVIEWS_QUERY = defineQuery(`
+  *[_type == "ensemblePreview" && defined(image.asset)] | order(displayOrder asc, name asc) {
+    _id,
+    name,
+    instructor,
+    level,
+    framework,
+    description,
+    category,
+    accent,
+    "imageUrl": image.asset->url,
+    "imageAlt": image.alt
+  }
+`);
+
+export type EnsemblePreview = {
+  _id: string;
+  name: string;
+  instructor: string;
+  level: string;
+  framework: string;
+  description: string;
+  category: string | null;
+  accent: "teal" | "amber" | "coral" | null;
+  imageUrl: string;
+  imageAlt: string | null;
+};

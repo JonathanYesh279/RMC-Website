@@ -18,10 +18,9 @@ import {
   ensembleInstructors,
   ensembles,
   programs,
-  smallEnsembles,
   staff,
 } from "./conservatory-data";
-import type { FormDoc } from "@/sanity/queries";
+import type { EnsemblePreview, FormDoc } from "@/sanity/queries";
 
 const tabLabels = [
   "מחלקות",
@@ -35,7 +34,13 @@ const tabLabels = [
 
 const STORAGE_KEY = "conservatoryTab";
 
-export default function ConservatoryContent({ forms }: { forms: FormDoc[] }) {
+export default function ConservatoryContent({
+  forms,
+  ensemblePreviews,
+}: {
+  forms: FormDoc[];
+  ensemblePreviews: EnsemblePreview[];
+}) {
   const [active, setActive] = useState(0);
   const [indicator, setIndicator] = useState({ width: 0, tx: 0 });
   const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
@@ -378,26 +383,32 @@ export default function ConservatoryContent({ forms }: { forms: FormDoc[] }) {
           </div>
 
           <div className="ens-grid">
-            {smallEnsembles.map((e, i) => (
+            {ensemblePreviews.map((e, i) => (
               <article
-                key={e.name}
+                key={e._id}
                 className="ens-card reveal"
                 style={{ transitionDelay: `${Math.min(i * 50, 300)}ms` }}
               >
                 <div
                   className="ens-img"
-                  style={{ backgroundImage: `url('${e.img}')` }}
+                  role={e.imageAlt ? "img" : undefined}
+                  aria-label={e.imageAlt ?? undefined}
+                  style={{
+                    backgroundImage: `url('${e.imageUrl}?w=1200&q=80&auto=format&fit=crop')`,
+                  }}
                 >
-                  <span className={`ens-cat ens-cat-${e.color}`}>
-                    {e.catLabel}
-                  </span>
+                  {e.category && (
+                    <span className={`ens-cat ens-cat-${e.accent ?? "teal"}`}>
+                      {e.category}
+                    </span>
+                  )}
                 </div>
                 <div className="ens-body">
                   <h3>{e.name}</h3>
                   <dl className="ens-meta">
                     <div>
                       <dt>מנחה</dt>
-                      <dd>{e.lead}</dd>
+                      <dd>{e.instructor}</dd>
                     </div>
                     <div>
                       <dt>רמה</dt>
@@ -405,10 +416,10 @@ export default function ConservatoryContent({ forms }: { forms: FormDoc[] }) {
                     </div>
                     <div>
                       <dt>מסגרת</dt>
-                      <dd>{e.members}</dd>
+                      <dd>{e.framework}</dd>
                     </div>
                   </dl>
-                  <p>{e.desc}</p>
+                  <p>{e.description}</p>
                 </div>
               </article>
             ))}
