@@ -59,3 +59,27 @@ export type EnsembleInstructorDoc = {
   imageUrl: string | null;
   imageAlt: string | null;
 };
+
+export const LEADERS_QUERY = defineQuery(`
+  *[_type == "leader"] | order(displayOrder asc, name asc) {
+    _id,
+    name,
+    title,
+    subtitle,
+    bio,
+    accent,
+    "imageUrl": photo.asset->url,
+    "imageAlt": photo.alt
+  }
+`);
+
+export type LeaderDoc = {
+  _id: string;
+  name: string;
+  title: string;
+  subtitle: string | null;
+  bio: string | null;
+  accent: "teal" | "coral" | "amber" | "ink";
+  imageUrl: string | null;
+  imageAlt: string | null;
+};

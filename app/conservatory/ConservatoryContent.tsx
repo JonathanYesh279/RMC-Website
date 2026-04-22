@@ -19,15 +19,17 @@ import {
   ensembles,
   programs,
   smallEnsembles,
-  staff,
+  staff as fallbackStaff,
 } from "./conservatory-data";
 import type {
   EnsembleInstructorDoc,
   EnsemblePreview,
   FormDoc,
+  LeaderDoc,
 } from "@/sanity/queries";
 
 const DEFAULT_INSTRUCTOR_IMAGE = "/fallbacks/instructor-portrait.jpg";
+const DEFAULT_LEADER_IMAGE = "/fallbacks/instructor-portrait.jpg";
 
 type InstructorCard = {
   key: string;
@@ -49,6 +51,17 @@ type EnsembleCard = {
   description: string;
 };
 
+type LeaderCard = {
+  key: string;
+  name: string;
+  title: string;
+  subtitle: string;
+  bio: string;
+  image: string;
+  imageAlt: string | null;
+  accentStyle: string;
+};
+
 const tabLabels = [
   "מחלקות",
   "תזמורות ומקהלות",
@@ -65,10 +78,12 @@ export default function ConservatoryContent({
   forms,
   ensemblePreviews,
   ensembleInstructorDocs,
+  leaderDocs,
 }: {
   forms: FormDoc[];
   ensemblePreviews: EnsemblePreview[];
   ensembleInstructorDocs: EnsembleInstructorDoc[];
+  leaderDocs: LeaderDoc[];
 }) {
   const [active, setActive] = useState(0);
   const [indicator, setIndicator] = useState({ width: 0, tx: 0 });
@@ -273,6 +288,30 @@ export default function ConservatoryContent({
         role: p.role,
         image: p.img,
         imageAlt: null,
+      }));
+
+  const leaderCards: LeaderCard[] = leaderDocs.length
+    ? leaderDocs.map((p) => ({
+        key: p._id,
+        name: p.name,
+        title: p.title,
+        subtitle: p.subtitle ?? "",
+        bio: p.bio ?? "",
+        image: p.imageUrl
+          ? `${p.imageUrl}?w=600&q=80&auto=format&fit=crop`
+          : DEFAULT_LEADER_IMAGE,
+        imageAlt: p.imageAlt,
+        accentStyle: `var(--${p.accent})`,
+      }))
+    : fallbackStaff.map((s) => ({
+        key: s.name,
+        name: s.name,
+        title: s.title,
+        subtitle: s.sub,
+        bio: s.bio,
+        image: s.img,
+        imageAlt: null,
+        accentStyle: s.color,
       }));
 
   return (
@@ -786,17 +825,19 @@ export default function ConservatoryContent({
             </p>
           </div>
           <div className="staff-grid">
-            {staff.map((s) => (
-              <article key={s.name} className="staff reveal">
+            {leaderCards.map((s) => (
+              <article key={s.key} className="staff reveal">
                 <div
                   className="portrait"
-                  style={{ backgroundImage: `url('${s.img}')` }}
+                  role={s.imageAlt ? "img" : undefined}
+                  aria-label={s.imageAlt ?? undefined}
+                  style={{ backgroundImage: `url('${s.image}')` }}
                 />
                 <h4>{s.name}</h4>
-                <div className="accent" style={{ background: s.color }} />
+                <div className="accent" style={{ background: s.accentStyle }} />
                 <p className="role">
                   <strong>{s.title}</strong>
-                  {s.sub}
+                  {s.subtitle}
                 </p>
                 <p
                   className="role"

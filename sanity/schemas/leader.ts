@@ -2,7 +2,7 @@ import { defineField, defineType } from "sanity";
 
 export default defineType({
   name: "leader",
-  title: "הנהגת המרכז",
+  title: "הנהלת המרכז",
   type: "document",
   fields: [
     defineField({
@@ -72,10 +72,11 @@ export default defineType({
     }),
     defineField({
       name: "displayOrder",
-      title: "סדר תצוגה",
+      title: "סדר תצוגה (אופציונלי)",
+      description:
+        "מספר נמוך יותר = גבוה יותר ברשימה. מנהלים ללא סדר תצוגה יופיעו בסוף.",
       type: "number",
-      initialValue: 99,
-      validation: (r) => r.required().integer().min(1).max(99),
+      validation: (r) => r.integer().min(1).max(99),
     }),
   ],
   orderings: [
