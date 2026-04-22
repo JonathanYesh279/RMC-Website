@@ -32,7 +32,6 @@ type EnsembleCard = {
   name: string;
   instructor: string;
   level: string;
-  framework: string;
   description: string;
 };
 
@@ -228,7 +227,6 @@ export default function ConservatoryContent({
         name: e.name,
         instructor: e.instructor,
         level: e.level,
-        framework: e.framework,
         description: e.description,
       }))
     : smallEnsembles.map((e) => ({
@@ -240,7 +238,6 @@ export default function ConservatoryContent({
         name: e.name,
         instructor: e.lead,
         level: e.level,
-        framework: e.members,
         description: e.desc,
       }));
 
@@ -451,10 +448,6 @@ export default function ConservatoryContent({
                     <div>
                       <dt>רמה</dt>
                       <dd>{e.level}</dd>
-                    </div>
-                    <div>
-                      <dt>מסגרת</dt>
-                      <dd>{e.framework}</dd>
                     </div>
                   </dl>
                   <p>{e.description}</p>

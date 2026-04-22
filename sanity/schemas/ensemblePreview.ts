@@ -24,13 +24,6 @@ export default defineType({
       validation: (r) => r.required().max(60),
     }),
     defineField({
-      name: "framework",
-      title: "מסגרת",
-      description: "למשל: ״שתי קבוצות״, ״4 הרכבים״, ״גיבוש לפי אודישן״",
-      type: "string",
-      validation: (r) => r.required().max(60),
-    }),
-    defineField({
       name: "description",
       title: "תיאור קצר",
       type: "text",
