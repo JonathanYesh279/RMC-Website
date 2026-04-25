@@ -2219,6 +2219,10 @@ body.home-locked .site-footer {
   display: flex;
   gap: 8px;
 }
+.dept-carousel-ctrl--center {
+  justify-content: center;
+  margin-block-start: 8px;
+}
 .dept-nav {
   width: 42px;
   height: 42px;
@@ -2245,12 +2249,8 @@ body.home-locked .site-footer {
 .dept-track {
   display: flex;
   gap: 22px;
+  transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: transform;
-  cursor: grab;
-  user-select: none;
-}
-.dept-track:active {
-  cursor: grabbing;
 }
 .dept-card-t {
   flex: 0 0 calc((100% - 66px) / 4);
