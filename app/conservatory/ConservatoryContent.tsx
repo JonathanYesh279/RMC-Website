@@ -9,6 +9,7 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
+import { motion, type PanInfo } from "motion/react";
 import {
   articles,
   catLabels,
@@ -95,6 +96,7 @@ export default function ConservatoryContent({
   const [teacherIdx, setTeacherIdx] = useState(0);
   const [activeProg, setActiveProg] = useState(0);
   const deptOverlayRef = useRef<HTMLDivElement | null>(null);
+  const deptCarouselRef = useRef<HTMLDivElement | null>(null);
 
   const positionIndicator = useCallback((idx: number) => {
     const btn = buttonsRef.current[idx];
@@ -534,12 +536,31 @@ export default function ConservatoryContent({
                 </div>
                 <div
                   className="dept-carousel"
+                  ref={deptCarouselRef}
                   onMouseEnter={() => setAutoPause(true)}
                   onMouseLeave={() => setAutoPause(false)}
                 >
-                  <div
+                  <motion.div
                     className="dept-track"
-                    style={{ transform: `translateX(${trackPercent}%)` }}
+                    drag="x"
+                    dragElastic={0.08}
+                    dragMomentum={false}
+                    dragConstraints={deptCarouselRef}
+                    onDragStart={() => setAutoPause(true)}
+                    onDragEnd={(_, info: PanInfo) => {
+                      const w = deptCarouselRef.current?.offsetWidth ?? 0;
+                      const visible = Math.min(openTeachers.length || 1, 3);
+                      const stepPx = w / visible;
+                      const threshold = Math.max(60, stepPx * 0.4);
+                      if (info.offset.x > threshold) stepTeacher(1);
+                      else if (info.offset.x < -threshold) stepTeacher(-1);
+                    }}
+                    animate={{ x: `${trackPercent}%` }}
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 0.61, 0.36, 1],
+                    }}
+                    style={{ touchAction: "pan-y" }}
                   >
                     {openTeachers.map((t, i) => (
                       <article
@@ -557,7 +578,7 @@ export default function ConservatoryContent({
                         </div>
                       </article>
                     ))}
-                  </div>
+                  </motion.div>
                 </div>
                 <div className="dept-dots">
                   {openTeachers.map((t, i) => (
