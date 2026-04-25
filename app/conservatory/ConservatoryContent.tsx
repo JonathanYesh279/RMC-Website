@@ -94,6 +94,7 @@ export default function ConservatoryContent({
   const [openDeptKey, setOpenDeptKey] = useState<string | null>(null);
   const [teacherIdx, setTeacherIdx] = useState(0);
   const [activeProg, setActiveProg] = useState(0);
+  const deptOverlayRef = useRef<HTMLDivElement | null>(null);
 
   const positionIndicator = useCallback((idx: number) => {
     const btn = buttonsRef.current[idx];
@@ -207,10 +208,13 @@ export default function ConservatoryContent({
 
   useEffect(() => {
     if (!openDeptKey) return;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    const id = requestAnimationFrame(() => {
+      const el = deptOverlayRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top, behavior: "smooth" });
+    });
+    return () => cancelAnimationFrame(id);
   }, [openDeptKey]);
 
   useEffect(() => {
@@ -406,6 +410,184 @@ export default function ConservatoryContent({
                 </div>
               </article>
             ))}
+          </div>
+
+          {/* Department detail — inline expanding panel */}
+          <div
+            ref={deptOverlayRef}
+            className={`dept-overlay ${openDeptKey ? "is-open" : ""}`}
+          >
+            <div className="dept-sheet" role="dialog" aria-modal="false">
+              <button
+                type="button"
+                className="dept-close"
+                aria-label="סגירה"
+                onClick={handleCloseDept}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M6 6l12 12M18 6L6 18"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+              <div className="dept-hero">
+                <div
+                  className="dept-hero-img"
+                  style={
+                    openDept
+                      ? { backgroundImage: `url('${openDept.img}')` }
+                      : undefined
+                  }
+                />
+                <div className="dept-hero-scrim" />
+                <div className="dept-hero-body">
+                  <span className="eyebrow" style={{ color: "#fcbc40" }}>
+                    <span
+                      className="eyebrow-dot"
+                      style={{ background: "#fcbc40" }}
+                    />
+                    מחלקה
+                  </span>
+                  <h2 className="dept-hero-title">{openDept?.name}</h2>
+                  <p className="dept-hero-desc">{openDept?.desc}</p>
+                  <dl className="dept-facts">
+                    <div>
+                      <dt>ראש המחלקה</dt>
+                      <dd>{openDetail?.lead || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>גילאים</dt>
+                      <dd>{openDetail?.ages || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>חללי אימון</dt>
+                      <dd>{openDetail?.rooms || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt>תלמידים</dt>
+                      <dd>{openDept?.count || "—"}</dd>
+                    </div>
+                  </dl>
+                </div>
+              </div>
+
+              <div className="dept-section">
+                <div className="dept-section-head">
+                  <div>
+                    <div className="eyebrow">
+                      <span className="eyebrow-dot" />
+                      הסגל
+                    </div>
+                    <h3>המורים של המחלקה</h3>
+                  </div>
+                  <div className="dept-carousel-ctrl">
+                    <button
+                      type="button"
+                      className="dept-nav"
+                      aria-label="הקודם"
+                      onClick={() => {
+                        stepTeacher(-1);
+                        setAutoPause(false);
+                      }}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M15 6l-6 6 6 6"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className="dept-nav"
+                      aria-label="הבא"
+                      onClick={() => {
+                        stepTeacher(1);
+                        setAutoPause(false);
+                      }}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M9 6l6 6-6 6"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div
+                  className="dept-carousel"
+                  onMouseEnter={() => setAutoPause(true)}
+                  onMouseLeave={() => setAutoPause(false)}
+                >
+                  <div
+                    className="dept-track"
+                    style={{ transform: `translateX(${trackPercent}%)` }}
+                  >
+                    {openTeachers.map((t, i) => (
+                      <article
+                        key={`${t.name}-${i}`}
+                        className={`dept-card-t ${i === teacherIdx ? "is-center" : ""}`}
+                      >
+                        <div
+                          className="dept-card-img"
+                          style={{ backgroundImage: `url('${t.img}')` }}
+                        />
+                        <div className="dept-card-body">
+                          <h4>{t.name}</h4>
+                          <span className="dept-card-role">{t.role}</span>
+                          <p>{t.bio}</p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+                <div className="dept-dots">
+                  {openTeachers.map((t, i) => (
+                    <button
+                      key={`${t.name}-dot-${i}`}
+                      type="button"
+                      className={`dept-dot ${i === teacherIdx ? "is-active" : ""}`}
+                      aria-label={`מורה ${i + 1}`}
+                      onClick={() => {
+                        setTeacherIdx(i);
+                        setAutoPause(false);
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="dept-section dept-highlights-wrap">
+                <div className="eyebrow">
+                  <span className="eyebrow-dot" />
+                  מאפיינים
+                </div>
+                <h3>מה מייחד את המחלקה</h3>
+                <ul className="dept-highlights">
+                  {(openDetail?.highlights ?? []).map((h) => (
+                    <li key={h}>{h}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -929,173 +1111,6 @@ export default function ConservatoryContent({
         </div>
       </div>
 
-      {/* Department detail overlay */}
-      <div
-        className={`dept-overlay ${openDeptKey ? "is-open" : ""}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) handleCloseDept();
-        }}
-      >
-        <button
-          type="button"
-          className="dept-close"
-          aria-label="סגירה"
-          onClick={handleCloseDept}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M6 6l12 12M18 6L6 18"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-        <div className="dept-sheet" role="dialog" aria-modal="true">
-          <div className="dept-hero">
-            <div
-              className="dept-hero-img"
-              style={
-                openDept ? { backgroundImage: `url('${openDept.img}')` } : undefined
-              }
-            />
-            <div className="dept-hero-scrim" />
-            <div className="dept-hero-body">
-              <span className="eyebrow" style={{ color: "#fcbc40" }}>
-                <span
-                  className="eyebrow-dot"
-                  style={{ background: "#fcbc40" }}
-                />
-                מחלקה
-              </span>
-              <h2 className="dept-hero-title">{openDept?.name}</h2>
-              <p className="dept-hero-desc">{openDept?.desc}</p>
-              <dl className="dept-facts">
-                <div>
-                  <dt>ראש המחלקה</dt>
-                  <dd>{openDetail?.lead || "—"}</dd>
-                </div>
-                <div>
-                  <dt>גילאים</dt>
-                  <dd>{openDetail?.ages || "—"}</dd>
-                </div>
-                <div>
-                  <dt>חללי אימון</dt>
-                  <dd>{openDetail?.rooms || "—"}</dd>
-                </div>
-                <div>
-                  <dt>תלמידים</dt>
-                  <dd>{openDept?.count || "—"}</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          <div className="dept-section">
-            <div className="dept-section-head">
-              <div>
-                <div className="eyebrow">
-                  <span className="eyebrow-dot" />
-                  הסגל
-                </div>
-                <h3>המורים של המחלקה</h3>
-              </div>
-              <div className="dept-carousel-ctrl">
-                <button
-                  type="button"
-                  className="dept-nav"
-                  aria-label="הקודם"
-                  onClick={() => {
-                    stepTeacher(-1);
-                    setAutoPause(false);
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M15 6l-6 6 6 6"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  className="dept-nav"
-                  aria-label="הבא"
-                  onClick={() => {
-                    stepTeacher(1);
-                    setAutoPause(false);
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M9 6l6 6-6 6"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div
-              className="dept-carousel"
-              onMouseEnter={() => setAutoPause(true)}
-              onMouseLeave={() => setAutoPause(false)}
-            >
-              <div
-                className="dept-track"
-                style={{ transform: `translateX(${trackPercent}%)` }}
-              >
-                {openTeachers.map((t, i) => (
-                  <article
-                    key={`${t.name}-${i}`}
-                    className={`dept-card-t ${i === teacherIdx ? "is-center" : ""}`}
-                  >
-                    <div
-                      className="dept-card-img"
-                      style={{ backgroundImage: `url('${t.img}')` }}
-                    />
-                    <div className="dept-card-body">
-                      <h4>{t.name}</h4>
-                      <span className="dept-card-role">{t.role}</span>
-                      <p>{t.bio}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-            <div className="dept-dots">
-              {openTeachers.map((t, i) => (
-                <button
-                  key={`${t.name}-dot-${i}`}
-                  type="button"
-                  className={`dept-dot ${i === teacherIdx ? "is-active" : ""}`}
-                  aria-label={`מורה ${i + 1}`}
-                  onClick={() => {
-                    setTeacherIdx(i);
-                    setAutoPause(false);
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="dept-section dept-highlights-wrap">
-            <div className="eyebrow">
-              <span className="eyebrow-dot" />
-              מאפיינים
-            </div>
-            <h3>מה מייחד את המחלקה</h3>
-            <ul className="dept-highlights">
-              {(openDetail?.highlights ?? []).map((h) => (
-                <li key={h}>{h}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
     </>
   );
 }
