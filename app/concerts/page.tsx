@@ -223,9 +223,9 @@ export default function ConcertsPage() {
                   const tag = genreTag[c.genre];
                   return (
                     <a
-                      key={`${c.m}-${c.d}-${c.title}`}
+                      key={c.slug}
                       className="concert-row reveal"
-                      href="#"
+                      href={`/concerts/${c.slug}`}
                     >
                       <div
                         className="img"
