@@ -3,15 +3,19 @@ import { SINGLETON_IDS } from "./schemas";
 
 export const structure: StructureResolver = (S) =>
   S.list()
+    .id("root")
     .title("תוכן האתר")
     .items([
       S.listItem()
+        .id("section-concerts")
         .title("🎵 קונצרטים")
         .child(
           S.list()
+            .id("concerts-section")
             .title("קונצרטים")
             .items([
               S.listItem()
+                .id("all-concerts")
                 .title("כל הקונצרטים")
                 .schemaType("concert")
                 .child(
@@ -21,16 +25,16 @@ export const structure: StructureResolver = (S) =>
                 ),
               S.divider(),
               S.listItem()
-                .title("⚙️ עמוד הרשימה")
                 .id("concertsPage")
+                .title("⚙️ עמוד הרשימה")
                 .child(
                   S.document()
                     .schemaType("concertsPage")
                     .documentId(SINGLETON_IDS.concertsPage),
                 ),
               S.listItem()
-                .title("⚙️ טקסטים — עמוד פרטי קונצרט")
                 .id("concertCopy")
+                .title("⚙️ טקסטים — עמוד פרטי קונצרט")
                 .child(
                   S.document()
                     .schemaType("concertCopy")
@@ -40,29 +44,37 @@ export const structure: StructureResolver = (S) =>
         ),
       S.divider(),
       S.listItem()
+        .id("section-conservatory")
         .title("🎓 קונסרבטוריון")
         .child(
           S.list()
+            .id("conservatory-section")
             .title("קונסרבטוריון")
             .items([
               S.listItem()
-                .title("⚙️ וידאו בכותרת")
                 .id("conservatoryHero")
+                .title("⚙️ וידאו בכותרת")
                 .child(
                   S.document()
                     .schemaType("conservatoryHero")
                     .documentId(SINGLETON_IDS.conservatoryHero),
                 ),
               S.divider(),
-              S.documentTypeListItem("ensemblePreview").title("הרכבים — כרטיסי תצוגה"),
-              S.documentTypeListItem("ensembleInstructor").title("הרכבים — מנחים"),
+              S.documentTypeListItem("ensemblePreview").title(
+                "הרכבים — כרטיסי תצוגה",
+              ),
+              S.documentTypeListItem("ensembleInstructor").title(
+                "הרכבים — מנחים",
+              ),
             ]),
         ),
       S.divider(),
       S.listItem()
+        .id("section-people")
         .title("👥 הנהלה ומורים")
         .child(
           S.list()
+            .id("people-section")
             .title("הנהלה ומורים")
             .items([
               S.documentTypeListItem("leader").title("הנהלת המרכז"),
