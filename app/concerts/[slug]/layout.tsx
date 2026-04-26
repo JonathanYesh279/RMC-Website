@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
+import { fetchConcerts } from "@/sanity/fetch";
 import {
-  concertDateLabels,
-  concerts,
-  findConcertBySlug,
-} from "../concerts-data";
-
-export async function generateStaticParams() {
-  return concerts.map((c) => ({ slug: c.slug }));
-}
+  CONCERT_BY_SLUG_QUERY,
+  type ConcertDoc,
+} from "@/sanity/queries";
+import { formatConcertDate } from "@/lib/concertDate";
 
 export async function generateMetadata({
   params,
@@ -15,16 +12,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const concert = findConcertBySlug(slug);
+  const concert = await fetchConcerts<ConcertDoc | null>(
+    CONCERT_BY_SLUG_QUERY,
+    { slug },
+  );
   if (!concert) {
-    return {
-      title: "קונצרט לא נמצא · מרכז המוסיקה רעננה",
-    };
+    return { title: "קונצרט לא נמצא · מרכז המוסיקה רעננה" };
   }
-  const dates = concertDateLabels(concert);
+  const date = formatConcertDate(concert.date);
   return {
     title: `${concert.title} · רכישת כרטיסים · מרכז המוסיקה רעננה`,
-    description: `${concert.desc} ${dates.shortDate}, ${concert.t} · ${concert.venue}.`,
+    description: `${concert.shortDescription} ${date.shortDate}, ${date.time} · ${concert.venue}.`,
   };
 }
 

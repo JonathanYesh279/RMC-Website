@@ -103,3 +103,131 @@ export type ConservatoryHeroDoc = {
   posterUrl: string | null;
   posterAlt: string | null;
 } | null;
+
+const CONCERT_PROJECTION = `
+  _id,
+  title,
+  "slug": slug.current,
+  genre,
+  highlightBadge,
+  date,
+  venue,
+  "image": {
+    "url": image.asset->url,
+    "alt": image.alt,
+    "width": image.asset->metadata.dimensions.width,
+    "height": image.asset->metadata.dimensions.height,
+    "lqip": image.asset->metadata.lqip
+  },
+  shortDescription,
+  lede,
+  basePrice,
+  availability,
+  duration,
+  language,
+  program[]{ work, composer }
+`;
+
+export const CONCERTS_LIST_QUERY = defineQuery(`
+  *[_type == "concert" && defined(slug.current) && dateTime(date) >= dateTime(now())]
+    | order(date asc) {
+    ${CONCERT_PROJECTION}
+  }
+`);
+
+export const CONCERTS_PAGE_QUERY = defineQuery(`
+  *[_type == "concertsPage" && _id == "concertsPage"][0] {
+    featuredEyebrow,
+    featuredBlurb,
+    primaryCtaLabel,
+    secondaryCtaLabel,
+    dateRangeLabel,
+    subEyebrow,
+    subTitle,
+    subTitleEm,
+    subBody,
+    subTiers[]{ title, body, price },
+    "featured": featured->{
+      ${CONCERT_PROJECTION}
+    }
+  }
+`);
+
+export const CONCERT_BY_SLUG_QUERY = defineQuery(`
+  *[_type == "concert" && slug.current == $slug][0] {
+    ${CONCERT_PROJECTION}
+  }
+`);
+
+export const CONCERT_SLUGS_QUERY = defineQuery(`
+  *[_type == "concert" && defined(slug.current) && dateTime(date) >= dateTime(now())].slug.current
+`);
+
+export const CONCERT_COPY_QUERY = defineQuery(`
+  *[_type == "concertCopy" && _id == "concertCopy"][0] {
+    purchaseEyebrow,
+    purchaseTitle,
+    accessibilityNote,
+    secureNote,
+    cancellationNote
+  }
+`);
+
+export type ConcertImage = {
+  url: string;
+  alt: string | null;
+  width: number | null;
+  height: number | null;
+  lqip: string | null;
+};
+
+export type ProgramItemDoc = {
+  work: string;
+  composer: string;
+};
+
+export type ConcertDoc = {
+  _id: string;
+  title: string;
+  slug: string;
+  genre: "classical" | "jazz" | "israeli" | "kids";
+  highlightBadge: string | null;
+  date: string;
+  venue: string;
+  image: ConcertImage;
+  shortDescription: string;
+  lede: string;
+  basePrice: number;
+  availability: "open" | "hot" | "full";
+  duration: string | null;
+  language: string | null;
+  program: ProgramItemDoc[] | null;
+};
+
+export type SubscriptionTierDoc = {
+  title: string;
+  body: string;
+  price: string;
+};
+
+export type ConcertsPageDoc = {
+  featuredEyebrow: string | null;
+  featuredBlurb: string | null;
+  primaryCtaLabel: string | null;
+  secondaryCtaLabel: string | null;
+  dateRangeLabel: string | null;
+  subEyebrow: string | null;
+  subTitle: string | null;
+  subTitleEm: string | null;
+  subBody: string | null;
+  subTiers: SubscriptionTierDoc[] | null;
+  featured: ConcertDoc | null;
+} | null;
+
+export type ConcertCopyDoc = {
+  purchaseEyebrow: string | null;
+  purchaseTitle: string | null;
+  accessibilityNote: string | null;
+  secureNote: string | null;
+  cancellationNote: string | null;
+} | null;

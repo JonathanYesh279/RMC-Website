@@ -1,7 +1,8 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
-import { schemaTypes } from "./sanity/schemas";
+import { SINGLETON_TYPES, schemaTypes } from "./sanity/schemas";
+import { structure } from "./sanity/structure";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? "production";
@@ -18,7 +19,26 @@ export default defineConfig({
   projectId,
   dataset,
   basePath: "/studio",
-  plugins: [structureTool(), visionTool()],
-  schema: { types: schemaTypes },
+  plugins: [structureTool({ structure }), visionTool()],
+  schema: {
+    types: schemaTypes,
+    templates: (templates) =>
+      templates.filter(({ schemaType }) => !SINGLETON_TYPES.has(schemaType)),
+  },
+  document: {
+    actions: (input, { schemaType }) =>
+      SINGLETON_TYPES.has(schemaType)
+        ? input.filter(
+            ({ action }) =>
+              action !== "duplicate" &&
+              action !== "delete" &&
+              action !== "unpublish",
+          )
+        : input,
+    newDocumentOptions: (prev, { creationContext }) =>
+      creationContext.type === "global"
+        ? prev.filter((tpl) => !SINGLETON_TYPES.has(tpl.templateId))
+        : prev,
+  },
   releases: { enabled: false },
 });
