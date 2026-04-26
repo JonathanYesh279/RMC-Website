@@ -10,6 +10,9 @@ import {
 type Copy = {
   purchaseEyebrow: string;
   purchaseTitle: string;
+  buyerDetailsHeading: string;
+  orderSummaryHeading: string;
+  payCtaLabel: string;
   accessibilityNote: string;
   secureNote: string;
   cancellationNote: string;
@@ -155,7 +158,7 @@ export default function TicketPurchase({
             </div>
 
             <div className="form-section reveal">
-              <h3>פרטי הרוכש</h3>
+              <h3>{copy.buyerDetailsHeading}</h3>
               <div className="form-grid">
                 <div className="field">
                   <label htmlFor="cd-first">
@@ -228,8 +231,11 @@ export default function TicketPurchase({
             </div>
           </div>
 
-          <aside className="order-summary reveal" aria-label="סיכום הזמנה">
-            <h3>סיכום הזמנה</h3>
+          <aside
+            className="order-summary reveal"
+            aria-label={copy.orderSummaryHeading}
+          >
+            <h3>{copy.orderSummaryHeading}</h3>
             <div className="os-concert">
               <div
                 className="os-thumb"
@@ -277,7 +283,7 @@ export default function TicketPurchase({
                 <path d="M2 9h16" />
                 <path d="M6 13h3" />
               </svg>
-              המשך לתשלום בכרטיס אשראי
+              {copy.payCtaLabel}
             </button>
 
             <div className="os-secure">

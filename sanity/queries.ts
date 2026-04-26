@@ -170,8 +170,13 @@ export const CONCERT_SLUGS_QUERY = defineQuery(`
 
 export const CONCERT_COPY_QUERY = defineQuery(`
   *[_type == "concertCopy" && _id == "concertCopy"][0] {
+    programHeading,
+    upcomingChip,
     purchaseEyebrow,
     purchaseTitle,
+    buyerDetailsHeading,
+    orderSummaryHeading,
+    payCtaLabel,
     accessibilityNote,
     secureNote,
     cancellationNote
@@ -237,8 +242,13 @@ export type ConcertsPageDoc = {
 } | null;
 
 export type ConcertCopyDoc = {
+  programHeading: string | null;
+  upcomingChip: string | null;
   purchaseEyebrow: string | null;
   purchaseTitle: string | null;
+  buyerDetailsHeading: string | null;
+  orderSummaryHeading: string | null;
+  payCtaLabel: string | null;
   accessibilityNote: string | null;
   secureNote: string | null;
   cancellationNote: string | null;

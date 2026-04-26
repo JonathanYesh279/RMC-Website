@@ -148,7 +148,7 @@ export default async function ConcertDetailPage({
               </div>
 
               <div className="detail-program reveal">
-                <h3>תוכנייה</h3>
+                <h3>{copy?.programHeading ?? "תוכנייה"}</h3>
                 <ul>
                   {program.map((p, i) => (
                     <li key={`${p.composer}-${p.work}-${i}`}>
@@ -162,7 +162,9 @@ export default async function ConcertDetailPage({
 
             <div>
               <div className="detail-date-card reveal">
-                <div className="ddc-chip">הקונצרט הקרוב</div>
+                <div className="ddc-chip">
+                  {copy?.upcomingChip ?? "הקונצרט הקרוב"}
+                </div>
                 <div className="ddc-num">{date.day}</div>
                 <div className="ddc-mo">{date.monthFull}</div>
                 <div className="ddc-day">{date.dayName}</div>
@@ -184,6 +186,12 @@ export default async function ConcertDetailPage({
           purchaseEyebrow: copy?.purchaseEyebrow ?? "רכישת כרטיסים",
           purchaseTitle:
             copy?.purchaseTitle ?? "בחרו כרטיסים והשלימו הזמנה",
+          buyerDetailsHeading:
+            copy?.buyerDetailsHeading ?? "פרטי הרוכש",
+          orderSummaryHeading:
+            copy?.orderSummaryHeading ?? "סיכום הזמנה",
+          payCtaLabel:
+            copy?.payCtaLabel ?? "המשך לתשלום בכרטיס אשראי",
           accessibilityNote:
             copy?.accessibilityNote ??
             "המרכז מונגש לבעלי מוגבלויות. לסיוע בהזמנה ניתן לפנות אלינו.",
