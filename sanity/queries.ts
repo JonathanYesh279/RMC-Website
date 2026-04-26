@@ -83,3 +83,23 @@ export type LeaderDoc = {
   imageUrl: string | null;
   imageAlt: string | null;
 };
+
+export const CONSERVATORY_HERO_QUERY = defineQuery(`
+  *[_type == "conservatoryHero"][0] {
+    headline,
+    headlineEm,
+    lede,
+    "videoUrl": video.asset->url,
+    "posterUrl": poster.asset->url,
+    "posterAlt": poster.alt
+  }
+`);
+
+export type ConservatoryHeroDoc = {
+  headline: string | null;
+  headlineEm: string | null;
+  lede: string | null;
+  videoUrl: string | null;
+  posterUrl: string | null;
+  posterAlt: string | null;
+} | null;

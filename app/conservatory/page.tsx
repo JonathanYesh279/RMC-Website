@@ -1,9 +1,11 @@
 import { sanityClient } from "@/sanity/client";
 import {
+  CONSERVATORY_HERO_QUERY,
   ENSEMBLE_INSTRUCTORS_QUERY,
   ENSEMBLE_PREVIEWS_QUERY,
   FORMS_QUERY,
   LEADERS_QUERY,
+  type ConservatoryHeroDoc,
   type EnsembleInstructorDoc,
   type EnsemblePreview,
   type FormDoc,
@@ -12,7 +14,7 @@ import {
 import ConservatoryContent from "./ConservatoryContent";
 
 export default async function ConservatoryPage() {
-  const [forms, ensemblePreviews, ensembleInstructorDocs, leaderDocs] =
+  const [forms, ensemblePreviews, ensembleInstructorDocs, leaderDocs, hero] =
     await Promise.all([
       sanityClient.fetch<FormDoc[]>(
         FORMS_QUERY,
@@ -34,6 +36,11 @@ export default async function ConservatoryPage() {
         {},
         { next: { revalidate: 60, tags: ["leader"] } },
       ),
+      sanityClient.fetch<ConservatoryHeroDoc>(
+        CONSERVATORY_HERO_QUERY,
+        {},
+        { next: { revalidate: 60, tags: ["conservatoryHero"] } },
+      ),
     ]);
 
   return (
@@ -42,6 +49,7 @@ export default async function ConservatoryPage() {
       ensemblePreviews={ensemblePreviews}
       ensembleInstructorDocs={ensembleInstructorDocs}
       leaderDocs={leaderDocs}
+      hero={hero}
     />
   );
 }

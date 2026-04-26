@@ -3,6 +3,7 @@ import leader from "./leader";
 import formDocument from "./formDocument";
 import ensemblePreview from "./ensemblePreview";
 import ensembleInstructor from "./ensembleInstructor";
+import conservatoryHero from "./conservatoryHero";
 
 export const schemaTypes = [
   teacher,
@@ -10,4 +11,5 @@ export const schemaTypes = [
   formDocument,
   ensemblePreview,
   ensembleInstructor,
+  conservatoryHero,
 ];

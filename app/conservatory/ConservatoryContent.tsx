@@ -22,6 +22,7 @@ import {
   staff as fallbackStaff,
 } from "./conservatory-data";
 import type {
+  ConservatoryHeroDoc,
   EnsembleInstructorDoc,
   EnsemblePreview,
   FormDoc,
@@ -79,11 +80,13 @@ export default function ConservatoryContent({
   ensemblePreviews,
   ensembleInstructorDocs,
   leaderDocs,
+  hero,
 }: {
   forms: FormDoc[];
   ensemblePreviews: EnsemblePreview[];
   ensembleInstructorDocs: EnsembleInstructorDoc[];
   leaderDocs: LeaderDoc[];
+  hero: ConservatoryHeroDoc;
 }) {
   const [active, setActive] = useState(0);
   const [indicator, setIndicator] = useState({ width: 0, tx: 0 });
@@ -320,22 +323,45 @@ export default function ConservatoryContent({
 
   return (
     <>
-      <section className="page-hero">
+      <section
+        className={`page-hero${hero?.videoUrl ? " page-hero--video" : ""}`}
+      >
+        {hero?.videoUrl ? (
+          <div className="page-hero-media" aria-hidden="true">
+            {hero.posterUrl ? (
+              <img
+                className="page-hero-poster"
+                src={hero.posterUrl}
+                alt=""
+              />
+            ) : null}
+            <video
+              className="page-hero-video"
+              src={hero.videoUrl}
+              poster={hero.posterUrl ?? undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+            <div className="page-hero-scrim" />
+          </div>
+        ) : null}
         <div className="container">
           <div className="reveal">
             <div className="crumbs">
               דף הבית · <span>קונסרבטוריון</span>
             </div>
             <h1>
-              חינוך מוסיקלי
+              {hero?.headline ?? "חינוך מוסיקלי"}
               <br />
-              <em>למצוינות</em>
+              <em>{hero?.headlineEm ?? "למצוינות"}</em>
             </h1>
           </div>
           <p className="lede reveal">
-            הקונסרבטוריון של מרכז פיס למוסיקה רעננה הוא הגדול בישראל — חממה
-            ל-1,300 תלמידים משש מחלקות נגינה, חמישה הרכבים ייצוגיים, ומסלולי
-            לימוד מגיל 5 ועד הכנה לבגרות ולאקדמיה.
+            {hero?.lede ??
+              "הקונסרבטוריון של מרכז פיס למוסיקה רעננה הוא הגדול בישראל — חממה ל-1,300 תלמידים משש מחלקות נגינה, חמישה הרכבים ייצוגיים, ומסלולי לימוד מגיל 5 ועד הכנה לבגרות ולאקדמיה."}
           </p>
         </div>
       </section>
