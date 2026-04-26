@@ -12,6 +12,7 @@ export default defineType({
     { name: "copy", title: "ד. טקסטים שמופיעים בכרטיס ובעמוד" },
     { name: "tickets", title: "ה. מחירים וכרטיסים" },
     { name: "program", title: "ו. תוכנית הקונצרט" },
+    { name: "hero", title: "ז. וידאו רקע לעמוד הקונצרט (אופציונלי)" },
   ],
   fields: [
     // ── א. מידע ראשי ──────────────────────────────────────────────
@@ -214,6 +215,40 @@ export default defineType({
           preview: {
             select: { title: "work", subtitle: "composer" },
           },
+        }),
+      ],
+    }),
+
+    // ── ז. וידאו רקע לעמוד הקונצרט ─────────────────────────────────
+    defineField({
+      name: "heroVideo",
+      title: "וידאו רקע ללולאה (אופציונלי)",
+      description:
+        "וידאו קצר שמתנגן בלולאה אינסופית ברקע של עמוד הקונצרט, מאחורי תמונת הקונצרט והכרטיס. מומלץ: 720p, 16:9, פחות מ-20MB, ללא סאונד, עד 20 שניות, ללא Fade-out בסוף. אם לא יוזן, יוצג הרקע המטושטש הקיים.",
+      type: "file",
+      group: "hero",
+      options: { accept: "video/mp4" },
+    }),
+    defineField({
+      name: "heroPoster",
+      title: "תמונת פוסטר לוידאו (אופציונלי)",
+      description:
+        "מוצגת לפני שהווידאו נטען, במכשירים ניידים, ובמצב חיסכון בנתונים. אם לא תוזן, תוצג תמונת הקונצרט הראשית כפוסטר.",
+      type: "image",
+      group: "hero",
+      options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "טקסט חלופי",
+          type: "string",
+          validation: (r) =>
+            r.max(160).custom((alt, ctx) => {
+              const parent = ctx.parent as { asset?: unknown } | undefined;
+              if (parent?.asset && !alt)
+                return "חובה להוסיף טקסט חלופי כשהועלתה תמונה";
+              return true;
+            }),
         }),
       ],
     }),

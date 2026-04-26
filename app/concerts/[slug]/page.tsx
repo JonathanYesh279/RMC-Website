@@ -64,13 +64,46 @@ export default async function ConcertDetailPage({
   const heroImg = sanityImageUrl(concert.image.url, { w: 1600 });
   const thumbImg = sanityImageUrl(concert.image.url, { w: 240 });
 
+  const heroVideoUrl = concert.heroVideoUrl ?? null;
+  const heroPosterUrl = heroVideoUrl
+    ? sanityImageUrl(concert.heroPoster?.url ?? concert.image.url, {
+        w: 2000,
+        q: 70,
+      })
+    : null;
+
   return (
     <>
-      <section className="detail-hero">
-        <div
-          className="detail-bg"
-          style={{ backgroundImage: `url('${heroBg}')` }}
-        />
+      <section
+        className={`detail-hero${heroVideoUrl ? " detail-hero--video" : ""}`}
+      >
+        {heroVideoUrl ? (
+          <div className="detail-hero-media" aria-hidden="true">
+            {heroPosterUrl ? (
+              <img
+                className="detail-hero-poster"
+                src={heroPosterUrl}
+                alt=""
+              />
+            ) : null}
+            <video
+              className="detail-hero-video"
+              src={heroVideoUrl}
+              poster={heroPosterUrl ?? undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
+            <div className="detail-hero-scrim" />
+          </div>
+        ) : (
+          <div
+            className="detail-bg"
+            style={{ backgroundImage: `url('${heroBg}')` }}
+          />
+        )}
         <div className="detail-shell container">
           <nav className="detail-crumbs reveal" aria-label="פירורי לחם">
             <Link href="/">{CONCERT_DEFAULTS.crumbs.home}</Link> /{" "}

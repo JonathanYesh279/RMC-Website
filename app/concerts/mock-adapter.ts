@@ -60,6 +60,8 @@ export function mockToConcertDoc(c: Concert): ConcertDoc {
     duration: c.duration ?? null,
     language: c.language ?? null,
     program: c.program ?? null,
+    heroVideoUrl: null,
+    heroPoster: null,
   };
 }
 

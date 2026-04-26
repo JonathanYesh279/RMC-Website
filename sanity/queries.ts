@@ -125,7 +125,12 @@ const CONCERT_PROJECTION = `
   availability,
   duration,
   language,
-  program[]{ work, composer }
+  program[]{ work, composer },
+  "heroVideoUrl": heroVideo.asset->url,
+  "heroPoster": {
+    "url": heroPoster.asset->url,
+    "alt": heroPoster.alt
+  }
 `;
 
 export const CONCERTS_LIST_QUERY = defineQuery(`
@@ -186,6 +191,11 @@ export type ProgramItemDoc = {
   composer: string;
 };
 
+export type ConcertHeroPoster = {
+  url: string | null;
+  alt: string | null;
+} | null;
+
 export type ConcertDoc = {
   _id: string;
   title: string;
@@ -202,6 +212,8 @@ export type ConcertDoc = {
   duration: string | null;
   language: string | null;
   program: ProgramItemDoc[] | null;
+  heroVideoUrl: string | null;
+  heroPoster: ConcertHeroPoster;
 };
 
 export type SubscriptionTierDoc = {
