@@ -11,17 +11,9 @@ import { sanityImageUrl } from "@/lib/sanityImage";
 import ConcertsList, {
   type ConcertCard,
 } from "./ConcertsList";
+import { mockConcertDocs, mockPageDoc } from "./mock-adapter";
 
 export const revalidate = 60;
-
-const FALLBACK = {
-  featuredEyebrow: "הקונצרט הקרוב",
-  primaryCtaLabel: "לרכישת כרטיסים",
-  secondaryCtaLabel: "קרא עוד על הקונצרט",
-  subEyebrow: "מנויי עונה",
-  subTitle: "עונה שלמה של",
-  subTitleEm: "מוסיקה חיה.",
-};
 
 function toCard(c: ConcertDoc): ConcertCard {
   const d = formatConcertDate(c.date);
@@ -44,32 +36,45 @@ function toCard(c: ConcertDoc): ConcertCard {
 }
 
 export default async function ConcertsPage() {
-  const [concerts, page] = await Promise.all([
+  const [sanityConcerts, sanityPage] = await Promise.all([
     fetchConcerts<ConcertDoc[]>(CONCERTS_LIST_QUERY),
     fetchConcerts<ConcertsPageDoc>(CONCERTS_PAGE_QUERY),
   ]);
 
+  // Per-section fallback: until editors create real content in Sanity,
+  // the page keeps rendering the original mock list and bands.
+  const concerts: ConcertDoc[] =
+    sanityConcerts.length > 0 ? sanityConcerts : mockConcertDocs;
+
+  const fallbackPage = mockPageDoc();
+  const page: NonNullable<ConcertsPageDoc> = sanityPage ?? fallbackPage;
+
+  // Featured priority: explicit upcoming pick → first upcoming concert
+  // (Sanity if any, else mock) → none.
+  const now = new Date();
+  const isUpcoming = (c: ConcertDoc) => new Date(c.date) >= now;
+  const featuredConcert: ConcertDoc | null = (() => {
+    if (page.featured && isUpcoming(page.featured)) return page.featured;
+    const firstUpcoming = concerts.find(isUpcoming);
+    if (firstUpcoming) return firstUpcoming;
+    return fallbackPage.featured && isUpcoming(fallbackPage.featured)
+      ? fallbackPage.featured
+      : null;
+  })();
+
   const cards = concerts.map(toCard);
   const dateRangeLabel =
-    page?.dateRangeLabel || deriveDateRangeLabel(concerts.map((c) => c.date));
-
-  const featuredConcert =
-    page?.featured && new Date(page.featured.date) >= new Date()
-      ? page.featured
-      : null;
+    page.dateRangeLabel || deriveDateRangeLabel(concerts.map((c) => c.date));
 
   const featuredDate = featuredConcert
     ? formatConcertDate(featuredConcert.date)
     : null;
   const featuredBlurb =
-    page?.featuredBlurb || featuredConcert?.lede || "";
-  const primaryCtaLabel = page?.primaryCtaLabel ?? FALLBACK.primaryCtaLabel;
-  const secondaryCtaLabel =
-    page?.secondaryCtaLabel ?? FALLBACK.secondaryCtaLabel;
-  const featuredEyebrow = page?.featuredEyebrow ?? FALLBACK.featuredEyebrow;
+    page.featuredBlurb || featuredConcert?.lede || "";
 
-  const showSubBand =
-    page && (page.subTitle || page.subBody || page.subTiers?.length);
+  const showSubBand = Boolean(
+    page.subTitle || page.subBody || (page.subTiers && page.subTiers.length),
+  );
 
   return (
     <main>
@@ -79,7 +84,7 @@ export default async function ConcertsPage() {
             <div className="sec-head reveal">
               <div className="eyebrow">
                 <span className="eyebrow-dot" />
-                {featuredEyebrow}
+                {page.featuredEyebrow ?? "הקונצרט הקרוב"}
               </div>
             </div>
             <div className="featured-inner">
@@ -134,13 +139,14 @@ export default async function ConcertsPage() {
                     href={`/concerts/${featuredConcert.slug}#tickets`}
                     className="btn btn--coral"
                   >
-                    {primaryCtaLabel} — ₪{featuredConcert.basePrice}
+                    {page.primaryCtaLabel ?? "לרכישת כרטיסים"} — ₪
+                    {featuredConcert.basePrice}
                   </a>
                   <a
                     href={`/concerts/${featuredConcert.slug}`}
                     className="btn btn--outline"
                   >
-                    {secondaryCtaLabel}
+                    {page.secondaryCtaLabel ?? "קרא עוד על הקונצרט"}
                   </a>
                 </div>
               </div>
@@ -157,16 +163,16 @@ export default async function ConcertsPage() {
             <div className="reveal">
               <div className="eyebrow sub-eyebrow">
                 <span className="eyebrow-dot" />
-                {page?.subEyebrow ?? FALLBACK.subEyebrow}
+                {page.subEyebrow ?? "מנויי עונה"}
               </div>
               <h2>
-                {page?.subTitle ?? FALLBACK.subTitle}
+                {page.subTitle ?? "עונה שלמה של"}
                 <br />
-                <em>{page?.subTitleEm ?? FALLBACK.subTitleEm}</em>
+                <em>{page.subTitleEm ?? "מוסיקה חיה."}</em>
               </h2>
-              {page?.subBody ? <p>{page.subBody}</p> : null}
+              {page.subBody ? <p>{page.subBody}</p> : null}
             </div>
-            {page?.subTiers && page.subTiers.length > 0 ? (
+            {page.subTiers && page.subTiers.length > 0 ? (
               <div className="sub-tiers reveal">
                 {page.subTiers.map((tier) => (
                   <div className="sub-tier" key={tier.title}>
@@ -188,4 +194,3 @@ export default async function ConcertsPage() {
     </main>
   );
 }
-

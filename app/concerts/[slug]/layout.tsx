@@ -5,6 +5,7 @@ import {
   type ConcertDoc,
 } from "@/sanity/queries";
 import { formatConcertDate } from "@/lib/concertDate";
+import { findMockConcertDoc } from "../mock-adapter";
 
 export async function generateMetadata({
   params,
@@ -12,10 +13,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const concert = await fetchConcerts<ConcertDoc | null>(
+  const sanityConcert = await fetchConcerts<ConcertDoc | null>(
     CONCERT_BY_SLUG_QUERY,
     { slug },
   );
+  const concert = sanityConcert ?? findMockConcertDoc(slug);
   if (!concert) {
     return { title: "קונצרט לא נמצא · מרכז המוסיקה רעננה" };
   }

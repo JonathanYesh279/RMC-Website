@@ -12,14 +12,26 @@ import { formatConcertDate } from "@/lib/concertDate";
 import { CONCERT_DEFAULTS } from "@/lib/concertMeta";
 import { sanityImageUrl } from "@/lib/sanityImage";
 import { buildTiers } from "@/lib/concertPricing";
+import { findMockConcertDoc, mockConcertDocs } from "../mock-adapter";
 import TicketPurchase from "./TicketPurchase";
 
 export const revalidate = 60;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const slugs = await fetchConcerts<string[]>(CONCERT_SLUGS_QUERY);
-  return slugs.map((slug) => ({ slug }));
+  // Pre-render Sanity slugs (if any) plus every mock slug, so detail
+  // routes work whether or not editors have published content yet.
+  let sanitySlugs: string[] = [];
+  try {
+    sanitySlugs = await fetchConcerts<string[]>(CONCERT_SLUGS_QUERY);
+  } catch {
+    sanitySlugs = [];
+  }
+  const all = new Set<string>([
+    ...sanitySlugs,
+    ...mockConcertDocs.map((c) => c.slug),
+  ]);
+  return Array.from(all).map((slug) => ({ slug }));
 }
 
 export default async function ConcertDetailPage({
@@ -29,11 +41,12 @@ export default async function ConcertDetailPage({
 }) {
   const { slug } = await params;
 
-  const [concert, copy] = await Promise.all([
+  const [sanityConcert, copy] = await Promise.all([
     fetchConcerts<ConcertDoc | null>(CONCERT_BY_SLUG_QUERY, { slug }),
     fetchConcerts<ConcertCopyDoc>(CONCERT_COPY_QUERY),
   ]);
 
+  const concert = sanityConcert ?? findMockConcertDoc(slug);
   if (!concert) notFound();
 
   const date = formatConcertDate(concert.date);

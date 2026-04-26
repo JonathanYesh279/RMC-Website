@@ -10,7 +10,15 @@ export function sanityImageUrl(
   source: string,
   opts: { w: number; h?: number; q?: number },
 ) {
-  const url = new URL(source);
+  let url: URL;
+  try {
+    url = new URL(source);
+  } catch {
+    return source;
+  }
+  // Only rewrite Sanity CDN URLs — leave external URLs (e.g. Unsplash
+  // mock images) untouched so we don't double-up incompatible params.
+  if (!url.hostname.endsWith("cdn.sanity.io")) return source;
   url.searchParams.set("w", String(opts.w));
   if (opts.h) url.searchParams.set("h", String(opts.h));
   url.searchParams.set("auto", "format");
