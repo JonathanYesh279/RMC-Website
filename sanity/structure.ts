@@ -25,6 +25,28 @@ export const structure: StructureResolver = (S) =>
                 ),
               S.divider(),
               S.listItem()
+                .id("new-concert")
+                .title("➕ הוספת קונצרט חדש")
+                .child(() => {
+                  // Generate a fresh document ID on every click so each
+                  // visit opens a clean blank concert (not a singleton).
+                  // Once published, this becomes a normal concert doc
+                  // identical to one created via the list's "+" button.
+                  const id =
+                    typeof crypto !== "undefined" &&
+                    typeof crypto.randomUUID === "function"
+                      ? crypto.randomUUID()
+                      : `concert-${Date.now()}-${Math.random()
+                          .toString(36)
+                          .slice(2, 9)}`;
+                  return S.editor()
+                    .id("create-concert-editor")
+                    .schemaType("concert")
+                    .documentId(id)
+                    .title("קונצרט חדש");
+                }),
+              S.divider(),
+              S.listItem()
                 .id("all-concerts")
                 .title("📋 כל הקונצרטים")
                 .schemaType("concert")
