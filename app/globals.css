@@ -2844,10 +2844,7 @@ body.home-locked .site-footer {
 .prog-tab {
   position: relative;
   width: 100%;
-  display: grid;
-  grid-template-columns: 28px 1fr;
-  gap: 14px;
-  align-items: start;
+  display: block;
   background: none;
   border: 0;
   padding: 12px 0 12px 14px;
@@ -2874,19 +2871,6 @@ body.home-locked .site-footer {
 .prog-tab.is-active::before {
   background: var(--coral);
   inset-block: 4px;
-}
-.prog-tab-num {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--ink-4);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.05em;
-  padding-block-start: 4px;
-  transition: color 0.25s;
-}
-.prog-tab.is-active .prog-tab-num {
-  color: var(--coral);
-  font-weight: 600;
 }
 .prog-tab-body {
   display: flex;
