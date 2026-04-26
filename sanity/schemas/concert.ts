@@ -3,34 +3,34 @@ import { slugifyHebrew } from "../../lib/slugifyHebrew";
 
 export default defineType({
   name: "concert",
-  title: "קונצרטים — קונצרט בודד",
+  title: "קונצרט",
   type: "document",
   groups: [
-    { name: "id", title: "זיהוי", default: true },
-    { name: "classification", title: "סיווג" },
-    { name: "schedule", title: "מועד ומקום" },
-    { name: "image", title: "תמונה" },
-    { name: "copy", title: "טקסטים" },
-    { name: "tickets", title: "כרטיסים וזמינות" },
-    { name: "details", title: "פרטים מורחבים" },
+    { name: "main", title: "א. מידע ראשי בראש הכרטיס", default: true },
+    { name: "schedule", title: "ב. מועד ומיקום" },
+    { name: "image", title: "ג. תמונה ראשית" },
+    { name: "copy", title: "ד. טקסטים שמופיעים בכרטיס ובעמוד" },
+    { name: "tickets", title: "ה. מחירים וכרטיסים" },
+    { name: "program", title: "ו. תוכנית הקונצרט" },
   ],
   fields: [
+    // ── א. מידע ראשי ──────────────────────────────────────────────
     defineField({
       name: "title",
       title: "שם הקונצרט",
       description:
-        'מופיע ככותרת בכרטיס הקונצרט ברשימה הראשית, וגם ככותרת ראשית בעמוד פרטי הקונצרט. למשל: "ברהמס · הסימפוניה הרביעית".',
+        "מופיע ככותרת בכרטיס הקונצרט ברשימה, וגם ככותרת הראשית בעמוד פרטי הקונצרט. למשל: ״ברהמס · הסימפוניה הרביעית״.",
       type: "string",
-      group: "id",
+      group: "main",
       validation: (r) => r.required().max(100),
     }),
     defineField({
       name: "slug",
-      title: "מזהה כתובת (Slug)",
+      title: "כתובת עמוד אוטומטית",
       description:
-        "החלק האחרון בכתובת ה-URL של עמוד הקונצרט (/concerts/SLUG). מתורגם אוטומטית מעברית. אפשר לערוך ידנית.",
+        "החלק האחרון בכתובת ה-URL של עמוד הקונצרט. נוצר אוטומטית מהשם — בדרך כלל אין צורך לערוך.",
       type: "slug",
-      group: "id",
+      group: "main",
       options: {
         source: "title",
         maxLength: 96,
@@ -40,10 +40,11 @@ export default defineType({
     }),
     defineField({
       name: "genre",
-      title: "סגנון",
-      description: "משפיע על תווית הסיווג ועל סינון ברשימת הקונצרטים.",
+      title: "סיווג / קטגוריה",
+      description:
+        "משפיע על תווית הצבע בכרטיס הקונצרט ועל הסינון ברשימת הקונצרטים.",
       type: "string",
-      group: "classification",
+      group: "main",
       options: {
         list: [
           { title: "קלאסי", value: "classical" },
@@ -57,18 +58,38 @@ export default defineType({
     }),
     defineField({
       name: "highlightBadge",
-      title: "תגית מודגשת (אופציונלי)",
+      title: "תגית קצרה (אופציונלי)",
       description:
-        'לשימוש שיווקי בלבד — לא לזמינות מקומות. למשל: "בכורה", "מומלץ למשפחות · גילאי 5+", "מופע סיום העונה".',
+        "סטיקר קטן ומודגש שמופיע על תמונת הקונצרט בכרטיס וברצועה הגדולה. למשל: ״בכורה״ או ״מומלץ למשפחות״. השאירו ריק אם אין צורך.",
       type: "string",
-      group: "classification",
+      group: "main",
       validation: (r) => r.max(60),
     }),
+    defineField({
+      name: "availability",
+      title: "מצב זמינות כרטיסים",
+      description:
+        "התווית הצבעונית בכרטיס הקונצרט (למשל ״כרטיסים זמינים״ / ״מקומות אחרונים״). הטקסט עצמו נקבע אוטומטית — בחרו רק את המצב.",
+      type: "string",
+      group: "main",
+      options: {
+        list: [
+          { title: "כרטיסים זמינים", value: "open" },
+          { title: "מקומות אחרונים", value: "hot" },
+          { title: "אולם מלא / אזל", value: "full" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "open",
+      validation: (r) => r.required(),
+    }),
+
+    // ── ב. מועד ומיקום ────────────────────────────────────────────
     defineField({
       name: "date",
       title: "תאריך ושעה",
       description:
-        "תאריך ושעת הקונצרט (שעון ישראל). מהשדה הזה נגזרים יום, חודש ושעה המופיעים בעמוד.",
+        "תאריך ושעת הקונצרט (לפי שעון ישראל). מהשדה הזה האתר מחשב אוטומטית את היום, החודש והשעה שמופיעים בכרטיס ובעמוד.",
       type: "datetime",
       group: "schedule",
       options: { dateFormat: "DD/MM/YYYY", timeFormat: "HH:mm", timeStep: 5 },
@@ -76,25 +97,29 @@ export default defineType({
     }),
     defineField({
       name: "venue",
-      title: "מקום",
+      title: "מקום האירוע",
       description:
-        'אולם ההופעה. למשל: "האודיטוריום המרכזי", "האולם הקאמרי".',
+        "אולם ההופעה. למשל: ״האודיטוריום המרכזי״ או ״האולם הקאמרי״.",
       type: "string",
       group: "schedule",
       validation: (r) => r.required().max(80),
     }),
+
+    // ── ג. תמונה ראשית ────────────────────────────────────────────
     defineField({
       name: "image",
-      title: "תמונת קונצרט",
+      title: "תמונת הקונצרט",
       description:
-        "תמונה ראשית של הקונצרט. משמשת בכרטיס ברשימה ובכותרת עמוד פרטי הקונצרט. רצוי 16:9, מינימום 1600 רוחב.",
+        "תמונה ראשית של הקונצרט. מופיעה בכרטיס ברשימה וברקע עמוד פרטי הקונצרט. רצוי תמונה איכותית ביחס 16:9, רוחב מינימלי 1600 פיקסלים.",
       type: "image",
       group: "image",
       options: { hotspot: true },
       fields: [
         defineField({
           name: "alt",
-          title: "טקסט חלופי (נגישות)",
+          title: "טקסט חלופי לתמונה (נגישות)",
+          description:
+            "תיאור קצר של מה שרואים בתמונה — נקרא על ידי קוראי מסך. למשל: ״תזמורת על במת האודיטוריום״.",
           type: "string",
           validation: (r) =>
             r.max(160).custom((alt, ctx) => {
@@ -107,11 +132,13 @@ export default defineType({
       ],
       validation: (r) => r.required(),
     }),
+
+    // ── ד. טקסטים ─────────────────────────────────────────────────
     defineField({
       name: "shortDescription",
-      title: "תיאור קצר",
+      title: "תיאור קצר לכרטיס ברשימה",
       description:
-        "מופיע בכרטיס הקונצרט ברשימה הראשית של עמוד הקונצרטים. מומלץ עד 2-3 משפטים.",
+        "מופיע מתחת לכותרת בכרטיס הקונצרט ברשימת הקונצרטים. כתבו 2-3 משפטים קצרים שמסכמים את הקונצרט.",
       type: "text",
       rows: 3,
       group: "copy",
@@ -119,66 +146,52 @@ export default defineType({
     }),
     defineField({
       name: "lede",
-      title: "פסקת פתיחה (עמוד הקונצרט)",
+      title: "טקסט פתיחה לעמוד הקונצרט",
       description:
-        "הפסקה שמופיעה מתחת לכותרת בעמוד פרטי הקונצרט. ארוך יותר מהתיאור הקצר.",
+        "הפסקה הגדולה שמופיעה מתחת לכותרת בעמוד פרטי הקונצרט. ארוכה ומפורטת יותר מהתיאור הקצר.",
       type: "text",
       rows: 5,
       group: "copy",
       validation: (r) => r.required().max(600),
     }),
     defineField({
-      name: "basePrice",
-      title: "מחיר בסיס (₪)",
-      description:
-        "מחיר כרטיס רגיל. מחירי כרטיס פרימיום וסטודנט נגזרים אוטומטית בקוד (לא ניתנים לעריכה כאן).",
-      type: "number",
-      group: "tickets",
-      validation: (r) => r.required().integer().min(0).max(2000),
-    }),
-    defineField({
-      name: "availability",
-      title: "מצב זמינות",
-      description:
-        'המצב נבחר כאן בלבד. תווית הטקסט שמופיעה באתר ("כרטיסים זמינים" / "מקומות אחרונים" / "אולם מלא") נגזרת אוטומטית.',
-      type: "string",
-      group: "tickets",
-      options: {
-        list: [
-          { title: "כרטיסים זמינים", value: "open" },
-          { title: "מקומות אחרונים", value: "hot" },
-          { title: "אולם מלא / אזל", value: "full" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "open",
-      validation: (r) => r.required(),
-    }),
-    defineField({
       name: "duration",
-      title: "משך (אופציונלי)",
+      title: "משך הקונצרט (אופציונלי)",
       description:
-        'מופיע בעמוד פרטי הקונצרט. למשל: "95 דקות · הפסקה אחת". אם יושאר ריק, יוצג טקסט ברירת מחדל.',
+        "מופיע בעמוד פרטי הקונצרט תחת ״משך״. למשל: ״95 דקות · הפסקה אחת״.",
       type: "string",
-      group: "details",
+      group: "copy",
       validation: (r) => r.max(60),
     }),
     defineField({
       name: "language",
       title: "שפה / תוכנייה (אופציונלי)",
       description:
-        'מופיע בעמוד פרטי הקונצרט. למשל: "תוכנייה בעברית". אם יושאר ריק, יוצג טקסט ברירת מחדל.',
+        "מופיע בעמוד פרטי הקונצרט תחת ״שפה״. למשל: ״תוכנייה בעברית״.",
       type: "string",
-      group: "details",
+      group: "copy",
       validation: (r) => r.max(60),
     }),
+
+    // ── ה. מחירים וכרטיסים ────────────────────────────────────────
+    defineField({
+      name: "basePrice",
+      title: "מחיר בסיס בלבד (₪)",
+      description:
+        "מחיר כרטיס רגיל. המחירים של פרימיום וסטודנט מחושבים אוטומטית — אין צורך להזין אותם.",
+      type: "number",
+      group: "tickets",
+      validation: (r) => r.required().integer().min(0).max(2000),
+    }),
+
+    // ── ו. תוכנית הקונצרט ─────────────────────────────────────────
     defineField({
       name: "program",
-      title: "תוכנייה (יצירות)",
+      title: "יצירות / תוכנייה",
       description:
-        "רשימת היצירות שיבוצעו בקונצרט. מופיע בעמוד פרטי הקונצרט. אופציונלי — אם תושאר ריקה, יוצג טקסט ברירת מחדל.",
+        "רשימת היצירות שיבוצעו בקונצרט. מופיעה בעמוד פרטי הקונצרט. אם תשאירו ריק, יוצג טקסט ברירת מחדל.",
       type: "array",
-      group: "details",
+      group: "program",
       of: [
         defineField({
           name: "programItem",

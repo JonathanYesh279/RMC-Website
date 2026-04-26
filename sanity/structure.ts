@@ -15,8 +15,18 @@ export const structure: StructureResolver = (S) =>
             .title("קונצרטים")
             .items([
               S.listItem()
+                .id("concertsPage")
+                .title("⭐ הקונצרט הקרוב בעמוד הראשי")
+                .child(
+                  S.document()
+                    .schemaType("concertsPage")
+                    .documentId(SINGLETON_IDS.concertsPage)
+                    .title("הגדרות עמוד הקונצרטים"),
+                ),
+              S.divider(),
+              S.listItem()
                 .id("all-concerts")
-                .title("כל הקונצרטים")
+                .title("📋 כל הקונצרטים")
                 .schemaType("concert")
                 .child(
                   S.documentTypeList("concert")
@@ -25,20 +35,13 @@ export const structure: StructureResolver = (S) =>
                 ),
               S.divider(),
               S.listItem()
-                .id("concertsPage")
-                .title("⚙️ עמוד הרשימה")
-                .child(
-                  S.document()
-                    .schemaType("concertsPage")
-                    .documentId(SINGLETON_IDS.concertsPage),
-                ),
-              S.listItem()
                 .id("concertCopy")
-                .title("⚙️ טקסטים — עמוד פרטי קונצרט")
+                .title("⚙️ טקסטים כלליים לעמוד קונצרט")
                 .child(
                   S.document()
                     .schemaType("concertCopy")
-                    .documentId(SINGLETON_IDS.concertCopy),
+                    .documentId(SINGLETON_IDS.concertCopy)
+                    .title("טקסטים כלליים לעמוד קונצרט"),
                 ),
             ]),
         ),

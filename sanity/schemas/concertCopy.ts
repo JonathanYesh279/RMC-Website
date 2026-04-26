@@ -2,17 +2,18 @@ import { defineField, defineType } from "sanity";
 
 export default defineType({
   name: "concertCopy",
-  title: "עמוד פרטי קונצרט — טקסטים גלובליים",
+  title: "טקסטים כלליים לעמוד קונצרט",
   type: "document",
   groups: [
-    { name: "purchase", title: "כותרות רכישה", default: true },
-    { name: "notes", title: "הערות בתחתית" },
+    { name: "purchase", title: "כותרות אזור רכישת הכרטיסים", default: true },
+    { name: "notes", title: "הערות בתחתית הטופס" },
   ],
   fields: [
     defineField({
       name: "purchaseEyebrow",
-      title: "כותרת-על של אזור הרכישה",
-      description: 'הטקסט הקטן מעל הכותרת. למשל: "רכישת כרטיסים".',
+      title: "כותרת קטנה מעל אזור הרכישה",
+      description:
+        "הטקסט הקטן הצבעוני מעל הכותרת בתחילת אזור רכישת הכרטיסים. למשל: ״רכישת כרטיסים״.",
       type: "string",
       group: "purchase",
       validation: (r) => r.max(60),
@@ -21,7 +22,7 @@ export default defineType({
     defineField({
       name: "purchaseTitle",
       title: "כותרת ראשית של אזור הרכישה",
-      description: 'למשל: "בחרו כרטיסים והשלימו הזמנה".',
+      description: 'למשל: ״בחרו כרטיסים והשלימו הזמנה״.',
       type: "string",
       group: "purchase",
       validation: (r) => r.max(120),
@@ -31,7 +32,7 @@ export default defineType({
       name: "accessibilityNote",
       title: "הודעת נגישות",
       description:
-        "הפסקה הקטנה מתחת לטופס פרטי הרוכש. כוללת מידע על נגישות וקישורים ליצירת קשר.",
+        "הפסקה שמופיעה מתחת לטופס פרטי הרוכש. כוללת מידע על נגישות וקישורים ליצירת קשר.",
       type: "text",
       rows: 3,
       group: "notes",
@@ -42,7 +43,8 @@ export default defineType({
     defineField({
       name: "secureNote",
       title: "הודעת תשלום מאובטח",
-      description: "מופיע מתחת לכפתור התשלום בסיכום ההזמנה.",
+      description:
+        "השורה הקטנה מתחת לכפתור התשלום בסיכום ההזמנה.",
       type: "string",
       group: "notes",
       validation: (r) => r.max(120),
@@ -51,7 +53,7 @@ export default defineType({
     defineField({
       name: "cancellationNote",
       title: "הודעת מדיניות ביטול",
-      description: "השורה הקטנה בתחתית סיכום ההזמנה.",
+      description: "השורה האחרונה בתחתית סיכום ההזמנה.",
       type: "string",
       group: "notes",
       validation: (r) => r.max(160),
@@ -59,6 +61,6 @@ export default defineType({
     }),
   ],
   preview: {
-    prepare: () => ({ title: "עמוד פרטי קונצרט — טקסטים" }),
+    prepare: () => ({ title: "טקסטים כלליים לעמוד קונצרט" }),
   },
 });

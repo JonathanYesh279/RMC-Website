@@ -2,19 +2,20 @@ import { defineField, defineType } from "sanity";
 
 export default defineType({
   name: "concertsPage",
-  title: "עמוד קונצרטים — הגדרות עמוד הרשימה",
+  title: "הגדרות עמוד הקונצרטים",
   type: "document",
   groups: [
-    { name: "featured", title: "קונצרט מוצג", default: true },
-    { name: "filter", title: "רצועת סינון" },
-    { name: "subscription", title: "רצועת מנויים" },
+    { name: "featured", title: "⭐ הקונצרט הקרוב", default: true },
+    { name: "subscription", title: "🎟️ רצועת מנויי עונה" },
+    { name: "filter", title: "📅 טווח תאריכים" },
   ],
   fields: [
+    // ── ⭐ הקונצרט הקרוב — סדר השדות לפי הסדר הויזואלי בעמוד ──────
     defineField({
       name: "featuredEyebrow",
-      title: "כותרת-על של רצועת הקונצרט המוצג",
+      title: "כותרת קטנה מעל הקונצרט",
       description:
-        'הטקסט הקטן מעל הכותרת. למשל: "הקונצרט הקרוב". אם יושאר ריק, רצועת הקונצרט המוצג עדיין תוצג עם ברירת מחדל.',
+        "הטקסט הקטן הצבעוני שמופיע מעל הכותרת בראש העמוד. למשל: ״הקונצרט הקרוב״.",
       type: "string",
       group: "featured",
       validation: (r) => r.max(60),
@@ -22,9 +23,9 @@ export default defineType({
     }),
     defineField({
       name: "featured",
-      title: "הקונצרט המוצג",
+      title: "בחירת הקונצרט הקרוב להצגה",
       description:
-        "בחרו את הקונצרט שיופיע ברצועה הראשונה של עמוד הקונצרטים. אם לא נבחר קונצרט, או אם הקונצרט שנבחר עבר תאריך — הרצועה כולה לא תוצג.",
+        "הקונצרט שיופיע ברצועה הגדולה בראש עמוד הקונצרטים. אם לא נבחר קונצרט, או אם הקונצרט שנבחר עבר תאריך, האתר יציג אוטומטית את הקונצרט הקרוב ביותר ברשימה.",
       type: "reference",
       group: "featured",
       to: [{ type: "concert" }],
@@ -32,9 +33,9 @@ export default defineType({
     }),
     defineField({
       name: "featuredBlurb",
-      title: "טקסט מותאם אישית (אופציונלי)",
+      title: "טקסט פתיחה לקונצרט הקרוב (אופציונלי)",
       description:
-        "אם תרצו שהטקסט ברצועת הקונצרט המוצג יהיה שונה מ״פסקת הפתיחה״ של הקונצרט עצמו — מלאו כאן. אם יושאר ריק, יוצג ה-lede של הקונצרט.",
+        "הטקסט שמופיע מתחת לשם הקונצרט בראש העמוד. אם תשאירו ריק, יוצג טקסט הפתיחה של הקונצרט עצמו. כתבו משפט או שניים קצרים.",
       type: "text",
       rows: 4,
       group: "featured",
@@ -42,9 +43,9 @@ export default defineType({
     }),
     defineField({
       name: "primaryCtaLabel",
-      title: "תווית כפתור ראשי",
+      title: "טקסט כפתור ראשי",
       description:
-        'הכפתור הקורלי. למשל: "לרכישת כרטיסים". המחיר לא נכלל בטקסט — הוא מתווסף אוטומטית.',
+        "הכפתור הקורלי הגדול. למשל: ״לרכישת כרטיסים״. המחיר נוסף אוטומטית בסוף — אין צורך לכלול אותו בטקסט.",
       type: "string",
       group: "featured",
       validation: (r) => r.max(40),
@@ -52,26 +53,21 @@ export default defineType({
     }),
     defineField({
       name: "secondaryCtaLabel",
-      title: "תווית כפתור משני",
-      description: 'למשל: "קרא עוד על הקונצרט".',
+      title: "טקסט כפתור משני",
+      description:
+        "הכפתור עם המסגרת ליד הכפתור הראשי. למשל: ״קרא עוד על הקונצרט״.",
       type: "string",
       group: "featured",
       validation: (r) => r.max(40),
       initialValue: "קרא עוד על הקונצרט",
     }),
-    defineField({
-      name: "dateRangeLabel",
-      title: "תווית טווח תאריכים (אופציונלי)",
-      description:
-        'מופיעה ליד אייקון לוח השנה ברצועת הסינון. למשל: "מאי 2026 — יולי 2026". אם יושאר ריק, יחושב אוטומטית מהקונצרטים שבמערכת.',
-      type: "string",
-      group: "filter",
-      validation: (r) => r.max(60),
-    }),
+
+    // ── 🎟️ רצועת מנויי עונה ──────────────────────────────────────
     defineField({
       name: "subEyebrow",
-      title: "כותרת-על של רצועת המנויים",
-      description: 'הטקסט הקטן מעל הכותרת הראשית. למשל: "מנויי עונה".',
+      title: "כותרת קטנה מעל רצועת המנויים",
+      description:
+        "הטקסט הקטן הצבעוני מעל הכותרת ברצועה התחתונה של עמוד הקונצרטים. למשל: ״מנויי עונה״.",
       type: "string",
       group: "subscription",
       validation: (r) => r.max(60),
@@ -80,7 +76,7 @@ export default defineType({
     defineField({
       name: "subTitle",
       title: "כותרת ראשית — חלק רגיל",
-      description: 'החלק הלא-נטוי של הכותרת. למשל: "עונה שלמה של".',
+      description: "החלק הלא-מודגש של הכותרת. למשל: ״עונה שלמה של״.",
       type: "string",
       group: "subscription",
       validation: (r) => r.max(80),
@@ -88,8 +84,9 @@ export default defineType({
     }),
     defineField({
       name: "subTitleEm",
-      title: "כותרת ראשית — חלק נטוי (אלמוג)",
-      description: 'החלק הצבעוני בנטוי. למשל: "מוסיקה חיה.".',
+      title: "כותרת ראשית — חלק מודגש בצבע",
+      description:
+        "החלק שמודגש בצבע אלמוג ובאות נטויה. למשל: ״מוסיקה חיה.״.",
       type: "string",
       group: "subscription",
       validation: (r) => r.max(80),
@@ -97,9 +94,9 @@ export default defineType({
     }),
     defineField({
       name: "subBody",
-      title: "פסקת תיאור",
+      title: "פסקת תיאור של רצועת המנויים",
       description:
-        "מופיעה מתחת לכותרת ברצועת המנויים. הסבר על המנויים והיתרונות שלהם.",
+        "מופיעה מתחת לכותרת ברצועת המנויים. הסבר על מה כולל המנוי השנתי.",
       type: "text",
       rows: 4,
       group: "subscription",
@@ -107,34 +104,37 @@ export default defineType({
     }),
     defineField({
       name: "subTiers",
-      title: "סוגי מנויים",
+      title: "כרטיסיות סוגי מנויים",
       description:
-        "כרטיסיות המנויים בצד ימין של הרצועה. מומלץ עד 4 כרטיסיות. אם יושאר ריק — הרצועה תציג רק את הטקסט מבלי הכרטיסיות.",
+        "הכרטיסיות שמופיעות בצד ימין של רצועת המנויים. מומלץ עד 4 כרטיסיות. אם תשאירו ריק, הרצועה תציג רק את הטקסט בלי הכרטיסיות.",
       type: "array",
       group: "subscription",
       of: [
         defineField({
           name: "tier",
-          title: "מנוי",
+          title: "כרטיסיית מנוי",
           type: "object",
           fields: [
             defineField({
               name: "title",
               title: "שם המנוי",
+              description: "למשל: ״מנוי סימפוני״, ״מנוי משפחתי״.",
               type: "string",
               validation: (r) => r.required().max(60),
             }),
             defineField({
               name: "body",
               title: "תיאור (יתרונות המנוי)",
+              description:
+                "שורה או שתיים שמתארות מה כלול במנוי הזה.",
               type: "text",
               rows: 3,
               validation: (r) => r.required().max(300),
             }),
             defineField({
               name: "price",
-              title: 'מחיר (כולל "₪")',
-              description: 'נוסח חופשי. למשל: "₪890".',
+              title: "מחיר לעונה",
+              description: "נוסח חופשי. למשל: ״₪890״.",
               type: "string",
               validation: (r) => r.required().max(20),
             }),
@@ -146,8 +146,19 @@ export default defineType({
       ],
       validation: (r) => r.max(6),
     }),
+
+    // ── 📅 טווח תאריכים ───────────────────────────────────────────
+    defineField({
+      name: "dateRangeLabel",
+      title: "טווח תאריכים שמופיע ברצועת הסינון (אופציונלי)",
+      description:
+        "מופיע ליד אייקון לוח השנה מעל רשימת הקונצרטים. למשל: ״מאי 2026 — יולי 2026״. אם תשאירו ריק, האתר יחשב את הטווח אוטומטית מתוך הקונצרטים הקיימים.",
+      type: "string",
+      group: "filter",
+      validation: (r) => r.max(60),
+    }),
   ],
   preview: {
-    prepare: () => ({ title: "עמוד קונצרטים — הגדרות" }),
+    prepare: () => ({ title: "הגדרות עמוד הקונצרטים" }),
   },
 });
