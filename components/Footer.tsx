@@ -106,7 +106,7 @@ export default function Footer() {
                   <circle cx="7" cy="5.5" r="1.5" />
                 </svg>
                 <span>
-                  רחוב אצטיון 48
+                  רחוב עציון 48
                   <br />
                   רעננה, 4322948
                 </span>
