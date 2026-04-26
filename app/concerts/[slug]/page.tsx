@@ -65,45 +65,19 @@ export default async function ConcertDetailPage({
   const thumbImg = sanityImageUrl(concert.image.url, { w: 240 });
 
   const heroVideoUrl = concert.heroVideoUrl ?? null;
-  const heroPosterUrl = heroVideoUrl
+  const videoPosterUrl = heroVideoUrl
     ? sanityImageUrl(concert.heroPoster?.url ?? concert.image.url, {
-        w: 2000,
-        q: 70,
+        w: 1600,
       })
     : null;
 
   return (
     <>
-      <section
-        className={`detail-hero${heroVideoUrl ? " detail-hero--video" : ""}`}
-      >
-        {heroVideoUrl ? (
-          <div className="detail-hero-media" aria-hidden="true">
-            {heroPosterUrl ? (
-              <img
-                className="detail-hero-poster"
-                src={heroPosterUrl}
-                alt=""
-              />
-            ) : null}
-            <video
-              className="detail-hero-video"
-              src={heroVideoUrl}
-              poster={heroPosterUrl ?? undefined}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-            />
-            <div className="detail-hero-scrim" />
-          </div>
-        ) : (
-          <div
-            className="detail-bg"
-            style={{ backgroundImage: `url('${heroBg}')` }}
-          />
-        )}
+      <section className="detail-hero">
+        <div
+          className="detail-bg"
+          style={{ backgroundImage: `url('${heroBg}')` }}
+        />
         <div className="detail-shell container">
           <nav className="detail-crumbs reveal" aria-label="פירורי לחם">
             <Link href="/">{CONCERT_DEFAULTS.crumbs.home}</Link> /{" "}
@@ -115,10 +89,29 @@ export default async function ConcertDetailPage({
             <div>
               <div
                 className="detail-img reveal"
-                style={{ backgroundImage: `url('${heroImg}')` }}
-                role="img"
-                aria-label={concert.image.alt || concert.title}
+                style={{
+                  backgroundImage: `url('${
+                    heroVideoUrl ? (videoPosterUrl ?? heroImg) : heroImg
+                  }')`,
+                }}
+                role={heroVideoUrl ? undefined : "img"}
+                aria-label={
+                  heroVideoUrl ? undefined : concert.image.alt || concert.title
+                }
               >
+                {heroVideoUrl ? (
+                  <video
+                    className="detail-img-video"
+                    src={heroVideoUrl}
+                    poster={videoPosterUrl ?? undefined}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    aria-label={concert.image.alt || concert.title}
+                  />
+                ) : null}
                 <div className="detail-badge">{heroBadge}</div>
               </div>
               <div className="detail-info reveal">
