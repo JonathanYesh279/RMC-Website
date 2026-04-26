@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { slugifyHebrew } from "../../lib/slugifyHebrew";
+import { AutoSlugInput } from "../components/AutoSlugInput";
 
 export default defineType({
   name: "concert",
@@ -29,7 +30,7 @@ export default defineType({
       name: "slug",
       title: "כתובת עמוד אוטומטית",
       description:
-        "החלק האחרון בכתובת ה-URL של עמוד הקונצרט. נוצר אוטומטית מהשם — בדרך כלל אין צורך לערוך.",
+        "החלק האחרון בכתובת ה-URL של עמוד הקונצרט. נוצר אוטומטית מהשם בעת השמירה הראשונה — אין צורך לערוך.",
       type: "slug",
       group: "main",
       options: {
@@ -37,6 +38,14 @@ export default defineType({
         maxLength: 96,
         slugify: (input) => slugifyHebrew(input),
       },
+      // Hidden once a slug exists, so editors never see this field after
+      // the first save. Locks the URL so renaming a concert later won't
+      // change its address (preserves shared links and SEO).
+      hidden: ({ document }) => {
+        const slug = document?.slug as { current?: string } | undefined;
+        return Boolean(slug?.current);
+      },
+      components: { input: AutoSlugInput },
       validation: (r) => r.required(),
     }),
     defineField({
