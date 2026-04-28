@@ -762,9 +762,8 @@ body.home-locked .site-footer {
 }
 .page-hero .container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: end;
+  grid-template-columns: 1fr;
+  gap: 28px;
   position: relative;
 }
 .page-hero .crumbs {
@@ -792,16 +791,7 @@ body.home-locked .site-footer {
   color: var(--ink-2);
   font-size: 18px;
   line-height: 1.75;
-  max-width: 520px;
-  justify-self: end;
-}
-@media (max-width: 900px) {
-  .page-hero .container {
-    grid-template-columns: 1fr;
-  }
-  .page-hero .lede {
-    justify-self: start;
-  }
+  max-width: 640px;
 }
 
 .page-hero--video {
