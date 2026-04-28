@@ -28,6 +28,7 @@ import type {
   FormDoc,
   LeaderDoc,
 } from "@/sanity/queries";
+import type { SpecialProgramKey } from "@/lib/specialPrograms";
 
 const DEFAULT_INSTRUCTOR_IMAGE = "/fallbacks/instructor-portrait.jpg";
 const DEFAULT_LEADER_IMAGE = "/fallbacks/instructor-portrait.jpg";
@@ -250,6 +251,19 @@ export default function ConservatoryContent({
   // ===== Programs carousel =====
   const progCount = programs.length;
   const setProg = (i: number) => setActiveProg(((i % progCount) + progCount) % progCount);
+
+  // Map each special-program key to the URL of the form linked to it in
+  // Sanity. First-write-wins if two forms point at the same program (the
+  // editor should only link one). Centralizing this here keeps the future
+  // switch to a multi-program field (array) a one-spot change.
+  const formUrlByProgram = useMemo(() => {
+    const map: Partial<Record<SpecialProgramKey, string>> = {};
+    for (const f of forms) {
+      const key = f.linkedSpecialProgram;
+      if (key && !map[key]) map[key] = f.fileUrl;
+    }
+    return map;
+  }, [forms]);
 
   const [feature, ...rest] = articles;
   const sideList = rest.slice(0, 3);
@@ -937,8 +951,13 @@ export default function ConservatoryContent({
                         ))}
                       </div>
                       {p.note && <div className="prog-note">{p.note}</div>}
-                      {p.cta && (
-                        <a href="#" className="btn btn--coral prog-cta">
+                      {p.cta && formUrlByProgram[p.key] && (
+                        <a
+                          href={formUrlByProgram[p.key]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn--coral prog-cta"
+                        >
                           {p.cta}
                         </a>
                       )}

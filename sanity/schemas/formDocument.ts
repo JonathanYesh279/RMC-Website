@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { SPECIAL_PROGRAM_OPTIONS } from "../../lib/specialPrograms";
 
 export default defineType({
   name: "formDocument",
@@ -24,6 +25,19 @@ export default defineType({
       type: "text",
       rows: 2,
       validation: (r) => r.max(180),
+    }),
+    defineField({
+      name: "linkedSpecialProgram",
+      title: "שיוך לתוכנית מיוחדת (אופציונלי)",
+      description:
+        "אם הטופס משמש כטופס הרישום של תוכנית מיוחדת בעמוד הקונסרבטוריון, בחרו את התוכנית. כפתור הקריאה לפעולה בכרטיסיית התוכנית יקושר אוטומטית לקובץ. השאירו ריק אם הטופס כללי.",
+      type: "string",
+      options: {
+        list: SPECIAL_PROGRAM_OPTIONS.map(({ value, title }) => ({
+          value,
+          title,
+        })),
+      },
     }),
     defineField({
       name: "displayOrder",

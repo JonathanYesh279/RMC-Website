@@ -1,10 +1,12 @@
 import { defineQuery } from "next-sanity";
+import type { SpecialProgramKey } from "@/lib/specialPrograms";
 
 export const FORMS_QUERY = defineQuery(`
   *[_type == "formDocument" && defined(file.asset)] | order(displayOrder asc, title asc) {
     _id,
     title,
     description,
+    linkedSpecialProgram,
     "fileUrl": file.asset->url
   }
 `);
@@ -13,6 +15,7 @@ export type FormDoc = {
   _id: string;
   title: string;
   description: string | null;
+  linkedSpecialProgram: SpecialProgramKey | null;
   fileUrl: string;
 };
 

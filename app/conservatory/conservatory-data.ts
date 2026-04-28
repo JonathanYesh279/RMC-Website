@@ -1,3 +1,5 @@
+import type { SpecialProgramKey } from "@/lib/specialPrograms";
+
 export type Department = {
   key: string;
   name: string;
@@ -56,7 +58,7 @@ export type ProgramBlock = {
 };
 
 export type Program = {
-  key: string;
+  key: SpecialProgramKey;
   kicker: string;
   title: string;
   subtitle: string;
