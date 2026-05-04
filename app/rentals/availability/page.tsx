@@ -8,18 +8,21 @@ import {
   type FormEvent,
 } from "react";
 import {
+  EQ_CATALOG,
+  EQ_CATEGORIES,
   HE_DAYS,
   HE_MONTHS,
   KIND_LABEL,
   KIND_TAG_CLASS,
   VENUES,
   type AvailabilityVenue,
+  type EquipmentCategory,
   type VenueKind,
 } from "./availability-data";
 
 type CellStatus = "past" | "booked" | "partial" | "free";
-
 type FilterKey = "all" | VenueKind;
+type EqFilter = "all" | EquipmentCategory;
 
 const FILTER_CHIPS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "הכל" },
@@ -28,6 +31,8 @@ const FILTER_CHIPS: { key: FilterKey; label: string }[] = [
   { key: "rehe", label: "חדרי חזרה" },
   { key: "class", label: "כיתות הוראה" },
 ];
+
+const VAT_RATE = 0.17;
 
 function availabilityFor(
   venueKey: string,
@@ -53,7 +58,7 @@ function slotIsBooked(venueKey: string, day: number, slotId: string, status: Cel
 }
 
 function parseHourSpan(time: string): number {
-  const m = time.match(/(\d{2}):\d{2}\s*–\s*(\d{2}):\d{2}/);
+  const m = time.match(/(\d{1,2}):\d{2}\s*–\s*(\d{1,2}):\d{2}/);
   return m ? +m[2] - +m[1] : 0;
 }
 
@@ -61,15 +66,13 @@ function formatHebrewDate(d: Date): string {
   return `${d.getDate()} ${HE_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+function fmt(n: number): string {
+  return `₪${n.toLocaleString("he-IL")}`;
+}
+
 function getDefaultDate(): Date {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  for (let i = 0; i < 60; i++) {
-    const cand = new Date(today);
-    cand.setDate(today.getDate() + i);
-    cand.setHours(0, 0, 0, 0);
-    return cand;
-  }
   return today;
 }
 
@@ -114,9 +117,9 @@ function NextIcon() {
   );
 }
 
-function CheckIcon() {
+function CheckIcon({ size = 12 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
       <path d="M3 7l3 3 5-6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -132,29 +135,29 @@ function ArrowIcon() {
 
 const INCLUSIONS = [
   {
-    title: "חלל מוכן לשימוש",
-    body: "ניקיון מקדים, מיזוג, תאורת רקע ובמה ערוכה לפי דרישה.",
+    title: "חלל מוכן",
+    body: "ניקיון, מיזוג ובמה ערוכה.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
         <rect x="2" y="4" width="14" height="10" rx="1" />
         <path d="M5 4V2.5h8V4M9 14v1.5" />
       </svg>
     ),
   },
   {
-    title: "מערכת קול בסיסית",
-    body: "הגברה, מיקרופונים אלחוטיים ומסכי במה (פירוט נוסף לכל חלל בנפרד).",
+    title: "קול בסיסי",
+    body: "הגברה ומיקרופונים אלחוטיים.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
         <path d="M9 2.5v9M9 11.5a2.5 2.5 0 0 0 2.5-2.5V5a2.5 2.5 0 0 0-5 0v4A2.5 2.5 0 0 0 9 11.5zM5 9a4 4 0 0 0 8 0M9 14.5v1" />
       </svg>
     ),
   },
   {
-    title: "תאורת במה",
-    body: "תאורת LED קבועה, ניתן להזמין מעצב תאורה לעיצוב מלא של המופע.",
+    title: "תאורת LED",
+    body: "תאורת רקע קבועה.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
         <circle cx="9" cy="6.5" r="3.5" />
         <path d="M9 10v6M6 16h6" />
       </svg>
@@ -162,28 +165,28 @@ const INCLUSIONS = [
   },
   {
     title: "חדרי הלבשה",
-    body: "שני חדרי הלבשה צמודים לבמה, מקלחות, מקררים ומתקני שתייה.",
+    body: "שני חדרים צמודים לבמה.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
         <path d="M2.5 15.5V6l3-2.5h7L15.5 6v9.5M2.5 15.5h13M7 12.5h4M7 9.5h4" />
       </svg>
     ),
   },
   {
-    title: "זמן הקמה ופירוק",
-    body: "שעה לפני ושעה אחרי כלולות במחיר; ההגדלה אפשרית בתעריף שעתי.",
+    title: "הקמה ופירוק",
+    body: "שעה לפני ושעה אחרי.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
         <circle cx="9" cy="9" r="6.5" />
         <path d="M9 5.5V9l2.5 1.5" />
       </svg>
     ),
   },
   {
-    title: "חניה בשבילכם",
-    body: "40 מקומות חניה לאמנים ולצוות, 220 מקומות חניה ציבוריים סמוכים.",
+    title: "חניה",
+    body: "40 מקומות צמודים.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4">
         <path d="M3 14.5V8l6-4.5L15 8v6.5M3 14.5h12M7 14.5v-4h4v4" />
       </svg>
     ),
@@ -244,6 +247,8 @@ export default function AvailabilityPage() {
   const [viewMonth, setViewMonth] = useState(initialDate.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
+  const [selectedEq, setSelectedEq] = useState<Set<string>>(new Set());
+  const [eqCat, setEqCat] = useState<EqFilter>("all");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerFilter, setPickerFilter] = useState<FilterKey>("all");
   const [pickerQuery, setPickerQuery] = useState("");
@@ -266,7 +271,22 @@ export default function AvailabilityPage() {
     window.history.replaceState(null, "", url);
   }, [venueKey]);
 
-  // reveal-on-scroll
+  // when venue changes, drop equipment selections that aren't available in the new venue
+  useEffect(() => {
+    const ids = VENUES[venueKey].equipment;
+    setSelectedEq((prev) => {
+      let changed = false;
+      const next = new Set<string>();
+      prev.forEach((id) => {
+        if (ids.includes(id)) next.add(id);
+        else changed = true;
+      });
+      return changed ? next : prev;
+    });
+    setEqCat("all");
+  }, [venueKey]);
+
+  // reveal-on-scroll (only hero/process/faq still use .reveal — main functional content is opacity:1 by default)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -281,7 +301,7 @@ export default function AvailabilityPage() {
     );
     document.querySelectorAll(".reveal:not(.in)").forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [venueKey, viewMonth, viewYear]);
+  }, [venueKey]);
 
   // close modal on Escape, lock body scroll while open
   useEffect(() => {
@@ -302,6 +322,7 @@ export default function AvailabilityPage() {
 
   const venue: AvailabilityVenue = VENUES[venueKey];
   const isWeekend = selectedDate.getDay() === 5 || selectedDate.getDay() === 6;
+  const dayName = HE_DAYS[selectedDate.getDay()];
 
   const filterCounts = useMemo(() => {
     const all = Object.values(VENUES);
@@ -374,17 +395,64 @@ export default function AvailabilityPage() {
     });
   }, [venue, venueKey, selectedDate, isWeekend]);
 
+  // Equipment items for the current venue
+  const eqItems = useMemo(() => {
+    return venue.equipment
+      .map((id) => {
+        const item = EQ_CATALOG[id];
+        return item ? { id, ...item } : null;
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null);
+  }, [venue]);
+
+  const eqCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: eqItems.length };
+    EQ_CATEGORIES.forEach((c) => {
+      if (c.id !== "all") counts[c.id] = eqItems.filter((x) => x.cat === c.id).length;
+    });
+    return counts;
+  }, [eqItems]);
+
+  const eqFiltered = useMemo(() => {
+    if (eqCat === "all") return eqItems;
+    return eqItems.filter((x) => x.cat === eqCat);
+  }, [eqItems, eqCat]);
+
+  const eqSelectedTotal = useMemo(() => {
+    let t = 0;
+    selectedEq.forEach((id) => {
+      const it = EQ_CATALOG[id];
+      if (it) t += it.price;
+    });
+    return t;
+  }, [selectedEq]);
+
+  // Itemized summary calculations
   const summary = useMemo(() => {
     const slotObjs = venue.slots.filter((s) => selectedSlots.has(s.id));
     const totalHours = slotObjs.reduce((acc, s) => acc + parseHourSpan(s.time), 0);
-    const total = slotObjs.reduce(
+    const hallTotal = slotObjs.reduce(
       (acc, s) => acc + (isWeekend ? s.priceWknd : s.priceWeek),
       0
     );
-    return { slotObjs, totalHours, total };
-  }, [venue, selectedSlots, isWeekend]);
-
-  const dayName = HE_DAYS[selectedDate.getDay()];
+    const eqIds = [...selectedEq];
+    const eqTotal = eqIds.reduce((acc, id) => acc + (EQ_CATALOG[id]?.price ?? 0), 0);
+    const subtotal = hallTotal + eqTotal;
+    const vat = Math.round(subtotal * VAT_RATE);
+    const total = subtotal + vat;
+    const hasAnything = slotObjs.length > 0;
+    return {
+      slotObjs,
+      eqIds,
+      totalHours,
+      hallTotal,
+      eqTotal,
+      subtotal,
+      vat,
+      total,
+      hasAnything,
+    };
+  }, [venue, selectedSlots, selectedEq, isWeekend]);
 
   function shiftMonth(dir: 1 | -1) {
     let m = viewMonth + dir;
@@ -415,6 +483,15 @@ export default function AvailabilityPage() {
     });
   }
 
+  function toggleEq(id: string) {
+    setSelectedEq((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   function chooseVenue(key: string) {
     setVenueKey(key);
     setSelectedSlots(new Set());
@@ -429,6 +506,8 @@ export default function AvailabilityPage() {
     }
     alert("הבקשה נשלחה!\nנחזור אליכם תוך 48 שעות עם אישור והצעת מחיר.");
   }
+
+  const eqShouldScroll = summary.eqIds.length > 3;
 
   return (
     <>
@@ -447,8 +526,7 @@ export default function AvailabilityPage() {
           </h1>
           <p className="av-lede reveal">
             לוח זמנים בזמן אמת לכל החללים שלנו — צפו בתאריכים פנויים, בחרו חלון
-            הפקה ושלחו בקשת הזמנה. נחזור אליכם תוך 48 שעות עם אישור והצעת מחיר
-            מפורטת.
+            הפקה, סמנו את הציוד הדרוש ושלחו בקשת הזמנה. נחזור אליכם תוך 48 שעות.
           </p>
 
           <div className="vsel reveal">
@@ -606,149 +684,135 @@ export default function AvailabilityPage() {
       <section className="av-main">
         <div className="container av-grid">
           <div>
-            <div className="av-sec reveal">
-              <div className="av-sec-head">
-                <div className="eyebrow">
-                  <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
-                  שלב 1 · בחירת תאריך
-                </div>
-                <h2>זמינות באולם — {venue.name}</h2>
-                <p>
-                  לחצו על תאריך לצפייה בחלונות הזמינים. הזמנות פתוחות עד 6 חודשים
-                  מראש; מועדים פופולריים נסגרים לרוב 8 שבועות מראש.
-                </p>
-              </div>
-              <div className="cal">
-                <div className="cal-top">
-                  <div className="cal-month">
-                    <span>{HE_MONTHS[viewMonth]}</span>
-                    <small>{viewYear}</small>
+            {/* Row 1: Calendar + Time slots */}
+            <div className="av-row">
+              <div>
+                <div className="av-sec-head">
+                  <div className="eyebrow">
+                    <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
+                    שלב 1 · תאריך
                   </div>
-                  <div className="cal-nav">
-                    <button
-                      type="button"
-                      className="cal-nav-btn"
-                      aria-label="חודש קודם"
-                      onClick={() => shiftMonth(-1)}
-                    >
-                      <PrevIcon />
-                    </button>
-                    <button
-                      type="button"
-                      className="cal-nav-btn"
-                      aria-label="חודש הבא"
-                      onClick={() => shiftMonth(1)}
-                    >
-                      <NextIcon />
-                    </button>
-                  </div>
+                  <h2>זמינות · {venue.name}</h2>
                 </div>
-                <div className="cal-dows">
-                  {["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "שבת"].map((d) => (
-                    <div key={d} className="cal-dow">
-                      {d}
+                <div className="cal">
+                  <div className="cal-top">
+                    <div className="cal-month">
+                      <span>{HE_MONTHS[viewMonth]}</span>
+                      <small>{viewYear}</small>
                     </div>
-                  ))}
-                </div>
-                <div className="cal-grid">
-                  {calendarCells.map((cell) =>
-                    cell.kind === "empty" ? (
-                      <div key={cell.key} className="cal-cell empty" />
-                    ) : (
+                    <div className="cal-nav">
                       <button
-                        key={cell.key}
                         type="button"
-                        disabled={cell.status === "past" || cell.status === "booked"}
+                        className="cal-nav-btn"
+                        aria-label="חודש קודם"
+                        onClick={() => shiftMonth(-1)}
+                      >
+                        <PrevIcon />
+                      </button>
+                      <button
+                        type="button"
+                        className="cal-nav-btn"
+                        aria-label="חודש הבא"
+                        onClick={() => shiftMonth(1)}
+                      >
+                        <NextIcon />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="cal-dows">
+                    {["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "שבת"].map((d) => (
+                      <div key={d} className="cal-dow">
+                        {d}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="cal-grid">
+                    {calendarCells.map((cell) =>
+                      cell.kind === "empty" ? (
+                        <div key={cell.key} className="cal-cell empty" />
+                      ) : (
+                        <button
+                          key={cell.key}
+                          type="button"
+                          disabled={cell.status === "past" || cell.status === "booked"}
+                          className={[
+                            "cal-cell",
+                            cell.status,
+                            cell.today ? "today" : "",
+                            cell.selected && cell.status !== "past" && cell.status !== "booked"
+                              ? "selected"
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          onClick={() => pickDate(cell.day)}
+                        >
+                          <span className="d">{cell.day}</span>
+                          {cell.status === "free" && <span className="pill">פנוי</span>}
+                          {cell.status === "partial" && <span className="pill">חלקית</span>}
+                          {cell.status === "booked" && <span className="pill">תפוס</span>}
+                        </button>
+                      )
+                    )}
+                  </div>
+                  <div className="cal-legend">
+                    <span><i className="lg-free" />פנוי</span>
+                    <span><i className="lg-part" />חלקית</span>
+                    <span><i className="lg-booked" />תפוס</span>
+                    <span><i className="lg-today" />היום</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="av-sec-head">
+                  <div className="eyebrow">
+                    <span className="av-eb-dot" style={{ background: "var(--amber)" }} />
+                    שלב 2 · חלון זמן
+                  </div>
+                  <h2>
+                    {selectedDate.getDate()} {HE_MONTHS[selectedDate.getMonth()]}, {dayName}
+                    {isWeekend ? " · תעריף סופ״ש" : ""}
+                  </h2>
+                </div>
+                <div className="slots">
+                  {slotItems.map(({ slot, booked, price }) => {
+                    const sel = selectedSlots.has(slot.id);
+                    return (
+                      <div
+                        key={slot.id}
                         className={[
-                          "cal-cell",
-                          cell.status,
-                          cell.today ? "today" : "",
-                          cell.selected && cell.status !== "past" && cell.status !== "booked"
-                            ? "selected"
-                            : "",
+                          "slot",
+                          sel ? "selected" : "",
+                          booked ? "disabled" : "",
                         ]
                           .filter(Boolean)
                           .join(" ")}
-                        onClick={() => pickDate(cell.day)}
+                        onClick={() => !booked && toggleSlot(slot.id)}
                       >
-                        <span className="d">{cell.day}</span>
-                        {cell.status === "free" && <span className="pill">פנוי</span>}
-                        {cell.status === "partial" && <span className="pill">חלקית</span>}
-                        {cell.status === "booked" && <span className="pill">תפוס</span>}
-                      </button>
-                    )
-                  )}
-                </div>
-                <div className="cal-legend">
-                  <span>
-                    <i className="lg-free" />
-                    פנוי
-                  </span>
-                  <span>
-                    <i className="lg-part" />
-                    חלקית פנוי
-                  </span>
-                  <span>
-                    <i className="lg-booked" />
-                    תפוס
-                  </span>
-                  <span>
-                    <i className="lg-today" />
-                    היום
-                  </span>
+                        <div className="slot-check">
+                          <CheckIcon />
+                        </div>
+                        <div className="slot-info">
+                          <h4>
+                            {slot.title} ·{" "}
+                            <span className="slot-time-emph">{slot.time}</span>
+                          </h4>
+                          <div className="slot-desc">{slot.desc}</div>
+                        </div>
+                        <div className="slot-price">
+                          ₪{price.toLocaleString("he-IL")}
+                          <small>{booked ? "תפוס" : "לחלון"}</small>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            <div className="av-sec reveal">
-              <div className="av-sec-head">
-                <div className="eyebrow">
-                  <span className="av-eb-dot" style={{ background: "var(--amber)" }} />
-                  שלב 2 · בחירת חלון
-                </div>
-                <h2>
-                  חלונות זמינים · {formatHebrewDate(selectedDate)}, {dayName}
-                  {isWeekend ? " · תעריף סוף שבוע" : ""}
-                </h2>
-                <p>
-                  אפשר לבחור חלון בודד או לסמן מספר חלונות עוקבים להפקה ארוכה.
-                  תעריפי שבת/חג מסומנים בנפרד.
-                </p>
-              </div>
-              <div className="slots">
-                {slotItems.map(({ slot, booked, price }) => {
-                  const sel = selectedSlots.has(slot.id);
-                  return (
-                    <div
-                      key={slot.id}
-                      className={[
-                        "slot",
-                        sel ? "selected" : "",
-                        booked ? "disabled" : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      onClick={() => !booked && toggleSlot(slot.id)}
-                    >
-                      <div className="slot-check">
-                        <CheckIcon />
-                      </div>
-                      <div className="slot-info">
-                        <h4>{slot.title}</h4>
-                        <p>{slot.desc}</p>
-                      </div>
-                      <div className="slot-time">{slot.time}</div>
-                      <div className="slot-price">
-                        ₪{price.toLocaleString("he-IL")}
-                        <small>{booked ? "תפוס" : "לחלון"}</small>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="av-sec reveal">
+            {/* Pricing matrix (full-width section) */}
+            <div className="av-sec">
               <div className="av-sec-head">
                 <div className="eyebrow">
                   <span className="av-eb-dot" style={{ background: "var(--coral)" }} />
@@ -784,33 +848,123 @@ export default function AvailabilityPage() {
                 <div className="av-pricing-foot">
                   המחיר כולל שימוש בחלל, מערכת קול בסיסית, תאורת רקע ומיזוג.
                   תוספות (פסנתר קונצרט, מהנדס קול, צילום וידאו) נגבות בנפרד —
-                  ראו ״מה כלול״.
+                  ראו ״ציוד וכלים זמינים״.
                 </div>
               </div>
             </div>
 
-            <div className="av-sec reveal">
-              <div className="av-sec-head">
-                <div className="eyebrow">
-                  <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
-                  כלול בהשכרה
-                </div>
-                <h2>מה אתם מקבלים</h2>
-              </div>
-              <div className="incl-grid">
-                {INCLUSIONS.map((inc) => (
-                  <div className="incl" key={inc.title}>
-                    <div className="ico">{inc.icon}</div>
-                    <div>
-                      <h4>{inc.title}</h4>
-                      <p>{inc.body}</p>
-                    </div>
+            {/* Row 2: What's included + Equipment picker */}
+            <div className="av-row">
+              <div>
+                <div className="av-sec-head">
+                  <div className="eyebrow">
+                    <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
+                    כלול בהשכרה
                   </div>
-                ))}
+                  <h2>מה אתם מקבלים</h2>
+                </div>
+                <div className="incl-grid">
+                  {INCLUSIONS.map((inc) => (
+                    <div className="incl" key={inc.title}>
+                      <div className="ico">{inc.icon}</div>
+                      <div>
+                        <h4>{inc.title}</h4>
+                        <p>{inc.body}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="av-sec-head">
+                  <div className="eyebrow">
+                    <span className="av-eb-dot" style={{ background: "var(--amber)" }} />
+                    שלב 4 · ציוד נוסף
+                  </div>
+                  <h2>ציוד וכלים זמינים</h2>
+                </div>
+                <div className="eqp">
+                  <div className="eqp-top">
+                    <div className="eqp-top-l">
+                      <strong>{venue.name}</strong>
+                      <span>·</span>
+                      <span>{eqItems.length} פריטים זמינים</span>
+                    </div>
+                    <span className="badge">{selectedEq.size} נבחרו</span>
+                  </div>
+                  <div className="eqp-cats">
+                    {EQ_CATEGORIES.filter(
+                      (c) => c.id === "all" || (eqCounts[c.id] ?? 0) > 0
+                    ).map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        className={`eqp-cat${eqCat === c.id ? " active" : ""}`}
+                        onClick={() => setEqCat(c.id)}
+                      >
+                        {c.label}
+                        <span className="ct">{eqCounts[c.id] ?? 0}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="eqp-list">
+                    {eqFiltered.length === 0 ? (
+                      <div className="eqp-empty">אין פריטים בקטגוריה זו</div>
+                    ) : (
+                      eqFiltered.map((x) => {
+                        const sel = selectedEq.has(x.id);
+                        const qtyClass =
+                          x.qty === 0 ? "out" : x.qty <= 2 ? "low" : "";
+                        const qtyLabel = x.qty === 1 ? "יחידה אחת" : `${x.qty} זמינים`;
+                        return (
+                          <div
+                            key={x.id}
+                            className={`eqp-item${sel ? " selected" : ""}`}
+                            onClick={() => toggleEq(x.id)}
+                          >
+                            <div className="eqp-cb">
+                              <CheckIcon size={11} />
+                            </div>
+                            <div className="eqp-info">
+                              <div className="eqp-name">
+                                {x.name}
+                                <span className={`qty${qtyClass ? ` ${qtyClass}` : ""}`}>
+                                  {qtyLabel}
+                                </span>
+                              </div>
+                              <div className="eqp-spec">{x.spec}</div>
+                            </div>
+                            {x.price === 0 ? (
+                              <div className="eqp-price free">כלול</div>
+                            ) : (
+                              <div className="eqp-price">
+                                +₪{x.price.toLocaleString("he-IL")}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  <div className="eqp-foot">
+                    <span>
+                      תוספת לציוד: ₪{eqSelectedTotal.toLocaleString("he-IL")}
+                    </span>
+                    <button
+                      type="button"
+                      className="clear"
+                      onClick={() => setSelectedEq(new Set())}
+                    >
+                      ניקוי בחירה
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="av-sec reveal">
+            {/* Booking form */}
+            <div className="av-sec">
               <div className="av-sec-head">
                 <div className="eyebrow">
                   <span className="av-eb-dot" style={{ background: "var(--coral)" }} />
@@ -826,15 +980,11 @@ export default function AvailabilityPage() {
                 <h3>איש הקשר וההפקה</h3>
                 <div className="form-grid">
                   <div className="field">
-                    <label>
-                      שם פרטי <span className="req">*</span>
-                    </label>
+                    <label>שם פרטי <span className="req">*</span></label>
                     <input type="text" placeholder="ישראל" required />
                   </div>
                   <div className="field">
-                    <label>
-                      שם משפחה <span className="req">*</span>
-                    </label>
+                    <label>שם משפחה <span className="req">*</span></label>
                     <input type="text" placeholder="ישראלי" required />
                   </div>
                   <div className="field">
@@ -842,13 +992,9 @@ export default function AvailabilityPage() {
                     <input type="text" placeholder="הפקת אבני חברתי" />
                   </div>
                   <div className="field">
-                    <label>
-                      סוג האירוע <span className="req">*</span>
-                    </label>
+                    <label>סוג האירוע <span className="req">*</span></label>
                     <select required defaultValue="">
-                      <option value="" disabled>
-                        בחרו סוג
-                      </option>
+                      <option value="" disabled>בחרו סוג</option>
                       <option>קונצרט / רסיטל</option>
                       <option>הקלטת סטודיו</option>
                       <option>הקלטה חיה / שידור</option>
@@ -860,15 +1006,11 @@ export default function AvailabilityPage() {
                     </select>
                   </div>
                   <div className="field">
-                    <label>
-                      דוא״ל <span className="req">*</span>
-                    </label>
+                    <label>דוא״ל <span className="req">*</span></label>
                     <input type="email" placeholder="rentals@example.com" required />
                   </div>
                   <div className="field">
-                    <label>
-                      טלפון <span className="req">*</span>
-                    </label>
+                    <label>טלפון <span className="req">*</span></label>
                     <input type="tel" placeholder="050-1234567" required />
                   </div>
                   <div className="field">
@@ -885,15 +1027,16 @@ export default function AvailabilityPage() {
                   </div>
                   <div className="field full">
                     <label>תוספות וצרכים מיוחדים</label>
-                    <textarea placeholder="לדוגמה: צריכים פסנתר קונצרט מכוון, צוות הקלטה מרובה ערוצים, תאורה צבעונית, חדר הלבשה נוסף, הגברה לקהל גדול וכו׳" />
+                    <textarea placeholder="לדוגמה: תאורה צבעונית, חדר הלבשה נוסף, הגברה לקהל גדול וכו׳" />
                   </div>
                 </div>
               </form>
             </div>
           </div>
 
+          {/* RIGHT: itemized sticky summary */}
           <div>
-            <aside className="av-sum reveal">
+            <aside className="av-sum">
               <h3>סיכום הבקשה</h3>
               <div className="av-sum-venue">
                 <div
@@ -905,39 +1048,128 @@ export default function AvailabilityPage() {
                   <div className="av-sum-vmeta">{venue.meta}</div>
                 </div>
               </div>
-              <div className="av-sum-lines">
-                <div className="av-sum-line">
-                  <span className="av-sum-l">תאריך</span>
-                  <span className="av-sum-v">{formatHebrewDate(selectedDate)}</span>
+
+              <div className="av-sum-meta">
+                <div className="av-sum-meta-item">
+                  <span className="av-sum-meta-l">תאריך</span>
+                  <span className="av-sum-meta-v">{formatHebrewDate(selectedDate)}</span>
                 </div>
-                <div className="av-sum-line">
-                  <span className="av-sum-l">חלונות</span>
-                  <span
-                    className={`av-sum-v${summary.slotObjs.length === 0 ? " muted" : ""}`}
-                  >
-                    {summary.slotObjs.length === 0
-                      ? "לא נבחרו"
-                      : summary.slotObjs.map((s) => s.title).join(" · ")}
-                  </span>
-                </div>
-                <div className="av-sum-line">
-                  <span className="av-sum-l">סה״כ שעות</span>
-                  <span className="av-sum-v">
-                    {summary.totalHours > 0 ? `${summary.totalHours} שעות` : "—"}
-                  </span>
-                </div>
-                <div className="av-sum-line">
-                  <span className="av-sum-l">תעריף יום</span>
-                  <span className="av-sum-v">{isWeekend ? "סוף שבוע" : "יום חול"}</span>
+                <div className="av-sum-meta-item">
+                  <span className="av-sum-meta-l">תעריף</span>
+                  <span className="av-sum-meta-v">{isWeekend ? "סוף שבוע" : "יום חול"}</span>
                 </div>
               </div>
+
+              <div className="av-sum-section">
+                <div className="av-sum-section-h">
+                  <span className="av-sum-section-t">חלונות זמן</span>
+                  <span
+                    className={`av-sum-section-c${summary.slotObjs.length === 0 ? " zero" : ""}`}
+                  >
+                    {summary.slotObjs.length}
+                  </span>
+                </div>
+                <div className="av-sum-items">
+                  {summary.slotObjs.length === 0 ? (
+                    <div className="av-sum-empty">בחרו לפחות חלון זמן אחד</div>
+                  ) : (
+                    summary.slotObjs.map((s) => {
+                      const hrs = parseHourSpan(s.time);
+                      const price = isWeekend ? s.priceWknd : s.priceWeek;
+                      return (
+                        <div className="av-sum-item" key={s.id}>
+                          <div>
+                            <div className="av-sum-item-t">
+                              {s.title} ·{" "}
+                              <span className="av-sum-item-meta">{s.time}</span>
+                            </div>
+                            <div className="av-sum-item-d">
+                              {s.desc} · {hrs} שעות
+                            </div>
+                          </div>
+                          <div className="av-sum-item-p">{fmt(price)}</div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              <div className={`av-sum-section${eqShouldScroll ? " has-scroll" : ""}`}>
+                <div className="av-sum-section-h">
+                  <span className="av-sum-section-t">ציוד וכלים</span>
+                  <span
+                    className={`av-sum-section-c${summary.eqIds.length === 0 ? " zero" : ""}`}
+                  >
+                    {summary.eqIds.length}
+                  </span>
+                </div>
+                <div className={`av-sum-items${eqShouldScroll ? " scroll" : ""}`}>
+                  {summary.eqIds.length === 0 ? (
+                    <div className="av-sum-empty">לא נבחר ציוד נוסף</div>
+                  ) : (
+                    summary.eqIds.map((id) => {
+                      const x = EQ_CATALOG[id];
+                      if (!x) return null;
+                      return (
+                        <div className="av-sum-item" key={id}>
+                          <div>
+                            <div className="av-sum-item-t">{x.name}</div>
+                            <div className="av-sum-item-d">{x.spec}</div>
+                          </div>
+                          {x.price === 0 ? (
+                            <div className="av-sum-item-p free">כלול</div>
+                          ) : (
+                            <div className="av-sum-item-p">{fmt(x.price)}</div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+              <div className="av-sum-costs">
+                <div className="av-sum-cost-row">
+                  <span>השכרת חלל</span>
+                  <span className="av-sum-cost-v">
+                    {summary.hasAnything ? fmt(summary.hallTotal) : "—"}
+                  </span>
+                </div>
+                <div className="av-sum-cost-row">
+                  <span>ציוד נוסף</span>
+                  <span className="av-sum-cost-v">
+                    {summary.hasAnything
+                      ? summary.eqTotal > 0
+                        ? fmt(summary.eqTotal)
+                        : "₪0"
+                      : "—"}
+                  </span>
+                </div>
+                <div className="av-sum-cost-row av-sum-cost-sub">
+                  <span>סכום ביניים</span>
+                  <span className="av-sum-cost-v">
+                    {summary.hasAnything ? fmt(summary.subtotal) : "—"}
+                  </span>
+                </div>
+                <div className="av-sum-cost-row av-sum-cost-vat">
+                  <span>מע״מ (17%)</span>
+                  <span className="av-sum-cost-v">
+                    {summary.hasAnything ? fmt(summary.vat) : "—"}
+                  </span>
+                </div>
+              </div>
+
               <div className="av-sum-est">
-                <span className="lbl">הערכת מחיר</span>
+                <div className="av-sum-est-l">
+                  <span className="lbl">סה״כ לתשלום</span>
+                  <small>כולל מע״מ · הערכה ראשונית</small>
+                </div>
                 <span className="amt">
-                  <small>לא כולל מע״מ</small>
-                  {summary.total > 0 ? `₪${summary.total.toLocaleString("he-IL")}` : "—"}
+                  {summary.hasAnything ? fmt(summary.total) : "—"}
                 </span>
               </div>
+
               <button
                 type="button"
                 className="av-sum-btn"

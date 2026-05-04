@@ -11,6 +11,16 @@ export type Slot = {
 
 export type PricingRow = [pkg: string, weekday: string, weekend: string, note: string];
 
+export type EquipmentCategory = "pa" | "mic" | "ins" | "rec" | "light" | "misc";
+
+export type EquipmentItem = {
+  name: string;
+  spec: string;
+  cat: EquipmentCategory;
+  price: number;
+  qty: number;
+};
+
 export type AvailabilityVenue = {
   kind: VenueKind;
   name: string;
@@ -25,7 +35,70 @@ export type AvailabilityVenue = {
   thumb: string;
   pricing: PricingRow[];
   slots: Slot[];
+  equipment: string[];
 };
+
+export const EQ_CATALOG: Record<string, EquipmentItem> = {
+  // PA / Mixing
+  mix_dlive: { name: "Allen & Heath dLive S5000", spec: "128 ערוצים · DSP מלא · UI להפקות גדולות", cat: "pa", price: 0, qty: 1 },
+  mix_ssl: { name: "SSL AWS 948 δ-edition", spec: "מיקסר אנלוגי 48 ערוצים · אינטגרציית DAW", cat: "pa", price: 0, qty: 1 },
+  mix_x32: { name: "Behringer X32", spec: "32 ערוצים · דיגיטלי · נייד", cat: "pa", price: 800, qty: 2 },
+  pa_main: { name: "L-Acoustics Kara II Line", spec: "מערך תליה ראשי · 2×6 קופסאות + 2 SUB", cat: "pa", price: 0, qty: 1 },
+  pa_kiva: { name: "L-Acoustics Kiva II", spec: "מערך נייד · אולמות עד 250 מקומות", cat: "pa", price: 0, qty: 2 },
+  monitor: { name: "מסכי במה d&b M4", spec: "מסכי החזרה אישיים · 4 ערוצים נפרדים", cat: "pa", price: 0, qty: 8 },
+  iem: { name: "Shure PSM-1000 IEM", spec: "מערכת אוזניות אלחוטיות · עד 6 משדרים", cat: "pa", price: 1200, qty: 6 },
+
+  // Microphones
+  mic_sm58: { name: "Shure SM58", spec: "מיקרופון ווקאל דינמי · קלאסיקה", cat: "mic", price: 0, qty: 12 },
+  mic_sm57: { name: "Shure SM57", spec: "מיקרופון אינסטרומנט · תופים, גיטרה, נחושת", cat: "mic", price: 0, qty: 10 },
+  mic_ksm9: { name: "Shure KSM9 אלחוטי", spec: "ווקאל אלחוטי קונדנסר · ערוץ דיגיטלי", cat: "mic", price: 350, qty: 8 },
+  mic_dpa: { name: "DPA 4099 (לכלי מיתר)", spec: "מיקרופון קליפ לכינור, צ׳לו, נשיפה", cat: "mic", price: 250, qty: 10 },
+  mic_neumann: { name: "Neumann KM 184 זוג", spec: "זוג מיקרופוני אולם קונדנסר · להקלטה אקוסטית", cat: "mic", price: 600, qty: 2 },
+  mic_dpa4011: { name: "DPA 4011 זוג", spec: "זוג קונדנסר Cardioid להקלטה קלאסית", cat: "mic", price: 800, qty: 1 },
+  mic_lavalier: { name: "DPA 4061 לאוואלייר", spec: "מיקרופון דש אלחוטי · לדוברים, מנחים", cat: "mic", price: 280, qty: 6 },
+  mic_kick: { name: "AKG D112 (Kick)", spec: "מיקרופון תוף בס", cat: "mic", price: 0, qty: 2 },
+
+  // Instruments
+  ins_steinway: { name: "Steinway D-274", spec: "פסנתר כנף קונצרט · 9 רגל · באולם בלבד", cat: "ins", price: 0, qty: 1 },
+  ins_yamaha_c7: { name: "Yamaha C7X", spec: "פסנתר כנף 7½ רגל · אולם קאמרי", cat: "ins", price: 0, qty: 1 },
+  ins_kawai: { name: "Kawai GX-2", spec: "פסנתר כנף בייבי · חזרות וכיתות", cat: "ins", price: 0, qty: 4 },
+  ins_upright: { name: "פסנתר עומד Yamaha U3", spec: "פסנתר עומד · להוראה ולחזרות", cat: "ins", price: 0, qty: 6 },
+  ins_drumkit: { name: "Yamaha Maple Custom Drums", spec: "מערכת תופים מלאה · 4 פיסס + צ׳יילו", cat: "ins", price: 450, qty: 2 },
+  ins_amps: { name: "מגברי גיטרה (Fender / Marshall)", spec: "מגברי במה · גיטרה ובס", cat: "ins", price: 350, qty: 4 },
+  ins_harp: { name: "נבל Salvi Daphne 47", spec: "נבל קונצרט · להזמנה מראש בלבד", cat: "ins", price: 1200, qty: 1 },
+  ins_marimba: { name: "מארימבה Marimba One", spec: "5 אוקטבות · רוזווד", cat: "ins", price: 800, qty: 1 },
+
+  // Recording
+  rec_protools: { name: "תחנת Pro Tools HDX", spec: "64 ערוצים בו-זמנית · Avid HDX", cat: "rec", price: 0, qty: 1 },
+  rec_dante: { name: "מערכת Dante 64×64", spec: "תשתית רשת אודיו דיגיטלית", cat: "rec", price: 0, qty: 1 },
+  rec_engineer: { name: "מהנדס הקלטה ראשי", spec: "6 שעות · עריכה ראשונה כלולה", cat: "rec", price: 2400, qty: 1 },
+  rec_video: { name: "הקלטת וידאו 4K (3 מצלמות)", spec: "הפקת וידאו · עריכה לא כלולה", cat: "rec", price: 4500, qty: 1 },
+  rec_stream: { name: "הזרמה חיה (Multi-platform)", spec: "YouTube · Facebook · Vimeo · ספירת צופים", cat: "rec", price: 1800, qty: 1 },
+
+  // Lighting + stage
+  light_basic: { name: "תאורת LED בסיסית", spec: "12 גופי LED RGB · לוח הפעלה", cat: "light", price: 0, qty: 1 },
+  light_full: { name: "עיצוב תאורה מלא", spec: "מעצב תאורה · 30 גופים · נשלט DMX", cat: "light", price: 2800, qty: 1 },
+  light_movers: { name: "גופים זזים Robe Pointe", spec: "8 גופים · להפקות גדולות", cat: "light", price: 1600, qty: 1 },
+  stage_riser: { name: "בימות ניידות (1×2 מ׳)", spec: "בימה מודולרית · בגבהים שונים", cat: "light", price: 180, qty: 12 },
+  stage_truss: { name: "מערכת טרסים תלייה", spec: "מבנה תלייה · 8 מטר רוחב", cat: "light", price: 900, qty: 1 },
+
+  // Misc
+  misc_chairs: { name: "כסאות תזמורת (Wenger)", spec: "כסא נגן מתכוונן", cat: "misc", price: 0, qty: 80 },
+  misc_stands: { name: "סטנדרים לתווים", spec: "סטנד נגן + מנורת LED", cat: "misc", price: 0, qty: 80 },
+  misc_podium: { name: "פודיום מנצח", spec: "פודיום מוגבה למנצח · עם סטנד", cat: "misc", price: 0, qty: 2 },
+  misc_piano_tune: { name: "כיוונון פסנתר לפני האירוע", spec: "מכוון מקצועי · בוקר האירוע", cat: "misc", price: 850, qty: 1 },
+  misc_translation: { name: "מערכת תרגום סימולטני", spec: "50 מקלטים · 2 תאי מתרגמים", cat: "misc", price: 1400, qty: 1 },
+};
+
+export const EQ_CATEGORIES: { id: "all" | EquipmentCategory; label: string }[] = [
+  { id: "all", label: "הכל" },
+  { id: "pa", label: "הגברה ומיקסרים" },
+  { id: "mic", label: "מיקרופונים" },
+  { id: "ins", label: "כלי נגינה" },
+  { id: "rec", label: "הקלטה" },
+  { id: "light", label: "תאורה ובמה" },
+  { id: "misc", label: "אביזרים נוספים" },
+];
 
 const hallSlots = (
   m1: string,
@@ -86,6 +159,13 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       [7000, 9500],
       [11000, 14000],
     ]),
+    equipment: [
+      "mix_dlive", "pa_main", "monitor", "iem", "mic_sm58", "mic_sm57", "mic_ksm9", "mic_dpa", "mic_neumann", "mic_lavalier", "mic_kick",
+      "ins_steinway", "ins_drumkit", "ins_amps", "ins_harp", "ins_marimba",
+      "rec_protools", "rec_dante", "rec_engineer", "rec_video", "rec_stream",
+      "light_basic", "light_full", "light_movers", "stage_riser", "stage_truss",
+      "misc_chairs", "misc_stands", "misc_podium", "misc_piano_tune", "misc_translation",
+    ],
   },
   chamber: {
     kind: "hall",
@@ -110,6 +190,13 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       [3600, 4800],
       [5800, 7600],
     ]),
+    equipment: [
+      "mix_x32", "pa_kiva", "monitor", "mic_sm58", "mic_ksm9", "mic_dpa", "mic_neumann", "mic_dpa4011", "mic_lavalier",
+      "ins_yamaha_c7", "ins_amps",
+      "rec_protools", "rec_engineer", "rec_video", "rec_stream",
+      "light_basic", "light_full", "stage_riser",
+      "misc_chairs", "misc_stands", "misc_podium", "misc_piano_tune",
+    ],
   },
   blackbox: {
     kind: "hall",
@@ -134,6 +221,13 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       [3000, 4000],
       [4800, 6400],
     ]),
+    equipment: [
+      "mix_x32", "pa_kiva", "monitor", "mic_sm58", "mic_sm57", "mic_ksm9", "mic_lavalier",
+      "ins_kawai", "ins_drumkit", "ins_amps",
+      "rec_video", "rec_stream",
+      "light_basic", "light_full", "light_movers", "stage_riser", "stage_truss",
+      "misc_chairs", "misc_stands",
+    ],
   },
   foyer: {
     kind: "hall",
@@ -158,6 +252,13 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       [1800, 2400],
       [3200, 4200],
     ]),
+    equipment: [
+      "mix_x32", "pa_kiva", "mic_sm58", "mic_ksm9", "mic_lavalier",
+      "ins_kawai",
+      "rec_stream",
+      "light_basic", "stage_riser",
+      "misc_chairs", "misc_stands",
+    ],
   },
   studio: {
     kind: "studio",
@@ -181,6 +282,12 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "morning", title: "בוקר", time: "09:00 – 13:00", desc: "הקלטות סולו, voiceover, פודקאסטים", priceWeek: 4800, priceWknd: 6000 },
       { id: "afternoon", title: "אחה״צ", time: "14:00 – 18:00", desc: "הרכבים בינוניים, תקליטי לייב", priceWeek: 4800, priceWknd: 6000 },
       { id: "evening", title: "ערב לילה", time: "19:00 – 24:00", desc: "הרכבים גדולים, הקלטה מתוזמרת", priceWeek: 6000, priceWknd: 7500 },
+    ],
+    equipment: [
+      "mix_ssl", "monitor", "iem", "mic_sm58", "mic_sm57", "mic_ksm9", "mic_dpa", "mic_neumann", "mic_dpa4011", "mic_lavalier", "mic_kick",
+      "ins_kawai", "ins_drumkit", "ins_amps",
+      "rec_protools", "rec_dante", "rec_engineer",
+      "misc_chairs", "misc_stands", "misc_piano_tune",
     ],
   },
   studioB: {
@@ -206,6 +313,10 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "afternoon", title: "אחה״צ", time: "14:00 – 18:00", desc: "הקלטה אינטימית · סולן או דואט", priceWeek: 2600, priceWknd: 3300 },
       { id: "evening", title: "ערב", time: "19:00 – 23:00", desc: "מיקס ארוך · התייחסות ביקורתית", priceWeek: 2600, priceWknd: 3300 },
     ],
+    equipment: [
+      "mix_ssl", "monitor", "mic_sm58", "mic_dpa", "mic_neumann", "mic_lavalier",
+      "rec_protools", "rec_dante", "rec_engineer",
+    ],
   },
   vocalbooth: {
     kind: "studio",
@@ -230,6 +341,7 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "afternoon", title: "אחה״צ", time: "13:00 – 17:00", desc: "פודקאסט · הקלטה ועריכה", priceWeek: 1200, priceWknd: 1500 },
       { id: "evening", title: "ערב", time: "18:00 – 22:00", desc: "אודיובוק · סשן ארוך", priceWeek: 1200, priceWknd: 1500 },
     ],
+    equipment: ["mic_sm58", "mic_neumann", "mic_lavalier", "rec_protools", "rec_engineer"],
   },
   reheLarge: {
     kind: "rehe",
@@ -253,6 +365,12 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "morning", title: "בוקר", time: "07:00 – 12:00", desc: "חזרות אנסמבל · עומק אקוסטי", priceWeek: 950, priceWknd: 1200 },
       { id: "afternoon", title: "אחה״צ", time: "13:00 – 18:00", desc: "תזמורת קאמרית · קריאת תווים", priceWeek: 950, priceWknd: 1200 },
       { id: "evening", title: "ערב", time: "19:00 – 23:00", desc: "חזרת לילה · סבב הפקה", priceWeek: 950, priceWknd: 1200 },
+    ],
+    equipment: [
+      "mix_x32", "pa_kiva", "monitor", "mic_sm58", "mic_sm57", "mic_dpa",
+      "ins_kawai", "ins_drumkit", "ins_amps",
+      "light_basic",
+      "misc_chairs", "misc_stands", "misc_podium", "misc_piano_tune",
     ],
   },
   reheMid: {
@@ -278,6 +396,9 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "afternoon", title: "אחה״צ", time: "13:00 – 18:00", desc: "דואט / טריו · עבודה דקה", priceWeek: 600, priceWknd: 780 },
       { id: "evening", title: "ערב", time: "19:00 – 23:00", desc: "חזרה מאוחרת · קונסרבטוריון", priceWeek: 600, priceWknd: 780 },
     ],
+    equipment: [
+      "mic_sm58", "mic_dpa", "ins_upright", "ins_amps", "misc_chairs", "misc_stands", "misc_piano_tune",
+    ],
   },
   reheSmall: {
     kind: "rehe",
@@ -302,6 +423,7 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "afternoon", title: "אחה״צ", time: "13:00 – 18:00", desc: "תרגול אחה״צ · אחרי לימודים", priceWeek: 350, priceWknd: 450 },
       { id: "evening", title: "ערב", time: "19:00 – 24:00", desc: "תרגול ערב · שעות עומס מוזיקליות", priceWeek: 350, priceWknd: 450 },
     ],
+    equipment: ["ins_upright", "misc_chairs", "misc_stands"],
   },
   classMaster: {
     kind: "class",
@@ -325,6 +447,13 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "morning", title: "בוקר", time: "08:00 – 12:00", desc: "כיתת מאסטר · 4 סטודנטים", priceWeek: 1650, priceWknd: 2100 },
       { id: "afternoon", title: "אחה״צ", time: "13:00 – 17:00", desc: "הרצאה אקדמית · עד 30 צופים", priceWeek: 1650, priceWknd: 2100 },
       { id: "evening", title: "ערב", time: "18:00 – 22:00", desc: "הופעת חניכים · קונצרט סטודנטים", priceWeek: 1650, priceWknd: 2100 },
+    ],
+    equipment: [
+      "mix_x32", "mic_sm58", "mic_lavalier", "mic_dpa",
+      "ins_kawai",
+      "rec_video", "rec_stream",
+      "light_basic",
+      "misc_chairs", "misc_stands", "misc_podium",
     ],
   },
   classRoom: {
@@ -350,6 +479,7 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "afternoon", title: "אחה״צ", time: "13:00 – 17:00", desc: "שיעורים פרטניים · קונסרבטוריון", priceWeek: 780, priceWknd: 960 },
       { id: "evening", title: "ערב", time: "18:00 – 22:00", desc: "מבוגרים · לימודי ערב", priceWeek: 780, priceWknd: 960 },
     ],
+    equipment: ["mic_lavalier", "ins_upright", "rec_stream", "misc_chairs", "misc_stands"],
   },
 };
 
