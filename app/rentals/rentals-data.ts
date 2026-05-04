@@ -55,7 +55,7 @@ export const venues: Venue[] = [
       { dt: "קול", dd: "d&b audiotechnik Y-Series" },
     ],
     ctas: [
-      { label: "בדיקת זמינות", href: "#contact", variant: "ink" },
+      { label: "בדיקת זמינות", href: "/rentals/availability?venue=auditorium", variant: "ink" },
       { label: "סיור וירטואלי 360°", href: "#", variant: "outline" },
     ],
   },
@@ -77,7 +77,7 @@ export const venues: Venue[] = [
       { dt: "הקלטה", dd: "חיבור ישיר לסטודיו" },
     ],
     ctas: [
-      { label: "בדיקת זמינות", href: "#contact", variant: "ink" },
+      { label: "בדיקת זמינות", href: "/rentals/availability?venue=chamber", variant: "ink" },
       { label: "סיור וירטואלי 360°", href: "#", variant: "outline" },
     ],
   },
@@ -99,7 +99,7 @@ export const venues: Venue[] = [
       { dt: "תמיכה", dd: "מהנדס קול פנימי" },
     ],
     ctas: [
-      { label: "הצעת מחיר", href: "#contact", variant: "ink" },
+      { label: "בדיקת זמינות", href: "/rentals/availability?venue=studio", variant: "ink" },
       { label: "דוגמאות הקלטה", href: "#", variant: "outline" },
     ],
   },
