@@ -255,6 +255,10 @@ export default function AvailabilityPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
+  type SubmitState = "idle" | "sending" | "success" | "error";
+  const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   // pick venue from ?venue= on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -498,13 +502,64 @@ export default function AvailabilityPage() {
     setPickerOpen(false);
   }
 
-  function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function submitInquiry(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (submitState === "sending") return;
     if (selectedSlots.size === 0) {
-      alert("נא לבחור לפחות חלון זמן אחד");
+      setSubmitError("נא לבחור לפחות חלון זמן אחד");
+      setSubmitState("error");
       return;
     }
-    alert("הבקשה נשלחה!\nנחזור אליכם תוך 48 שעות עם אישור והצעת מחיר.");
+
+    const fd = new FormData(e.currentTarget);
+    const get = (name: string) => ((fd.get(name) as string) ?? "").trim();
+    const participantsRaw = get("participants");
+
+    const payload = {
+      honeypot: get("website"),
+      contact: {
+        firstName: get("firstName"),
+        lastName: get("lastName"),
+        organization: get("organization"),
+        eventType: get("eventType"),
+        email: get("email"),
+        phone: get("phone"),
+        participants: participantsRaw ? Number(participantsRaw) : null,
+        dateFlexibility: get("dateFlexibility"),
+        notes: get("notes"),
+      },
+      selection: {
+        venueKey,
+        date: selectedDate.toISOString(),
+        isWeekend,
+        slotIds: summary.slotObjs.map((s) => s.id),
+        equipmentIds: summary.eqIds,
+      },
+    };
+
+    setSubmitState("sending");
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/rentals/inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = (await res.json().catch(() => null)) as
+        | { ok: boolean; error?: string }
+        | null;
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || "שליחת הבקשה נכשלה");
+      }
+      setSubmitState("success");
+    } catch (err) {
+      setSubmitState("error");
+      setSubmitError(
+        err instanceof Error && err.message
+          ? err.message
+          : "שליחת הבקשה נכשלה. נסו שוב או צרו קשר טלפונית בטלפון 09-7610000.",
+      );
+    }
   }
 
   const eqShouldScroll = summary.eqIds.length > 3;
@@ -976,24 +1031,48 @@ export default function AvailabilityPage() {
                   מותאמת והזמנה לסיור פיזי במקום.
                 </p>
               </div>
-              <form className="av-form-card" onSubmit={onSubmit}>
+              <form
+                id="rentals-inquiry-form"
+                className="av-form-card"
+                onSubmit={submitInquiry}
+              >
                 <h3>איש הקשר וההפקה</h3>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                    width: 1,
+                    height: 1,
+                    overflow: "hidden",
+                  }}
+                >
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      name="website"
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </label>
+                </div>
                 <div className="form-grid">
                   <div className="field">
-                    <label>שם פרטי <span className="req">*</span></label>
-                    <input type="text" placeholder="ישראל" required />
+                    <label htmlFor="rf-first">שם פרטי <span className="req">*</span></label>
+                    <input id="rf-first" name="firstName" type="text" placeholder="ישראל" required maxLength={80} autoComplete="given-name" />
                   </div>
                   <div className="field">
-                    <label>שם משפחה <span className="req">*</span></label>
-                    <input type="text" placeholder="ישראלי" required />
+                    <label htmlFor="rf-last">שם משפחה <span className="req">*</span></label>
+                    <input id="rf-last" name="lastName" type="text" placeholder="ישראלי" required maxLength={80} autoComplete="family-name" />
                   </div>
                   <div className="field">
-                    <label>שם הארגון / ההפקה</label>
-                    <input type="text" placeholder="הפקת אבני חברתי" />
+                    <label htmlFor="rf-org">שם הארגון / ההפקה</label>
+                    <input id="rf-org" name="organization" type="text" placeholder="הפקת אבני חברתי" maxLength={120} autoComplete="organization" />
                   </div>
                   <div className="field">
-                    <label>סוג האירוע <span className="req">*</span></label>
-                    <select required defaultValue="">
+                    <label htmlFor="rf-event">סוג האירוע <span className="req">*</span></label>
+                    <select id="rf-event" name="eventType" required defaultValue="">
                       <option value="" disabled>בחרו סוג</option>
                       <option>קונצרט / רסיטל</option>
                       <option>הקלטת סטודיו</option>
@@ -1006,28 +1085,28 @@ export default function AvailabilityPage() {
                     </select>
                   </div>
                   <div className="field">
-                    <label>דוא״ל <span className="req">*</span></label>
-                    <input type="email" placeholder="rentals@example.com" required />
+                    <label htmlFor="rf-email">דוא״ל <span className="req">*</span></label>
+                    <input id="rf-email" name="email" type="email" placeholder="rentals@example.com" required maxLength={160} autoComplete="email" />
                   </div>
                   <div className="field">
-                    <label>טלפון <span className="req">*</span></label>
-                    <input type="tel" placeholder="050-1234567" required />
+                    <label htmlFor="rf-phone">טלפון <span className="req">*</span></label>
+                    <input id="rf-phone" name="phone" type="tel" placeholder="050-1234567" required maxLength={40} autoComplete="tel" />
                   </div>
                   <div className="field">
-                    <label>מספר משתתפים מתוכנן</label>
-                    <input type="number" placeholder="0" min={0} />
+                    <label htmlFor="rf-participants">מספר משתתפים מתוכנן</label>
+                    <input id="rf-participants" name="participants" type="number" placeholder="0" min={0} max={100000} />
                   </div>
                   <div className="field">
-                    <label>תאריך גמיש?</label>
-                    <select defaultValue="לא — תאריך מדויק">
+                    <label htmlFor="rf-flex">תאריך גמיש?</label>
+                    <select id="rf-flex" name="dateFlexibility" defaultValue="לא — תאריך מדויק">
                       <option>לא — תאריך מדויק</option>
                       <option>גמיש בשבוע סמוך</option>
                       <option>גמיש לחלוטין</option>
                     </select>
                   </div>
                   <div className="field full">
-                    <label>תוספות וצרכים מיוחדים</label>
-                    <textarea placeholder="לדוגמה: תאורה צבעונית, חדר הלבשה נוסף, הגברה לקהל גדול וכו׳" />
+                    <label htmlFor="rf-notes">תוספות וצרכים מיוחדים</label>
+                    <textarea id="rf-notes" name="notes" maxLength={2000} placeholder="לדוגמה: תאורה צבעונית, חדר הלבשה נוסף, הגברה לקהל גדול וכו׳" />
                   </div>
                 </div>
               </form>
@@ -1170,26 +1249,66 @@ export default function AvailabilityPage() {
                 </span>
               </div>
 
-              <button
-                type="button"
-                className="av-sum-btn"
-                onClick={() => {
-                  if (selectedSlots.size === 0) {
-                    alert("נא לבחור לפחות חלון זמן אחד");
-                    return;
-                  }
-                  alert(
-                    "הבקשה נשלחה!\nנחזור אליכם תוך 48 שעות עם אישור והצעת מחיר."
-                  );
-                }}
-              >
-                <ArrowIcon />
-                שליחת בקשת הזמנה
-              </button>
-              <div className="av-sum-foot">
-                <strong>אין חיוב בשלב זה.</strong> המספר מהווה הערכה ראשונית; מחיר
-                סופי ייקבע בהצעה המפורטת.
-              </div>
+              {submitState === "success" ? (
+                <div
+                  role="status"
+                  style={{
+                    background: "#faf7f2",
+                    border: "1px solid #3cbabd",
+                    borderRadius: 12,
+                    padding: "14px 16px",
+                    color: "#1a1a1a",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  <strong style={{ display: "block", marginBottom: 4 }}>
+                    הבקשה נשלחה!
+                  </strong>
+                  <span style={{ color: "#3a3a3a", fontSize: 14 }}>
+                    נחזור אליכם תוך 48 שעות עם אישור זמינות והצעת מחיר מותאמת.
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="submit"
+                    form="rentals-inquiry-form"
+                    className="av-sum-btn"
+                    disabled={submitState === "sending"}
+                    aria-busy={submitState === "sending"}
+                  >
+                    {submitState === "sending" ? (
+                      <span>שולח…</span>
+                    ) : (
+                      <>
+                        <ArrowIcon />
+                        שליחת בקשת הזמנה
+                      </>
+                    )}
+                  </button>
+                  {submitState === "error" && submitError ? (
+                    <div
+                      role="alert"
+                      style={{
+                        marginTop: 10,
+                        background: "#faf7f2",
+                        border: "1px solid #e83c4e",
+                        borderRadius: 10,
+                        padding: "10px 12px",
+                        color: "#1a1a1a",
+                        fontSize: 13,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {submitError}
+                    </div>
+                  ) : null}
+                  <div className="av-sum-foot">
+                    <strong>אין חיוב בשלב זה.</strong> המספר מהווה הערכה ראשונית; מחיר
+                    סופי ייקבע בהצעה המפורטת.
+                  </div>
+                </>
+              )}
             </aside>
           </div>
         </div>
