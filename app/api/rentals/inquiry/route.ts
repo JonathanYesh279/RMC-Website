@@ -261,7 +261,8 @@ export async function POST(req: NextRequest) {
   let body: unknown;
   try {
     body = await req.json();
-  } catch {
+  } catch (err) {
+    console.error("[rentals-inquiry] body parse failed:", err);
     return NextResponse.json(
       { ok: false, error: "גוף הבקשה לא תקין" },
       { status: 400 },
@@ -270,6 +271,10 @@ export async function POST(req: NextRequest) {
 
   const parsed = InquirySchema.safeParse(body);
   if (!parsed.success) {
+    console.error(
+      "[rentals-inquiry] zod validation failed:",
+      parsed.error.flatten(),
+    );
     return NextResponse.json(
       { ok: false, error: "אחד השדות לא תקין. בדקו וודאו שכל שדות החובה מולאו." },
       { status: 400 },
@@ -283,13 +288,15 @@ export async function POST(req: NextRequest) {
 
   const resolved = resolveAgainstCatalog(payload);
   if (!resolved.ok) {
+    console.error("[rentals-inquiry] catalog resolve failed:", resolved.error);
     return NextResponse.json({ ok: false, error: resolved.error }, { status: 400 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.RENTALS_INQUIRY_TO;
-  const from = process.env.RENTALS_INQUIRY_FROM;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const to = process.env.RENTALS_INQUIRY_TO?.trim().toLowerCase();
+  const from = process.env.RENTALS_INQUIRY_FROM?.trim();
   if (!apiKey || !to || !from) {
+    console.error("[rentals-inquiry] missing env vars — cannot send");
     return NextResponse.json(
       { ok: false, error: "השירות אינו מוגדר כראוי. נסו מאוחר יותר או צרו קשר טלפונית." },
       { status: 500 },
@@ -300,15 +307,31 @@ export async function POST(req: NextRequest) {
   const subject = `בקשת הזמנה — ${resolved.data.venueName} · ${resolved.data.dateLabel}`;
 
   const resend = new Resend(apiKey);
-  const sendResult = await resend.emails.send({
-    from,
-    to,
-    replyTo: payload.contact.email,
-    subject,
-    html,
-  });
+  let sendResult;
+  try {
+    sendResult = await resend.emails.send({
+      from,
+      to,
+      replyTo: payload.contact.email,
+      subject,
+      html,
+    });
+  } catch (err) {
+    console.error(
+      `[rentals-inquiry] resend.emails.send threw ${
+        err instanceof Error ? `${err.name}: ${err.message}` : JSON.stringify(err)
+      }`,
+    );
+    return NextResponse.json(
+      { ok: false, error: "שליחת המייל נכשלה. נסו שוב או צרו קשר טלפונית." },
+      { status: 502 },
+    );
+  }
 
   if (sendResult.error) {
+    console.error(
+      `[rentals-inquiry] resend returned error ${JSON.stringify(sendResult.error)}`,
+    );
     return NextResponse.json(
       { ok: false, error: "שליחת המייל נכשלה. נסו שוב או צרו קשר טלפונית." },
       { status: 502 },
