@@ -10,6 +10,7 @@ import {
 import {
   EQ_CATALOG,
   EQ_CATEGORIES,
+  GALLERY_TAG_LABELS,
   HE_DAYS,
   HE_MONTHS,
   KIND_LABEL,
@@ -133,6 +134,35 @@ function ArrowIcon() {
   );
 }
 
+function PhotosIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <rect x="1.5" y="2.5" width="13" height="11" rx="1" />
+      <circle cx="5.5" cy="6.5" r="1.2" />
+      <path d="M2 11l3.5-3 3 2.5 3.5-4 2 2.2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function VideoIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <rect x="1.5" y="3.5" width="9" height="9" rx="1" />
+      <path d="M10.5 6.5l4-2v7l-4-2z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
+}
+
+const GALLERY_AREAS = ["a", "b", "c", "d", "e", "f", "g"] as const;
+
 const INCLUSIONS = [
   {
     title: "חלל מוכן",
@@ -255,6 +285,13 @@ export default function AvailabilityPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Gallery state
+  const [galTab, setGalTab] = useState<"photos" | "video">("photos");
+  const [lbOpen, setLbOpen] = useState(false);
+  const [lbMode, setLbMode] = useState<"photo" | "video">("photo");
+  const [lbIdx, setLbIdx] = useState(0);
+  const lbThumbsRef = useRef<HTMLDivElement | null>(null);
+
   type SubmitState = "idle" | "sending" | "success" | "error";
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -323,6 +360,49 @@ export default function AvailabilityPage() {
       clearTimeout(t);
     };
   }, [pickerOpen]);
+
+  // Reset gallery tab to photos when venue changes (and close any open lightbox)
+  useEffect(() => {
+    setGalTab("photos");
+    setLbOpen(false);
+  }, [venueKey]);
+
+  // Lightbox keyboard nav + body scroll lock
+  useEffect(() => {
+    if (!lbOpen) return;
+    const venuePhotos = VENUES[venueKey].gallery.photos;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setLbOpen(false);
+        return;
+      }
+      if (lbMode === "video") return;
+      // In RTL the visual "next" arrow points right, but logically idx++ moves forward
+      if (e.key === "ArrowLeft") {
+        setLbIdx((i) => Math.min(i + 1, venuePhotos.length - 1));
+      } else if (e.key === "ArrowRight") {
+        setLbIdx((i) => Math.max(i - 1, 0));
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [lbOpen, lbMode, venueKey]);
+
+  // Keep active lightbox thumb in view
+  useEffect(() => {
+    if (!lbOpen || lbMode !== "photo") return;
+    const container = lbThumbsRef.current;
+    if (!container) return;
+    const active = container.querySelector<HTMLElement>(".glb-thumb.active");
+    if (active) {
+      active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    }
+  }, [lbIdx, lbOpen, lbMode]);
 
   const venue: AvailabilityVenue = VENUES[venueKey];
   const isWeekend = selectedDate.getDay() === 5 || selectedDate.getDay() === 6;
@@ -736,6 +816,292 @@ export default function AvailabilityPage() {
         </>
       )}
 
+      <section className="gal-sec">
+        <div className="container">
+          <div className="gal-head">
+            <div>
+              <h2>
+                כך נראה <em>{venue.name}</em>.
+              </h2>
+              <p>
+                סיור ויזואלי בחלל לפני שמחליטים — מקטעי ההפקה, האקוסטיקה,
+                הקלעים והבמה. לחצו על כל תמונה להגדלה, או דלגו לסרטון להיכרות
+                ב-90 שניות.
+              </p>
+            </div>
+            <div className="gal-tabs" role="tablist" aria-label="גלריה">
+              <button
+                type="button"
+                className={`gal-tab${galTab === "photos" ? " active" : ""}`}
+                role="tab"
+                aria-selected={galTab === "photos"}
+                onClick={() => setGalTab("photos")}
+              >
+                <PhotosIcon />
+                תמונות
+                <span className="ct">{venue.gallery.photos.length}</span>
+              </button>
+              <button
+                type="button"
+                className={`gal-tab${galTab === "video" ? " active" : ""}`}
+                role="tab"
+                aria-selected={galTab === "video"}
+                onClick={() => setGalTab("video")}
+              >
+                <VideoIcon />
+                וידאו
+                <span className="ct">90s</span>
+              </button>
+            </div>
+          </div>
+
+          {galTab === "photos" && (
+            <div className="gal-pane active" role="tabpanel">
+              <div className="gal-bento layout-a">
+                {venue.gallery.photos.slice(0, 7).map((photo, i) => {
+                  const area = GALLERY_AREAS[i];
+                  const isFeature = i === 0;
+                  const isMore = i === 6 && venue.gallery.photos.length > 7;
+                  const remaining = venue.gallery.photos.length - 6;
+                  const w = isFeature ? 1400 : 800;
+                  const src = photo.src.replace(/w=\d+/, `w=${w}`);
+                  const openIdx = () => {
+                    setLbMode("photo");
+                    setLbIdx(i);
+                    setLbOpen(true);
+                  };
+                  return (
+                    <button
+                      key={`${area}-${photo.src}`}
+                      type="button"
+                      className={`gal-cell gal-area-${area}${isFeature ? " gal-feature" : ""}`}
+                      style={{ gridArea: area }}
+                      aria-label={photo.t}
+                      onClick={openIdx}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={src} alt={photo.t} loading="lazy" />
+                      <span className="gal-idx">{String(i + 1).padStart(2, "0")}</span>
+                      {isMore && (
+                        <div className="gal-more">
+                          <span className="gal-more-l">לכל התמונות</span>
+                          <span className="gal-more-n">+{remaining}</span>
+                        </div>
+                      )}
+                      <div className="gal-cap">
+                        <div className="gal-cap-l">{GALLERY_TAG_LABELS[photo.tag]}</div>
+                        <div className="gal-cap-t">{photo.t}</div>
+                        {isFeature && photo.meta ? (
+                          <div className="gal-cell-meta">
+                            <strong>{venue.cap}</strong>
+                            <span className="sep">·</span>
+                            {photo.meta}
+                          </div>
+                        ) : null}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="gal-meta">
+                <div className="gal-meta-cell">
+                  <div className="gal-meta-l">צילום</div>
+                  <div className="gal-meta-v">{venue.gallery.photog}</div>
+                </div>
+                <div className="gal-meta-cell">
+                  <div className="gal-meta-l">תאריך עדכון</div>
+                  <div className="gal-meta-v">{venue.gallery.updated}</div>
+                </div>
+                <div className="gal-meta-cell">
+                  <div className="gal-meta-l">סגנון תאורה</div>
+                  <div className="gal-meta-v">{venue.gallery.light}</div>
+                </div>
+                <div className="gal-meta-cell">
+                  <div className="gal-meta-l">סבב 360°</div>
+                  <div className="gal-meta-v">
+                    {venue.gallery.tour.v} <small>{venue.gallery.tour.s}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {galTab === "video" && (
+            <div className="gal-pane active" role="tabpanel">
+              <div
+                className="gal-video-wrap"
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setLbMode("video");
+                  setLbOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setLbMode("video");
+                    setLbOpen(true);
+                  }
+                }}
+              >
+                <div className="gal-vid-stage">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={venue.gallery.video.poster} alt={venue.gallery.video.title} />
+                  <span className="gal-vid-play" aria-label="הפעלת סרטון">
+                    <PlayIcon />
+                  </span>
+                  <div className="gal-vid-meta">
+                    <div className="l">סיור וירטואלי</div>
+                    <div className="t">{venue.gallery.video.title}</div>
+                    <div className="d">{venue.gallery.video.sub}</div>
+                  </div>
+                </div>
+                <div className="gal-vid-side">
+                  <div>
+                    <div className="l-chip">פרק 01 · הסיור</div>
+                    <h4>מה תראו בסרטון?</h4>
+                    <p className="lede">
+                      צילום ראשון מהבמה, היציע, חדרי ההלבשה ובקרת הקול.
+                      הסרטון מצולם ביום חזרה רגיל כך שתראו את החלל כפי שהוא
+                      בעת הפקה — כולל תאורת הקונצרט וההגברה הראשית.
+                    </p>
+                  </div>
+                  <div className="gal-vid-chips">
+                    {venue.gallery.video.chips.map((chip) => (
+                      <span key={chip} className="gal-vid-chip">
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="gal-vid-stat">
+                    <span className="lbl">משך הסרטון</span>
+                    <span className="val">1:32</span>
+                  </div>
+                  <div className="gal-vid-stat">
+                    <span className="lbl">איכות</span>
+                    <span className="val">4K · 60fps</span>
+                  </div>
+                  <div className="gal-vid-stat">
+                    <span className="lbl">שפה</span>
+                    <span className="val">עברית · כתוביות</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {lbOpen && (
+        <div
+          className={`glb open${lbMode === "video" ? " video-mode" : ""}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="גלריה"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setLbOpen(false);
+          }}
+        >
+          <div className="glb-top">
+            <div className="glb-top-l">
+              <small>{venue.name}</small>
+              <span>
+                {lbMode === "video"
+                  ? venue.gallery.video.title
+                  : venue.gallery.photos[lbIdx]?.t || ""}
+              </span>
+            </div>
+            <div className="glb-top-r">
+              {lbMode === "photo" && (
+                <span className="glb-counter">
+                  <strong>{lbIdx + 1}</strong> / {venue.gallery.photos.length}
+                </span>
+              )}
+              <button
+                type="button"
+                className="glb-btn glb-close"
+                aria-label="סגירה"
+                onClick={() => setLbOpen(false)}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                  <path d="M3 3l8 8M11 3l-8 8" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div className="glb-stage">
+            {lbMode === "photo" && (
+              <button
+                type="button"
+                className="glb-nav glb-prev"
+                aria-label="הקודם"
+                disabled={lbIdx === 0}
+                onClick={() => setLbIdx((i) => Math.max(0, i - 1))}
+              >
+                <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                  <path d="M5 3l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+            <div className="glb-img-wrap">
+              {lbMode === "video" ? (
+                <iframe
+                  src={venue.gallery.video.src}
+                  title={venue.gallery.video.title}
+                  allow="autoplay; fullscreen; encrypted-media"
+                  allowFullScreen
+                />
+              ) : (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={venue.gallery.photos[lbIdx].src.replace(/w=\d+/, "w=1800")}
+                    alt={venue.gallery.photos[lbIdx].t}
+                  />
+                  <div className="glb-caption">
+                    <div className="l">{GALLERY_TAG_LABELS[venue.gallery.photos[lbIdx].tag]}</div>
+                    <div className="t">{venue.gallery.photos[lbIdx].t}</div>
+                  </div>
+                </>
+              )}
+            </div>
+            {lbMode === "photo" && (
+              <button
+                type="button"
+                className="glb-nav glb-next"
+                aria-label="הבא"
+                disabled={lbIdx === venue.gallery.photos.length - 1}
+                onClick={() =>
+                  setLbIdx((i) => Math.min(venue.gallery.photos.length - 1, i + 1))
+                }
+              >
+                <svg width="16" height="16" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                  <path d="M9 3L5 7l4 4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+          </div>
+          {lbMode === "photo" && (
+            <div className="glb-thumbs" ref={lbThumbsRef}>
+              {venue.gallery.photos.map((photo, i) => (
+                <button
+                  key={`thumb-${i}-${photo.src}`}
+                  type="button"
+                  className={`glb-thumb${i === lbIdx ? " active" : ""}`}
+                  aria-label={photo.t}
+                  onClick={() => setLbIdx(i)}
+                  style={{
+                    backgroundImage: `url('${photo.src.replace(/w=\d+/, "w=160")}')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <section className="av-main">
         <div className="container av-grid">
           <div>
@@ -743,10 +1109,6 @@ export default function AvailabilityPage() {
             <div className="av-row">
               <div>
                 <div className="av-sec-head">
-                  <div className="eyebrow">
-                    <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
-                    שלב 1 · תאריך
-                  </div>
                   <h2>זמינות · {venue.name}</h2>
                 </div>
                 <div className="cal">
@@ -821,10 +1183,6 @@ export default function AvailabilityPage() {
 
               <div>
                 <div className="av-sec-head">
-                  <div className="eyebrow">
-                    <span className="av-eb-dot" style={{ background: "var(--amber)" }} />
-                    שלב 2 · חלון זמן
-                  </div>
                   <h2>
                     {selectedDate.getDate()} {HE_MONTHS[selectedDate.getMonth()]}, {dayName}
                     {isWeekend ? " · תעריף סופ״ש" : ""}
@@ -869,11 +1227,7 @@ export default function AvailabilityPage() {
             {/* Pricing matrix (full-width section) */}
             <div className="av-sec">
               <div className="av-sec-head">
-                <div className="eyebrow">
-                  <span className="av-eb-dot" style={{ background: "var(--coral)" }} />
-                  תעריפים · {venue.name}
-                </div>
-                <h2>מחירון השכרה</h2>
+                <h2>מחירון השכרה · {venue.name}</h2>
                 <p>
                   המחירים אינם כוללים מע״מ ומופיעים לכל החללים. בחבילות הפקה
                   גדולות (יותר מ-12 שעות) חלות הנחות.
@@ -912,10 +1266,6 @@ export default function AvailabilityPage() {
             <div className="av-row">
               <div>
                 <div className="av-sec-head">
-                  <div className="eyebrow">
-                    <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
-                    כלול בהשכרה
-                  </div>
                   <h2>מה אתם מקבלים</h2>
                 </div>
                 <div className="incl-grid">
@@ -933,10 +1283,6 @@ export default function AvailabilityPage() {
 
               <div>
                 <div className="av-sec-head">
-                  <div className="eyebrow">
-                    <span className="av-eb-dot" style={{ background: "var(--amber)" }} />
-                    שלב 4 · ציוד נוסף
-                  </div>
                   <h2>ציוד וכלים זמינים</h2>
                 </div>
                 <div className="eqp">
@@ -1021,10 +1367,6 @@ export default function AvailabilityPage() {
             {/* Booking form */}
             <div className="av-sec">
               <div className="av-sec-head">
-                <div className="eyebrow">
-                  <span className="av-eb-dot" style={{ background: "var(--coral)" }} />
-                  שלב 3 · פרטים ושליחה
-                </div>
                 <h2>פרטי הפנייה</h2>
                 <p>
                   הצוות שלנו יחזור אליכם תוך 48 שעות עם אישור זמינות, הצעת מחיר
@@ -1318,10 +1660,6 @@ export default function AvailabilityPage() {
         <div className="container">
           <div className="sec-head reveal">
             <div>
-              <div className="eyebrow">
-                <span className="av-eb-dot" style={{ background: "var(--teal)" }} />
-                איך זה עובד
-              </div>
               <h2>מהבקשה ועד יום ההפקה.</h2>
             </div>
             <p className="trail">
@@ -1344,10 +1682,6 @@ export default function AvailabilityPage() {
         <div className="container">
           <div className="sec-head reveal">
             <div>
-              <div className="eyebrow">
-                <span className="av-eb-dot" style={{ background: "var(--coral)" }} />
-                שאלות נפוצות
-              </div>
               <h2>בודקים זמינות בפעם הראשונה?</h2>
             </div>
           </div>

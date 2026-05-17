@@ -21,6 +21,38 @@ export type EquipmentItem = {
   qty: number;
 };
 
+export type GalleryTag =
+  | "STAGE"
+  | "CROWD"
+  | "BACKSTAGE"
+  | "DETAIL"
+  | "TECH"
+  | "EXTERIOR";
+
+export type GalleryPhoto = {
+  src: string;
+  tag: GalleryTag;
+  t: string;
+  meta?: string;
+};
+
+export type GalleryVideo = {
+  poster: string;
+  title: string;
+  sub: string;
+  src: string;
+  chips: string[];
+};
+
+export type VenueGallery = {
+  photog: string;
+  updated: string;
+  light: string;
+  tour: { v: string; s: string };
+  video: GalleryVideo;
+  photos: GalleryPhoto[];
+};
+
 export type AvailabilityVenue = {
   kind: VenueKind;
   name: string;
@@ -36,7 +68,20 @@ export type AvailabilityVenue = {
   pricing: PricingRow[];
   slots: Slot[];
   equipment: string[];
+  gallery: VenueGallery;
 };
+
+export const GALLERY_TAG_LABELS: Record<GalleryTag, string> = {
+  STAGE: "הבמה",
+  CROWD: "הקהל",
+  BACKSTAGE: "מאחורי הקלעים",
+  DETAIL: "פרטים",
+  TECH: "טכנולוגיה",
+  EXTERIOR: "הלובי",
+};
+
+const u = (id: string, w = 1400) =>
+  `https://images.unsplash.com/${id}?w=${w}&q=80&auto=format&fit=crop`;
 
 export const EQ_CATALOG: Record<string, EquipmentItem> = {
   // PA / Mixing
@@ -166,6 +211,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "light_basic", "light_full", "light_movers", "stage_riser", "stage_truss",
       "misc_chairs", "misc_stands", "misc_podium", "misc_piano_tune", "misc_translation",
     ],
+    gallery: {
+      photog: "Studio Tal Cohen · Sept 25",
+      updated: "מרץ 2026",
+      light: "תאורת קונצרט · LED מתוכנת",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1470229722913-7c0e2dbbafd3", 1600),
+        title: "סיור 90 שניות באודיטוריום המרכזי",
+        sub: "צילום קונצרט · מבט מהשורה הראשונה ועד הבקרה האחורית",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["Steinway D-274", "L-Acoustics Kara II", "dLive S5000", "4K · 60fps"],
+      },
+      photos: [
+        { src: u("photo-1470229722913-7c0e2dbbafd3"), tag: "STAGE", t: "הבמה ערב מופע · 470 מקומות מלאים", meta: "120 מ״ר במה · גובה 9 מטר · אקוסטיקה משתנה" },
+        { src: u("photo-1519389950473-47ba0277781c"), tag: "STAGE", t: "מבט מהבמה אל היציע" },
+        { src: u("photo-1514525253161-7a46d19cd819"), tag: "CROWD", t: "יציע ראשי · 280 מקומות" },
+        { src: u("photo-1507676184212-d03ab07a01bf"), tag: "BACKSTAGE", t: "חדרי הלבשה צמודים לבמה" },
+        { src: u("photo-1503694978374-8a2fa686963a"), tag: "TECH", t: "בקרת קול · Allen & Heath dLive" },
+        { src: u("photo-1525286335722-c30c6b5df3b6"), tag: "DETAIL", t: "פאנלים אקוסטיים בעץ אלון" },
+        { src: u("photo-1572188863110-46d457c9234d"), tag: "EXTERIOR", t: "הלובי · פסטיבל החורף" },
+      ],
+    },
   },
   chamber: {
     kind: "hall",
@@ -197,6 +264,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "light_basic", "light_full", "stage_riser",
       "misc_chairs", "misc_stands", "misc_podium", "misc_piano_tune",
     ],
+    gallery: {
+      photog: "Lior Mizrahi Photo · Oct 25",
+      updated: "פברואר 2026",
+      light: "תאורה טבעית · נברשות פליז",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1519683109079-d5f539e1542f", 1600),
+        title: "הצצה לאולם הקאמרי",
+        sub: "180 מקומות · אקוסטיקה טבעית · Yamaha C7X",
+        src: "https://www.youtube.com/embed/9bZkp7q19f0?autoplay=1&rel=0",
+        chips: ["Yamaha C7X", "אקוסטיקה טבעית", "180 מקומות"],
+      },
+      photos: [
+        { src: u("photo-1519683109079-d5f539e1542f"), tag: "STAGE", t: "האולם הקאמרי · ערב רסיטל", meta: "180 מקומות · Yamaha C7X · אקוסטיקה טבעית" },
+        { src: u("photo-1505236858219-8359eb29e329"), tag: "STAGE", t: "פסנתר Yamaha C7X על הבמה" },
+        { src: u("photo-1465847899084-d164df4dedc6"), tag: "CROWD", t: "ישיבת קהל במעגל" },
+        { src: u("photo-1571266028243-d220bc476f63"), tag: "DETAIL", t: "הלובי · גלריית תערוכות" },
+        { src: u("photo-1551737823-dfd146d24ce8"), tag: "BACKSTAGE", t: "חדר אומנים" },
+        { src: u("photo-1454922915609-78549ad709bb"), tag: "TECH", t: "בקרת קול קומפקטית" },
+        { src: u("photo-1486162928267-e6274cb3106f"), tag: "EXTERIOR", t: "כניסה צידית" },
+      ],
+    },
   },
   blackbox: {
     kind: "hall",
@@ -228,6 +317,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "light_basic", "light_full", "light_movers", "stage_riser", "stage_truss",
       "misc_chairs", "misc_stands",
     ],
+    gallery: {
+      photog: "Maya Levin · Aug 25",
+      updated: "ינואר 2026",
+      light: "תאורה משתנה · 120 גופים DMX",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1503095396549-807759245b35", 1600),
+        title: "האולם השחור · תפאורה משתנה",
+        sub: "הצצה לקונפיגורציה משתנה — מבמה מרכזית ועד ישיבה משולשת",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["120 גופי DMX", "קונפיגורציה משתנה", "120 מקומות"],
+      },
+      photos: [
+        { src: u("photo-1503095396549-807759245b35"), tag: "STAGE", t: "האולם השחור · ערב הצגת תיאטרון", meta: "120 מקומות · קונפיגורציה משתנה · תאורה מתוכנתת" },
+        { src: u("photo-1485846234645-a62644f84728"), tag: "STAGE", t: "תפאורה דרמטית · תאורה אדומה" },
+        { src: u("photo-1516280440614-37939bbacd81"), tag: "TECH", t: "בקרת תאורה DMX" },
+        { src: u("photo-1499364615650-ec38552f4f34"), tag: "CROWD", t: "ישיבת קהל בצורת ח״ץ" },
+        { src: u("photo-1574267432553-4b4628081c31"), tag: "BACKSTAGE", t: "גריד תאורה מעל הבמה" },
+        { src: u("photo-1518972559570-7cc1309f3229"), tag: "DETAIL", t: "גופי Robe Pointe" },
+        { src: u("photo-1542401886-65d6c61db217"), tag: "EXTERIOR", t: "הכניסה לאולם · לובי מוצל" },
+      ],
+    },
   },
   foyer: {
     kind: "hall",
@@ -259,6 +370,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "light_basic", "stage_riser",
       "misc_chairs", "misc_stands",
     ],
+    gallery: {
+      photog: "Yair Hovav · Dec 25",
+      updated: "דצמבר 2025",
+      light: "נברשות בודדות · אור טבעי",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1571266028243-d220bc476f63", 1600),
+        title: "הפויאה ההיסטורית · אווירת קוקטייל",
+        sub: "הצצה לאירוע פתיחה אופייני בפויאה",
+        src: "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0",
+        chips: ["90 עמידה", "גלריית תערוכות", "עיצוב היסטורי"],
+      },
+      photos: [
+        { src: u("photo-1571266028243-d220bc476f63"), tag: "STAGE", t: "הפויאה · אירוע פתיחה", meta: "90 מקומות עומד · גלריה ואירועי קוקטייל" },
+        { src: u("photo-1505373877841-8d25f7d46678"), tag: "DETAIL", t: "נברשות פליז משוחזרות" },
+        { src: u("photo-1519167758481-83f550bb49b3"), tag: "CROWD", t: "ערב קוקטייל פתיחה" },
+        { src: u("photo-1473625247510-8ceb1760943f"), tag: "DETAIL", t: "אמנות על הקירות" },
+        { src: u("photo-1497366216548-37526070297c"), tag: "EXTERIOR", t: "הכניסה הראשית" },
+        { src: u("photo-1492684223066-81342ee5ff30"), tag: "CROWD", t: "מתחם הגשת קוקטיילים" },
+        { src: u("photo-1518998053901-5348d3961a04"), tag: "DETAIL", t: "גלריית סטילס · החודש" },
+      ],
+    },
   },
   studio: {
     kind: "studio",
@@ -289,6 +422,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "rec_protools", "rec_dante", "rec_engineer",
       "misc_chairs", "misc_stands", "misc_piano_tune",
     ],
+    gallery: {
+      photog: "Roy Berkowitz · Nov 25",
+      updated: "מרץ 2026",
+      light: "תאורה ניטרלית · 5000K",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1598488035139-bdbb2231ce04", 1600),
+        title: "סטודיו A · סשן הקלטה מתוזמרת",
+        sub: "מבט מבקרת ה-SSL אל החלל הראשי בסשן עם הרכב קאמרי",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["SSL AWS 948", "ProTools HDX", "עד 25 נגנים", "85 מ״ר"],
+      },
+      photos: [
+        { src: u("photo-1598488035139-bdbb2231ce04"), tag: "STAGE", t: "חלל הקלטה · אקוסטיקה מקצועית", meta: "עד 25 נגנים בו-זמנית · קירות עץ + רוק וול" },
+        { src: u("photo-1520523839897-bd0b52f945a0"), tag: "TECH", t: "מיקסר SSL AWS 948" },
+        { src: u("photo-1574375927938-d5a98e8ffe85"), tag: "TECH", t: "בקרת מאסטרינג · Genelec" },
+        { src: u("photo-1453090927415-5f45085b65c0"), tag: "DETAIL", t: "מיקרופונים Neumann מוכנים" },
+        { src: u("photo-1516280440614-37939bbacd81"), tag: "BACKSTAGE", t: "חדר Vocal Booth" },
+        { src: u("photo-1487180144351-b8472da7d491"), tag: "TECH", t: "Pro Tools HDX · 64 ערוצים" },
+        { src: u("photo-1581090700227-1e37b190418e"), tag: "DETAIL", t: "ארגז פלאגיניים · אינסרטים" },
+      ],
+    },
   },
   studioB: {
     kind: "studio",
@@ -317,6 +472,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "mix_ssl", "monitor", "mic_sm58", "mic_dpa", "mic_neumann", "mic_lavalier",
       "rec_protools", "rec_dante", "rec_engineer",
     ],
+    gallery: {
+      photog: "Roy Berkowitz · Nov 25",
+      updated: "פברואר 2026",
+      light: "תאורה ניטרלית",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1520523839897-bd0b52f945a0", 1600),
+        title: "סטודיו B · מיקס ומאסטרינג",
+        sub: "חדר בקרה אינטימי עם Pro Tools HDX ו-Genelec 8351B",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["ProTools HDX", "Genelec 8351B", "חדר מיקס"],
+      },
+      photos: [
+        { src: u("photo-1520523839897-bd0b52f945a0"), tag: "STAGE", t: "חדר בקרת מיקס · מבט קדמי", meta: "32 מ״ר · אקוסטיקה מבוקרת · עד 6 נגנים" },
+        { src: u("photo-1574375927938-d5a98e8ffe85"), tag: "TECH", t: "רמקולי Genelec 8351B" },
+        { src: u("photo-1487180144351-b8472da7d491"), tag: "TECH", t: "תחנת Pro Tools HDX" },
+        { src: u("photo-1453090927415-5f45085b65c0"), tag: "DETAIL", t: "מיקרופון Neumann U87 קלאסי" },
+        { src: u("photo-1511671782779-c97d3d27a1d4"), tag: "DETAIL", t: "ספרייה אקוסטית · קירות מודולריים" },
+        { src: u("photo-1564186763535-ebb21ef5277f"), tag: "TECH", t: "פאצ׳ פאנל אנלוגי" },
+        { src: u("photo-1505740106531-4243f3831c78"), tag: "BACKSTAGE", t: "חדר ישיבות צמוד" },
+      ],
+    },
   },
   vocalbooth: {
     kind: "studio",
@@ -342,6 +519,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "evening", title: "ערב", time: "18:00 – 22:00", desc: "אודיובוק · סשן ארוך", priceWeek: 1200, priceWknd: 1500 },
     ],
     equipment: ["mic_sm58", "mic_neumann", "mic_lavalier", "rec_protools", "rec_engineer"],
+    gallery: {
+      photog: "Roy Berkowitz · Sep 25",
+      updated: "ינואר 2026",
+      light: "אור בהיר ניטרלי",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1590602847861-f357a9332bbc", 1600),
+        title: "תא ווקאל · הקלטת voiceover",
+        sub: "תא בידוד ל-voiceover, פודקאסט והקלטות סולו",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["Neumann U87", "בידוד אקוסטי", "פודקאסט"],
+      },
+      photos: [
+        { src: u("photo-1590602847861-f357a9332bbc"), tag: "STAGE", t: "תא Iso Booth · מיקרופון U87", meta: "8 מ״ר · בידוד מוחלט · voiceover ופודקאסט" },
+        { src: u("photo-1453090927415-5f45085b65c0"), tag: "DETAIL", t: "Neumann U87 על Stand" },
+        { src: u("photo-1487180144351-b8472da7d491"), tag: "TECH", t: "מסך עורך · עריכה במקום" },
+        { src: u("photo-1573164574230-db1d5e960238"), tag: "DETAIL", t: "אוזניות Sennheiser HD650" },
+        { src: u("photo-1511671782779-c97d3d27a1d4"), tag: "DETAIL", t: "דפנות בידוד דקיקות" },
+        { src: u("photo-1564186763535-ebb21ef5277f"), tag: "TECH", t: "פאנל הקלטה · Apollo x16" },
+        { src: u("photo-1505740106531-4243f3831c78"), tag: "BACKSTAGE", t: "מסדרון הסטודיו" },
+      ],
+    },
   },
   reheLarge: {
     kind: "rehe",
@@ -372,6 +571,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "light_basic",
       "misc_chairs", "misc_stands", "misc_podium", "misc_piano_tune",
     ],
+    gallery: {
+      photog: "Maya Levin · Sep 25",
+      updated: "נובמבר 2025",
+      light: "אור טבעי + LED ניטרלי",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1465847899084-d164df4dedc6", 1600),
+        title: "חדר חזרה Lev · אנסמבל קאמרי",
+        sub: "מבט בחזרה אנסמבל · אקוסטיקה טבעית ופסנתר Yamaha C3",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["Yamaha C3", "12 נגנים", "ראי במה"],
+      },
+      photos: [
+        { src: u("photo-1465847899084-d164df4dedc6"), tag: "STAGE", t: "חדר Lev · חזרת אנסמבל", meta: "60 מ״ר · עד 12 נגנים · ראי במה" },
+        { src: u("photo-1551782450-a2132b4ba21d"), tag: "STAGE", t: "פסנתר Yamaha C3 במרכז" },
+        { src: u("photo-1444930694458-01babe71870e"), tag: "DETAIL", t: "מראת במה שלמה" },
+        { src: u("photo-1568667256549-094345857637"), tag: "CROWD", t: "הרכב ביצירה · 8 נגנים" },
+        { src: u("photo-1518972559570-7cc1309f3229"), tag: "DETAIL", t: "תאורת LED ניטרלית" },
+        { src: u("photo-1471666875520-c75081f42081"), tag: "BACKSTAGE", t: "מסדרון לחדרי חזרה" },
+        { src: u("photo-1532634726-8b9fb99825d3"), tag: "TECH", t: "מערכת הקלטה מצומצמת" },
+      ],
+    },
   },
   reheMid: {
     kind: "rehe",
@@ -399,6 +620,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
     equipment: [
       "mic_sm58", "mic_dpa", "ins_upright", "ins_amps", "misc_chairs", "misc_stands", "misc_piano_tune",
     ],
+    gallery: {
+      photog: "Maya Levin · Sep 25",
+      updated: "נובמבר 2025",
+      light: "אור טבעי גדול",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1471666875520-c75081f42081", 1600),
+        title: "חדר Bach · חמישייה במלאכת חזרה",
+        sub: "חדר חזרה בינוני · 32 מ״ר · פסנתר Upright",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["Upright Yamaha", "6 נגנים", "חלון מערב"],
+      },
+      photos: [
+        { src: u("photo-1471666875520-c75081f42081"), tag: "STAGE", t: "חדר Bach · חזרה אינטימית", meta: "32 מ״ר · 6 נגנים · אור טבעי" },
+        { src: u("photo-1552422535-c45813c61732"), tag: "DETAIL", t: "פסנתר Upright U3" },
+        { src: u("photo-1574267432553-4b4628081c31"), tag: "CROWD", t: "דואט בחזרה" },
+        { src: u("photo-1497366216548-37526070297c"), tag: "DETAIL", t: "חלון מערב · אור אחה״צ" },
+        { src: u("photo-1518972559570-7cc1309f3229"), tag: "TECH", t: "תאורה ניטרלית מתכווננת" },
+        { src: u("photo-1505236858219-8359eb29e329"), tag: "STAGE", t: "סטנדרים וכסאות מוכנים" },
+        { src: u("photo-1444930694458-01babe71870e"), tag: "DETAIL", t: "ראי לעבודה על תנועה" },
+      ],
+    },
   },
   reheSmall: {
     kind: "rehe",
@@ -424,6 +667,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "evening", title: "ערב", time: "19:00 – 24:00", desc: "תרגול ערב · שעות עומס מוזיקליות", priceWeek: 350, priceWknd: 450 },
     ],
     equipment: ["ins_upright", "misc_chairs", "misc_stands"],
+    gallery: {
+      photog: "Maya Levin · Sep 25",
+      updated: "נובמבר 2025",
+      light: "אור טבעי קטן · LED",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1552422535-c45813c61732", 1600),
+        title: "חדר Solo · תרגול אישי",
+        sub: "חדר תרגול אישי · 14 מ״ר · פסנתר Upright",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["Upright", "שעות ארוכות", "24 שעות"],
+      },
+      photos: [
+        { src: u("photo-1552422535-c45813c61732"), tag: "STAGE", t: "חדר אישי · תרגול בלילה", meta: "14 מ״ר · יחיד/דואט · 24/7" },
+        { src: u("photo-1493225457124-a3eb161ffa5f"), tag: "DETAIL", t: "פסנתר Upright פתוח" },
+        { src: u("photo-1454922915609-78549ad709bb"), tag: "DETAIL", t: "מטרונום ולוח תווים" },
+        { src: u("photo-1471666875520-c75081f42081"), tag: "STAGE", t: "תאורה רכה לתרגול ארוך" },
+        { src: u("photo-1505236858219-8359eb29e329"), tag: "DETAIL", t: "מדף לתיק וכלים אישיים" },
+        { src: u("photo-1485579149621-3123dd979885"), tag: "BACKSTAGE", t: "מסדרון חדרים אישיים" },
+        { src: u("photo-1483736762161-1d107f3c78e1"), tag: "EXTERIOR", t: "גישת לילה לחדרים" },
+      ],
+    },
   },
   classMaster: {
     kind: "class",
@@ -455,6 +720,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       "light_basic",
       "misc_chairs", "misc_stands", "misc_podium",
     ],
+    gallery: {
+      photog: "Yair Hovav · Oct 25",
+      updated: "דצמבר 2025",
+      light: "תאורת הוראה · ספוט לחניך",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1509824227185-9c5a01ceba0d", 1600),
+        title: "כיתת מאסטר Mahler · סדנה",
+        sub: "כיתת מאסטר עם 30 צופים · ההקלטה והבמה",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["במה מוגבהת", "30 צופים", "הקלטת וידאו"],
+      },
+      photos: [
+        { src: u("photo-1509824227185-9c5a01ceba0d"), tag: "STAGE", t: "כיתת מאסטר · ערב פתוח", meta: "45 מ״ר · 30 מקומות · במה מוגבהת" },
+        { src: u("photo-1488376739414-7f4e69cba8f8"), tag: "CROWD", t: "קהל צופים בכיתת מאסטר" },
+        { src: u("photo-1568667256549-094345857637"), tag: "STAGE", t: "חניכה מנגנת על הבמה" },
+        { src: u("photo-1551782450-a2132b4ba21d"), tag: "DETAIL", t: "פסנתר זנב על הבמה" },
+        { src: u("photo-1532634726-8b9fb99825d3"), tag: "TECH", t: "מצלמת תיעוד 4K" },
+        { src: u("photo-1471864190281-a93a3070b6de"), tag: "BACKSTAGE", t: "חדר חניכים צמוד" },
+        { src: u("photo-1466428996289-fb355538da1b"), tag: "EXTERIOR", t: "הכניסה לכיתה" },
+      ],
+    },
   },
   classRoom: {
     kind: "class",
@@ -480,6 +767,28 @@ export const VENUES: Record<string, AvailabilityVenue> = {
       { id: "evening", title: "ערב", time: "18:00 – 22:00", desc: "מבוגרים · לימודי ערב", priceWeek: 780, priceWknd: 960 },
     ],
     equipment: ["mic_lavalier", "ins_upright", "rec_stream", "misc_chairs", "misc_stands"],
+    gallery: {
+      photog: "Yair Hovav · Oct 25",
+      updated: "דצמבר 2025",
+      light: "תאורת כיתה ניטרלית",
+      tour: { v: "זמין לסיור פיזי", s: "בתיאום" },
+      video: {
+        poster: u("photo-1497486751825-1233686d5d80", 1600),
+        title: "כיתת תיאוריה Schenker",
+        sub: "כיתת לימוד עם לוח חכם, פסנתר ולוח תווים גדול",
+        src: "https://www.youtube.com/embed/3W8mvCUMNJ8?autoplay=1&rel=0",
+        chips: ["לוח חכם", "פסנתר", "16 תלמידים"],
+      },
+      photos: [
+        { src: u("photo-1497486751825-1233686d5d80"), tag: "STAGE", t: "כיתת תיאוריה · שיעור בוקר", meta: "28 מ״ר · 16 תלמידים · לוח חכם" },
+        { src: u("photo-1503676260728-1c00da094a0b"), tag: "CROWD", t: "תלמידים בשיעור סולפג׳" },
+        { src: u("photo-1571260899304-425eee4c7efc"), tag: "DETAIL", t: "לוח חכם · ניתוח יצירה" },
+        { src: u("photo-1453928582365-b6ad33cbcf64"), tag: "DETAIL", t: "פסנתר עומד לדוגמאות" },
+        { src: u("photo-1456428199391-a3b1cb5e93ab"), tag: "DETAIL", t: "ספרי תווים בספרייה" },
+        { src: u("photo-1532012197267-da84d127e765"), tag: "STAGE", t: "שולחנות תלמידים מסודרים" },
+        { src: u("photo-1571260899304-425eee4c7efc"), tag: "BACKSTAGE", t: "מסדרון הקונסרבטוריון" },
+      ],
+    },
   },
 };
 
