@@ -881,7 +881,6 @@ export default function AvailabilityPage() {
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={src} alt={photo.t} loading="lazy" />
-                      <span className="gal-idx">{String(i + 1).padStart(2, "0")}</span>
                       {isMore && (
                         <div className="gal-more">
                           <span className="gal-more-l">לכל התמונות</span>
