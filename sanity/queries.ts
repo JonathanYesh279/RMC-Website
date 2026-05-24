@@ -262,23 +262,10 @@ const DAY_ROW_PROJECTION = `{ time, today, closed }`;
 
 export const UPDATES_PAGE_QUERY = defineQuery(`
   *[_type == "updatesPage" && _id == "updatesPage"][0] {
-    heroStatusPill,
     heroLede,
-    heroTodayLine,
 
     "featuredImageUrl": featuredImage.asset->url,
     "featuredImageAlt": featuredImage.alt,
-    featuredStatusTag,
-    featuredEyebrowMain,
-    featuredEyebrowEm,
-    featuredTitle,
-    featuredBody,
-    featuredMeta1Label,
-    featuredMeta1Value,
-    featuredMeta1Sub,
-    featuredMeta2Label,
-    featuredMeta2Value,
-    featuredMeta2Sub,
 
     holidaysUpdatedLabel,
 
@@ -302,12 +289,9 @@ export const UPDATES_PAGE_QUERY = defineQuery(`
 
     "theoryImageUrl": theoryImage.asset->url,
     "theoryImageAlt": theoryImage.alt,
-    theoryUpdatedDate,
 
     "calendarImageUrl": calendarImage.asset->url,
     "calendarImageAlt": calendarImage.alt,
-    calendarAdminChip,
-    calendarPublishedDate,
 
     archiveSummary,
 
@@ -360,23 +344,10 @@ export type DayRow = {
 } | null;
 
 export type UpdatesPageDoc = {
-  heroStatusPill: string | null;
   heroLede: string | null;
-  heroTodayLine: string | null;
 
   featuredImageUrl: string | null;
   featuredImageAlt: string | null;
-  featuredStatusTag: string | null;
-  featuredEyebrowMain: string | null;
-  featuredEyebrowEm: string | null;
-  featuredTitle: string | null;
-  featuredBody: string | null;
-  featuredMeta1Label: string | null;
-  featuredMeta1Value: string | null;
-  featuredMeta1Sub: string | null;
-  featuredMeta2Label: string | null;
-  featuredMeta2Value: string | null;
-  featuredMeta2Sub: string | null;
 
   holidaysUpdatedLabel: string | null;
 
@@ -400,12 +371,9 @@ export type UpdatesPageDoc = {
 
   theoryImageUrl: string | null;
   theoryImageAlt: string | null;
-  theoryUpdatedDate: string | null;
 
   calendarImageUrl: string | null;
   calendarImageAlt: string | null;
-  calendarAdminChip: string | null;
-  calendarPublishedDate: string | null;
 
   archiveSummary: string | null;
 

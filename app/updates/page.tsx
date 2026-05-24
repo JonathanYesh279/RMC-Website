@@ -8,6 +8,11 @@ import {
   type UpdatesPageDoc,
 } from "@/sanity/queries";
 import UpdatesContent from "./UpdatesContent";
+import {
+  buildStatusPill,
+  buildTodayLine,
+  FALLBACK_HOURS_ROWS,
+} from "./derived";
 
 export default async function UpdatesPage() {
   const [page, holidays, archive] = await Promise.all([
@@ -28,11 +33,18 @@ export default async function UpdatesPage() {
     ),
   ]);
 
+  const safeHolidays = holidays ?? [];
+  const safeArchive = archive ?? [];
+  const statusPill = buildStatusPill(safeArchive);
+  const todayLine = buildTodayLine(page ?? null, FALLBACK_HOURS_ROWS);
+
   return (
     <UpdatesContent
       page={page ?? null}
-      holidays={holidays ?? []}
-      archive={archive ?? []}
+      holidays={safeHolidays}
+      archive={safeArchive}
+      statusPill={statusPill}
+      todayLine={todayLine}
     />
   );
 }

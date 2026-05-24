@@ -7,30 +7,17 @@ import type {
   UpdateHolidayDoc,
   UpdatesPageDoc,
 } from "@/sanity/queries";
+import { FALLBACK_HOURS_ROWS } from "./derived";
 
 // ── Hard-coded fallbacks (used when a Sanity field is empty) ──
 const FALLBACK = {
   hero: {
-    statusPill: "פורסם עדכון חדש — לפני 3 ימים",
     lede: "כל מה שצריך לדעת על שעות פעילות, חגים וחופשות, מערכת השיעורים ולוח השנה של הקונסרבטוריון — מתעדכן באופן שוטף ע״י מזכירות המרכז.",
-    todayLine: "היום ראשון · המרכז פעיל בשעות 14:00–20:00",
   },
   featured: {
     image:
       "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=1600&q=80&auto=format&fit=crop",
     imageAlt: "מודעת חופשת פסח",
-    statusTag: "מודעה פעילה",
-    eyebrowMain: "חופשת חג ·",
-    eyebrowEm: "פסח תשפ״ו",
-    title:
-      "חופשת פסח — השיעורים הפרטיים יתקיימו עד יום שלישי 31/03 (כולל)",
-    body: "חזרה ללימודים סדירים ביום חמישי 09/04. הזמני פעילות לתזמורות והרכבי החדר יפורטו בעדכון נפרד שיופץ דרך המורים הראשיים.",
-    meta1Label: "תקופת חופשה",
-    meta1Value: "01.04 – 08.04",
-    meta1Sub: "שמונה ימי חופשה",
-    meta2Label: "חזרה ללימודים",
-    meta2Value: "09.04.2026",
-    meta2Sub: "יום חמישי · 14:00",
   },
   holidaysUpdatedLabel: "לפני 5 ימים",
   hours: {
@@ -52,14 +39,11 @@ const FALLBACK = {
     image:
       "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1600&q=80&auto=format&fit=crop",
     imageAlt: "לוח שעות התאוריה",
-    updatedDate: "27.08.2025",
   },
   calendar: {
     image:
       "https://images.unsplash.com/photo-1606326608690-4e0281b1e588?w=1400&q=80&auto=format&fit=crop",
     imageAlt: "לוח השנה השנתי",
-    adminChip: "תמונה שנתית",
-    publishedDate: "15.08.2025",
   },
   archiveSummary: "12 עדכונים · שנת תשפ״ו",
   subscribe: {
@@ -199,17 +183,14 @@ const DAY_ORDER: Array<{
     | "hoursDayFriday"
     | "hoursDaySaturday";
   label: string;
-  fallbackTime: string;
-  fallbackToday?: boolean;
-  fallbackClosed?: boolean;
 }> = [
-  { key: "hoursDaySunday", label: "ראשון", fallbackTime: "14:00 – 20:00", fallbackToday: true },
-  { key: "hoursDayMonday", label: "שני", fallbackTime: "14:00 – 21:00" },
-  { key: "hoursDayTuesday", label: "שלישי", fallbackTime: "14:00 – 21:00" },
-  { key: "hoursDayWednesday", label: "רביעי", fallbackTime: "14:00 – 21:00" },
-  { key: "hoursDayThursday", label: "חמישי", fallbackTime: "14:00 – 20:00" },
-  { key: "hoursDayFriday", label: "שישי", fallbackTime: "חופשת חג", fallbackClosed: true },
-  { key: "hoursDaySaturday", label: "שבת", fallbackTime: "סגור", fallbackClosed: true },
+  { key: "hoursDaySunday", label: "ראשון" },
+  { key: "hoursDayMonday", label: "שני" },
+  { key: "hoursDayTuesday", label: "שלישי" },
+  { key: "hoursDayWednesday", label: "רביעי" },
+  { key: "hoursDayThursday", label: "חמישי" },
+  { key: "hoursDayFriday", label: "שישי" },
+  { key: "hoursDaySaturday", label: "שבת" },
 ];
 
 function formatIsoDate(iso: string | null | undefined): string {
@@ -237,9 +218,19 @@ type Props = {
   page: UpdatesPageDoc;
   holidays: UpdateHolidayDoc[];
   archive: UpdateArchiveDoc[];
+  /** Computed on the server from the most recent archive item. Null = hide pill. */
+  statusPill: string | null;
+  /** Computed on the server from today's day-of-week + the hours table. */
+  todayLine: string;
 };
 
-export default function UpdatesContent({ page, holidays, archive }: Props) {
+export default function UpdatesContent({
+  page,
+  holidays,
+  archive,
+  statusPill,
+  todayLine,
+}: Props) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -261,32 +252,17 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
   const holidayList = holidays.length > 0 ? holidays : FALLBACK_HOLIDAYS;
   const archiveList = archive.length > 0 ? archive : FALLBACK_ARCHIVE;
 
-  const statusPill = page?.heroStatusPill ?? FALLBACK.hero.statusPill;
   const heroLede = page?.heroLede ?? FALLBACK.hero.lede;
-  const todayLine = page?.heroTodayLine ?? FALLBACK.hero.todayLine;
 
   const featImg = page?.featuredImageUrl ?? FALLBACK.featured.image;
   const featAlt = page?.featuredImageAlt ?? FALLBACK.featured.imageAlt;
-  const featStatusTag = page?.featuredStatusTag ?? FALLBACK.featured.statusTag;
-  const featEyebrowMain =
-    page?.featuredEyebrowMain ?? FALLBACK.featured.eyebrowMain;
-  const featEyebrowEm =
-    page?.featuredEyebrowEm ?? FALLBACK.featured.eyebrowEm;
-  const featTitle = page?.featuredTitle ?? FALLBACK.featured.title;
-  const featBody = page?.featuredBody ?? FALLBACK.featured.body;
-  const featM1Label = page?.featuredMeta1Label ?? FALLBACK.featured.meta1Label;
-  const featM1Value = page?.featuredMeta1Value ?? FALLBACK.featured.meta1Value;
-  const featM1Sub = page?.featuredMeta1Sub ?? FALLBACK.featured.meta1Sub;
-  const featM2Label = page?.featuredMeta2Label ?? FALLBACK.featured.meta2Label;
-  const featM2Value = page?.featuredMeta2Value ?? FALLBACK.featured.meta2Value;
-  const featM2Sub = page?.featuredMeta2Sub ?? FALLBACK.featured.meta2Sub;
 
   const holidaysUpdated =
     page?.holidaysUpdatedLabel ?? FALLBACK.holidaysUpdatedLabel;
 
   const hoursAdminChip = page?.hoursAdminChip ?? FALLBACK.hours.adminChip;
   const hoursValidUntil = page?.hoursValidUntil ?? FALLBACK.hours.validUntil;
-  const hoursImg = page?.hoursImageUrl ?? FALLBACK.hours.image;
+  const hoursImg = page?.hoursImageUrl ?? null;
   const hoursImgAlt = page?.hoursImageAlt ?? FALLBACK.hours.imageAlt;
   const hoursOverlayLabel =
     page?.hoursOverlayLabel ?? FALLBACK.hours.overlayLabel;
@@ -297,18 +273,14 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
   const hoursSideLede = page?.hoursSideLede ?? FALLBACK.hours.sideLede;
   const hoursNoteLead = page?.hoursNoteLead ?? FALLBACK.hours.noteLead;
   const hoursNoteBody = page?.hoursNoteBody ?? FALLBACK.hours.noteBody;
+  const hasHoursImage = Boolean(hoursImg);
 
   const theoryImg = page?.theoryImageUrl ?? FALLBACK.theory.image;
   const theoryImgAlt = page?.theoryImageAlt ?? FALLBACK.theory.imageAlt;
-  const theoryUpdated = page?.theoryUpdatedDate ?? FALLBACK.theory.updatedDate;
 
   const calendarImg = page?.calendarImageUrl ?? FALLBACK.calendar.image;
   const calendarImgAlt =
     page?.calendarImageAlt ?? FALLBACK.calendar.imageAlt;
-  const calendarAdminChip =
-    page?.calendarAdminChip ?? FALLBACK.calendar.adminChip;
-  const calendarPublished =
-    page?.calendarPublishedDate ?? FALLBACK.calendar.publishedDate;
 
   const archiveSummary = page?.archiveSummary ?? FALLBACK.archiveSummary;
 
@@ -352,72 +324,38 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
               <p className="up-h-lede">{heroLede}</p>
             </div>
 
-            {todayLine && (
-              <aside
-                className="up-h-stats up-h-stats-solo reveal"
-                aria-label="שעות פעילות היום"
-              >
-                <div className="up-h-quick">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path
-                      d="M7 1.5v5l3 2"
-                      stroke="currentColor"
-                      strokeWidth="1.4"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="7" cy="7" r="5.6" stroke="currentColor" strokeWidth="1.4" />
-                  </svg>
-                  <span>{todayLine}</span>
-                </div>
-              </aside>
-            )}
+            <aside
+              className="up-h-stats up-h-stats-solo reveal"
+              aria-label="שעות פעילות היום"
+            >
+              <div className="up-h-quick">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path
+                    d="M7 1.5v5l3 2"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="7" cy="7" r="5.6" stroke="currentColor" strokeWidth="1.4" />
+                </svg>
+                <span>{todayLine}</span>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
 
       <div className="up-main">
         <div className="container">
-          {/* Featured update */}
+          {/* Big image (featured update — image only, no text overlay) */}
           <section className="up-sec">
-            <article className="up-featured reveal">
+            <article className="up-featured up-featured--solo reveal">
               <div
-                className="up-feat-media"
+                className="up-feat-media up-feat-media--solo"
                 style={{ backgroundImage: `url('${featImg}')` }}
                 role="img"
                 aria-label={featAlt}
-              >
-                {featStatusTag && (
-                  <span className="up-feat-tag">
-                    <span className="d" />
-                    {featStatusTag}
-                  </span>
-                )}
-              </div>
-              <div className="up-feat-body">
-                {(featEyebrowMain || featEyebrowEm) && (
-                  <span className="up-feat-eyebrow">
-                    {featEyebrowMain} {featEyebrowEm && <em>{featEyebrowEm}</em>}
-                  </span>
-                )}
-                <h3 className="up-feat-title">{featTitle}</h3>
-                <p className="up-feat-text">{featBody}</p>
-                <div className="up-feat-meta">
-                  <div className="up-feat-meta-item">
-                    <div className="l">{featM1Label}</div>
-                    <div className="v">
-                      {featM1Value}
-                      {featM1Sub && <small>{featM1Sub}</small>}
-                    </div>
-                  </div>
-                  <div className="up-feat-meta-item">
-                    <div className="l">{featM2Label}</div>
-                    <div className="v">
-                      {featM2Value}
-                      {featM2Sub && <small>{featM2Sub}</small>}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              />
             </article>
           </section>
 
@@ -496,7 +434,7 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
             </div>
           </section>
 
-          {/* Activity hours */}
+          {/* Activity hours (image is optional) */}
           <section className="up-sec">
             <header className="up-sec-head reveal">
               <div>
@@ -514,40 +452,43 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
               </div>
             </header>
 
-            <div className="up-hours">
-              <div
-                className="up-hours-img reveal"
-                style={{ backgroundImage: `url('${hoursImg}')` }}
-                role="img"
-                aria-label={hoursImgAlt}
-              >
-                {(hoursOverlayLabel || hoursOverlayValue || hoursOverlayBadge) && (
-                  <div className="up-hours-overlay">
-                    <div>
-                      {hoursOverlayLabel && (
-                        <div className="l">{hoursOverlayLabel}</div>
-                      )}
-                      {hoursOverlayValue && (
-                        <div className="v">{hoursOverlayValue}</div>
+            <div className={`up-hours${hasHoursImage ? "" : " up-hours--solo"}`}>
+              {hasHoursImage && (
+                <div
+                  className="up-hours-img reveal"
+                  style={{ backgroundImage: `url('${hoursImg}')` }}
+                  role="img"
+                  aria-label={hoursImgAlt}
+                >
+                  {(hoursOverlayLabel || hoursOverlayValue || hoursOverlayBadge) && (
+                    <div className="up-hours-overlay">
+                      <div>
+                        {hoursOverlayLabel && (
+                          <div className="l">{hoursOverlayLabel}</div>
+                        )}
+                        {hoursOverlayValue && (
+                          <div className="v">{hoursOverlayValue}</div>
+                        )}
+                      </div>
+                      {hoursOverlayBadge && (
+                        <span className="badge">{hoursOverlayBadge}</span>
                       )}
                     </div>
-                    {hoursOverlayBadge && (
-                      <span className="badge">{hoursOverlayBadge}</span>
-                    )}
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               <div className="up-hours-side reveal">
                 <h3>שעות פתיחה — שבוע נוכחי</h3>
                 {hoursSideLede && <p className="lede">{hoursSideLede}</p>}
 
                 <div className="up-hours-list">
-                  {DAY_ORDER.map((d) => {
+                  {DAY_ORDER.map((d, i) => {
                     const row = page?.[d.key];
-                    const time = row?.time ?? d.fallbackTime;
-                    const today = row?.today ?? d.fallbackToday ?? false;
-                    const closed = row?.closed ?? d.fallbackClosed ?? false;
+                    const fb = FALLBACK_HOURS_ROWS[i];
+                    const time = row?.time ?? fb.time;
+                    const today = row?.today ?? false;
+                    const closed = row?.closed ?? fb.closed;
                     return (
                       <div
                         key={d.key}
@@ -573,19 +514,13 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
             </div>
           </section>
 
-          {/* Theory hours board */}
+          {/* Theory hours board — image only */}
           <section className="up-sec">
             <header className="up-sec-head reveal">
               <div>
                 <span className="eyebrow">מערכת השיעורים</span>
               </div>
-              <div className="up-sec-meta">
-                {theoryUpdated && (
-                  <span className="up-updated">
-                    עודכן <b>{theoryUpdated}</b>
-                  </span>
-                )}
-              </div>
+              <div className="up-sec-meta" />
             </header>
 
             <div
@@ -596,22 +531,13 @@ export default function UpdatesContent({ page, holidays, archive }: Props) {
             />
           </section>
 
-          {/* Yearly calendar */}
+          {/* Yearly calendar — image only */}
           <section className="up-sec">
             <header className="up-sec-head reveal">
               <div>
                 <span className="eyebrow">לוח שנה</span>
               </div>
-              <div className="up-sec-meta">
-                {calendarAdminChip && (
-                  <span className="up-admin-chip">{calendarAdminChip}</span>
-                )}
-                {calendarPublished && (
-                  <span className="up-updated">
-                    פורסם <b>{calendarPublished}</b>
-                  </span>
-                )}
-              </div>
+              <div className="up-sec-meta" />
             </header>
 
             <div

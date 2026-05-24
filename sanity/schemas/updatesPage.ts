@@ -37,7 +37,8 @@ const dayRowField = (
       defineField({
         name: "today",
         title: "סמן את היום הזה כ״היום״",
-        description: "ההדגשה הירוקה בטבלה. סמנו רק יום אחד.",
+        description:
+          "ההדגשה הירוקה בטבלה. סמנו רק יום אחד. אם אף יום לא מסומן, האתר יזהה אוטומטית את היום הנוכחי.",
         type: "boolean",
         initialValue: initialToday,
       }),
@@ -58,26 +59,17 @@ export default defineType({
   title: "עמוד מידע ועדכונים",
   type: "document",
   groups: [
-    { name: "hero", title: "🟦 כותרת ראשית", default: true },
-    { name: "featured", title: "📣 עדכון מרכזי" },
-    { name: "holidays", title: "🎉 חגים וחופשות" },
-    { name: "hours", title: "🕘 שעות פעילות" },
-    { name: "theory", title: "📋 מערכת השיעורים" },
-    { name: "calendar", title: "🗓️ לוח שנה" },
-    { name: "archive", title: "📦 ארכיון" },
-    { name: "subscribe", title: "✉️ הרשמה לעדכונים" },
+    { name: "hero", title: "1️⃣ כותרת ראשית", default: true },
+    { name: "featured", title: "2️⃣ תמונה מרכזית (עדכון פעיל)" },
+    { name: "holidays", title: "3️⃣ חגים, חופשות ואירועים" },
+    { name: "hours", title: "4️⃣ שעות פעילות" },
+    { name: "theory", title: "5️⃣ מערכת השיעורים" },
+    { name: "calendar", title: "6️⃣ לוח שנה" },
+    { name: "archive", title: "7️⃣ עדכונים קודמים" },
+    { name: "subscribe", title: "8️⃣ הרשמה לעדכונים" },
   ],
   fields: [
-    // ── 🟦 Hero ──────────────────────────────────────────────────────
-    defineField({
-      name: "heroStatusPill",
-      title: "תווית סטטוס מעל הכותרת",
-      description:
-        'התווית הקטנה בעיגול עם הנקודה הירוקה הפועמת. למשל: ״פורסם עדכון חדש — לפני 3 ימים״. אם תושאר ריקה, התווית לא תוצג.',
-      type: "string",
-      group: "hero",
-      validation: (r) => r.max(80),
-    }),
+    // ── 1️⃣ Hero ─────────────────────────────────────────────────────
     defineField({
       name: "heroLede",
       title: "פסקת תיאור בכותרת",
@@ -87,148 +79,57 @@ export default defineType({
       group: "hero",
       validation: (r) => r.max(400),
     }),
-    defineField({
-      name: "heroTodayLine",
-      title: "שורת פעילות היום",
-      description:
-        'הטקסט שמופיע בכרטיסיית הסטטוס בצד הכותרת. למשל: ״היום ראשון · המרכז פעיל בשעות 14:00–20:00״.',
-      type: "string",
-      group: "hero",
-      validation: (r) => r.max(120),
-    }),
+    // NOTE: heroStatusPill ("פורסם עדכון חדש — לפני X ימים") is computed
+    //       automatically from the most recent archive item.
+    // NOTE: heroTodayLine is computed automatically from the day-of-week
+    //       and the matching שעות פעילות row below.
 
-    // ── 📣 Featured update ───────────────────────────────────────────
+    // ── 2️⃣ Featured (Big image) — image-only ───────────────────────
     defineField({
       name: "featuredImage",
-      title: "תמונת המודעה",
-      description: "התמונה הגדולה של העדכון המרכזי. יחס מומלץ: 4:3.",
+      title: "תמונת המודעה הגדולה",
+      description:
+        "התמונה הגדולה של העדכון המרכזי. יחס מומלץ: 4:3. הכל בתוך התמונה — אין שדות טקסט נוספים.",
       type: "image",
       options: { hotspot: true },
       group: "featured",
       fields: [altField],
     }),
-    defineField({
-      name: "featuredStatusTag",
-      title: "תווית סטטוס על התמונה",
-      description: 'התווית האדומה בפינה. למשל: ״מודעה פעילה״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredEyebrowMain",
-      title: "כותרת קטנה — חלק רגיל",
-      description: 'החלק האפור של ה־eyebrow. למשל: ״חופשת חג ·״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredEyebrowEm",
-      title: "כותרת קטנה — חלק מודגש",
-      description: 'החלק האלמוגי של ה־eyebrow. למשל: ״פסח תשפ״ו״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredTitle",
-      title: "כותרת העדכון",
-      description: "הכותרת הראשית של המודעה.",
-      type: "text",
-      rows: 2,
-      group: "featured",
-      validation: (r) => r.max(200),
-    }),
-    defineField({
-      name: "featuredBody",
-      title: "פסקת תיאור",
-      description: "הפסקה הקצרה שמתחת לכותרת.",
-      type: "text",
-      rows: 4,
-      group: "featured",
-      validation: (r) => r.max(500),
-    }),
-    defineField({
-      name: "featuredMeta1Label",
-      title: 'תווית מטא 1 (למשל: "תקופת חופשה")',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredMeta1Value",
-      title: "ערך מטא 1",
-      description: 'למשל: ״01.04 – 08.04״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredMeta1Sub",
-      title: "תווית קטנה תחת ערך מטא 1",
-      description: 'למשל: ״שמונה ימי חופשה״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(60),
-    }),
-    defineField({
-      name: "featuredMeta2Label",
-      title: 'תווית מטא 2 (למשל: "חזרה ללימודים")',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredMeta2Value",
-      title: "ערך מטא 2",
-      description: 'למשל: ״09.04.2026״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(40),
-    }),
-    defineField({
-      name: "featuredMeta2Sub",
-      title: "תווית קטנה תחת ערך מטא 2",
-      description: 'למשל: ״יום חמישי · 14:00״.',
-      type: "string",
-      group: "featured",
-      validation: (r) => r.max(60),
-    }),
 
-    // ── 🎉 Holidays ──────────────────────────────────────────────────
+    // ── 3️⃣ Holidays — section meta only (cards live in their own document) ─
     defineField({
       name: "holidaysUpdatedLabel",
       title: "תווית ״עודכן״ בצד הימני של הסקציה",
       description:
-        'הטקסט בצד הימני של ראש הסקציה. למשל: ״עודכן לפני 5 ימים״ — האדמין מעדכן ידנית.',
+        'הטקסט בצד הימני של ראש הסקציה. למשל: ״לפני 5 ימים״ — האדמין מעדכן ידנית.',
       type: "string",
       group: "holidays",
       validation: (r) => r.max(60),
     }),
 
-    // ── 🕘 Activity hours ────────────────────────────────────────────
+    // ── 4️⃣ Activity hours ──────────────────────────────────────────
     defineField({
       name: "hoursAdminChip",
       title: "תווית טורקיז בראש הסקציה",
-      description: 'למשל: ״תמונה דינמית · מתעדכנת לפי תקופה״.',
+      description:
+        'למשל: ״תמונה דינמית · מתעדכנת לפי תקופה״. תוצג רק אם תוזן.',
       type: "string",
       group: "hours",
       validation: (r) => r.max(80),
     }),
     defineField({
       name: "hoursValidUntil",
-      title: 'תאריך תוקף ("בתוקף עד")',
-      description: 'הטקסט שמופיע אחרי ״בתוקף עד״. למשל: ״31.03.2026״.',
+      title: 'תאריך תוקף (אחרי "בתוקף עד")',
+      description: 'למשל: ״31.03.2026״. תוצג רק אם תוזן.',
       type: "string",
       group: "hours",
       validation: (r) => r.max(40),
     }),
     defineField({
       name: "hoursImage",
-      title: "תמונת שעות הפעילות",
+      title: "תמונה לצד טבלת השעות (אופציונלי)",
       description:
-        "התמונה השמאלית של סקציית השעות. תמונה ייעודית לתקופה הנוכחית.",
+        "אם תועלה תמונה, היא תופיע לצד טבלת השעות. אם תושאר ריקה, הטבלה תוצג לבד במרכז.",
       type: "image",
       options: { hotspot: true },
       group: "hours",
@@ -237,7 +138,8 @@ export default defineType({
     defineField({
       name: "hoursOverlayLabel",
       title: "תווית שכבת התמונה — תווית קטנה",
-      description: 'הטקסט הקטן בכרטיסיה השחורה על התמונה. למשל: ״תוקף התמונה״.',
+      description:
+        'הטקסט הקטן בכרטיסיה השחורה על התמונה. למשל: ״תוקף התמונה״. (רק אם הועלתה תמונה)',
       type: "string",
       group: "hours",
       validation: (r) => r.max(40),
@@ -260,9 +162,9 @@ export default defineType({
     }),
     defineField({
       name: "hoursSideLede",
-      title: "פסקת עזר בסיידבר השעות",
+      title: "פסקת עזר בטבלת השעות",
       description:
-        "הפסקה הקצרה שמופיעה מתחת לכותרת ״שעות פתיחה — שבוע נוכחי״ בסיידבר הכהה.",
+        "הפסקה הקצרה שמופיעה מתחת לכותרת ״שעות פתיחה — שבוע נוכחי״ בטבלה הכהה.",
       type: "text",
       rows: 3,
       group: "hours",
@@ -293,53 +195,31 @@ export default defineType({
       validation: (r) => r.max(300),
     }),
 
-    // ── 📋 Theory ────────────────────────────────────────────────────
+    // ── 5️⃣ Theory — image only ────────────────────────────────────
     defineField({
       name: "theoryImage",
       title: "תמונת לוח השעות",
-      description: "הצילום של לוח שעות התאוריה. יחס מומלץ: 16:10.",
+      description:
+        "הצילום של לוח שעות התאוריה. יחס מומלץ: 16:10. כל המידע בתוך התמונה.",
       type: "image",
       options: { hotspot: true },
       group: "theory",
       fields: [altField],
     }),
-    defineField({
-      name: "theoryUpdatedDate",
-      title: 'תאריך עדכון אחרון (אחרי "עודכן")',
-      description: 'למשל: ״27.08.2025״.',
-      type: "string",
-      group: "theory",
-      validation: (r) => r.max(40),
-    }),
 
-    // ── 🗓️ Yearly calendar ─────────────────────────────────────────
+    // ── 6️⃣ Yearly calendar — image only ───────────────────────────
     defineField({
       name: "calendarImage",
       title: "תמונת לוח השנה השנתי",
-      description: "התמונה השלמה של הלוח. יחס מומלץ: 4:3.",
+      description:
+        "התמונה השלמה של הלוח. יחס מומלץ: 4:3. כל המידע בתוך התמונה.",
       type: "image",
       options: { hotspot: true },
       group: "calendar",
       fields: [altField],
     }),
-    defineField({
-      name: "calendarAdminChip",
-      title: "תווית טורקיז בראש הסקציה",
-      description: 'למשל: ״תמונה שנתית״.',
-      type: "string",
-      group: "calendar",
-      validation: (r) => r.max(60),
-    }),
-    defineField({
-      name: "calendarPublishedDate",
-      title: 'תאריך פרסום (אחרי "פורסם")',
-      description: 'למשל: ״15.08.2025״.',
-      type: "string",
-      group: "calendar",
-      validation: (r) => r.max(40),
-    }),
 
-    // ── 📦 Archive ───────────────────────────────────────────────────
+    // ── 7️⃣ Archive — section meta only ────────────────────────────
     defineField({
       name: "archiveSummary",
       title: "תווית סיכום בצד הימני של הסקציה",
@@ -349,7 +229,7 @@ export default defineType({
       validation: (r) => r.max(80),
     }),
 
-    // ── ✉️ Subscribe ────────────────────────────────────────────────
+    // ── 8️⃣ Subscribe ──────────────────────────────────────────────
     defineField({
       name: "subscribeLede",
       title: "פסקת תיאור ההרשמה",
@@ -394,8 +274,7 @@ export default defineType({
       title: "כתובת פייסבוק",
       type: "url",
       group: "subscribe",
-      validation: (r) =>
-        r.uri({ scheme: ["http", "https"] }),
+      validation: (r) => r.uri({ scheme: ["http", "https"] }),
     }),
     defineField({
       name: "subscribeInstagramLabel",
@@ -409,8 +288,7 @@ export default defineType({
       title: "כתובת אינסטגרם",
       type: "url",
       group: "subscribe",
-      validation: (r) =>
-        r.uri({ scheme: ["http", "https"] }),
+      validation: (r) => r.uri({ scheme: ["http", "https"] }),
     }),
   ],
   preview: {
