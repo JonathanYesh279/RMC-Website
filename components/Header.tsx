@@ -71,7 +71,7 @@ export default function Header() {
             );
           })}
         </nav>
-        <a className="header-cta" href="#">
+        <Link className="header-cta" href="/conservatory#forms">
           הרשמה לשנה״ל
           <svg
             width="14"
@@ -88,7 +88,7 @@ export default function Header() {
               strokeLinejoin="round"
             />
           </svg>
-        </a>
+        </Link>
         <button
           className="icon-btn mobile-toggle"
           aria-label="פתיחת תפריט"

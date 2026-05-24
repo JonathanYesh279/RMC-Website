@@ -74,6 +74,16 @@ const tabLabels = [
   "העשרה",
 ];
 
+const TAB_SLUGS = [
+  "departments",
+  "ensembles",
+  "groups",
+  "programs",
+  "forms",
+  "leadership",
+  "enrichment",
+] as const;
+
 const STORAGE_KEY = "conservatoryTab";
 
 export default function ConservatoryContent({
@@ -155,7 +165,13 @@ export default function ConservatoryContent({
   }, [active]);
 
   const activate = useCallback(
-    (idx: number, { scroll = true }: { scroll?: boolean } = {}) => {
+    (
+      idx: number,
+      {
+        scroll = true,
+        force = false,
+      }: { scroll?: boolean; force?: boolean } = {}
+    ) => {
       setActive(idx);
       try {
         localStorage.setItem(STORAGE_KEY, String(idx));
@@ -163,13 +179,27 @@ export default function ConservatoryContent({
       if (scroll && stickyRef.current) {
         const offset =
           window.scrollY + stickyRef.current.getBoundingClientRect().top;
-        if (window.scrollY > offset + 20) {
+        if (force || window.scrollY > offset + 20) {
           window.scrollTo({ top: offset - 10, behavior: "smooth" });
         }
       }
     },
     []
   );
+
+  useEffect(() => {
+    const applyHash = () => {
+      const raw = window.location.hash.replace(/^#/, "");
+      if (!raw) return false;
+      const idx = TAB_SLUGS.indexOf(raw as (typeof TAB_SLUGS)[number]);
+      if (idx === -1) return false;
+      activate(idx, { force: true });
+      return true;
+    };
+    applyHash();
+    window.addEventListener("hashchange", applyHash);
+    return () => window.removeEventListener("hashchange", applyHash);
+  }, [activate]);
 
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
     const len = tabLabels.length;
