@@ -8,6 +8,12 @@ const CONCERT_TYPES = new Set([
   "concertCopy",
 ]);
 
+const UPDATES_TYPES = new Set([
+  "updatesPage",
+  "updateHoliday",
+  "updateArchive",
+]);
+
 export async function POST(req: NextRequest) {
   const expected = process.env.SANITY_REVALIDATE_SECRET;
   if (!expected) {
@@ -38,6 +44,12 @@ export async function POST(req: NextRequest) {
       typeof body.slug === "string" ? body.slug : body.slug?.current;
     if (type === "concert" && slug) revalidatePath(`/concerts/${slug}`);
     return NextResponse.json({ ok: true, revalidated: type, slug: slug ?? null });
+  }
+
+  if (type && UPDATES_TYPES.has(type)) {
+    revalidateTag(type, "max");
+    revalidatePath("/updates");
+    return NextResponse.json({ ok: true, revalidated: type });
   }
 
   return NextResponse.json({ ok: true, ignored: type ?? null });

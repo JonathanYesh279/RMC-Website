@@ -85,5 +85,32 @@ export const structure: StructureResolver = (S) =>
             ]),
         ),
       S.divider(),
+      S.listItem()
+        .id("section-updates")
+        .title("📰 מידע ועדכונים")
+        .child(
+          S.list()
+            .id("updates-section")
+            .title("מידע ועדכונים")
+            .items([
+              S.listItem()
+                .id("updatesPage")
+                .title("⚙️ הגדרות העמוד")
+                .child(
+                  S.document()
+                    .schemaType("updatesPage")
+                    .documentId(SINGLETON_IDS.updatesPage)
+                    .title("הגדרות עמוד מידע ועדכונים"),
+                ),
+              S.divider(),
+              S.documentTypeListItem("updateHoliday").title(
+                "🎉 חגים, חופשות ואירועים",
+              ),
+              S.documentTypeListItem("updateArchive").title(
+                "📦 ארכיון עדכונים",
+              ),
+            ]),
+        ),
+      S.divider(),
       S.documentTypeListItem("formDocument").title("📄 טפסים להורדה"),
     ]);

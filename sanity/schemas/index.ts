@@ -7,6 +7,9 @@ import conservatoryHero from "./conservatoryHero";
 import concert from "./concert";
 import concertsPage from "./concertsPage";
 import concertCopy from "./concertCopy";
+import updatesPage from "./updatesPage";
+import updateHoliday from "./updateHoliday";
+import updateArchive from "./updateArchive";
 
 export const schemaTypes = [
   teacher,
@@ -18,16 +21,21 @@ export const schemaTypes = [
   concert,
   concertsPage,
   concertCopy,
+  updatesPage,
+  updateHoliday,
+  updateArchive,
 ];
 
 export const SINGLETON_TYPES = new Set([
   "concertsPage",
   "concertCopy",
   "conservatoryHero",
+  "updatesPage",
 ]);
 
 export const SINGLETON_IDS: Record<string, string> = {
   concertsPage: "concertsPage",
   concertCopy: "concertCopy",
   conservatoryHero: "conservatoryHero",
+  updatesPage: "updatesPage",
 };

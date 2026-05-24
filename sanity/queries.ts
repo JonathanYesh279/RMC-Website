@@ -256,3 +256,192 @@ export type ConcertCopyDoc = {
   secureNote: string | null;
   cancellationNote: string | null;
 } | null;
+
+// ── Updates page ────────────────────────────────────────────────────
+const DAY_ROW_PROJECTION = `{ time, today, closed }`;
+
+export const UPDATES_PAGE_QUERY = defineQuery(`
+  *[_type == "updatesPage" && _id == "updatesPage"][0] {
+    heroStatusPill,
+    heroLede,
+    heroTodayLine,
+
+    "featuredImageUrl": featuredImage.asset->url,
+    "featuredImageAlt": featuredImage.alt,
+    featuredStatusTag,
+    featuredEyebrowMain,
+    featuredEyebrowEm,
+    featuredTitle,
+    featuredBody,
+    featuredMeta1Label,
+    featuredMeta1Value,
+    featuredMeta1Sub,
+    featuredMeta2Label,
+    featuredMeta2Value,
+    featuredMeta2Sub,
+
+    holidaysUpdatedLabel,
+
+    hoursAdminChip,
+    hoursValidUntil,
+    "hoursImageUrl": hoursImage.asset->url,
+    "hoursImageAlt": hoursImage.alt,
+    hoursOverlayLabel,
+    hoursOverlayValue,
+    hoursOverlayBadge,
+    hoursSideLede,
+    hoursDaySunday ${DAY_ROW_PROJECTION},
+    hoursDayMonday ${DAY_ROW_PROJECTION},
+    hoursDayTuesday ${DAY_ROW_PROJECTION},
+    hoursDayWednesday ${DAY_ROW_PROJECTION},
+    hoursDayThursday ${DAY_ROW_PROJECTION},
+    hoursDayFriday ${DAY_ROW_PROJECTION},
+    hoursDaySaturday ${DAY_ROW_PROJECTION},
+    hoursNoteLead,
+    hoursNoteBody,
+
+    "theoryImageUrl": theoryImage.asset->url,
+    "theoryImageAlt": theoryImage.alt,
+    theoryUpdatedDate,
+
+    "calendarImageUrl": calendarImage.asset->url,
+    "calendarImageAlt": calendarImage.alt,
+    calendarAdminChip,
+    calendarPublishedDate,
+
+    archiveSummary,
+
+    subscribeLede,
+    subscribeEmailPlaceholder,
+    subscribeSubmitLabel,
+    subscribeChannelsHeading,
+    subscribeFacebookLabel,
+    subscribeFacebookUrl,
+    subscribeInstagramLabel,
+    subscribeInstagramUrl
+  }
+`);
+
+export const UPDATE_HOLIDAYS_QUERY = defineQuery(`
+  *[_type == "updateHoliday"] | order(displayOrder asc, _createdAt asc) {
+    _id,
+    "imageUrl": image.asset->url,
+    "imageAlt": image.alt,
+    cornerLabel,
+    cornerTone,
+    title,
+    metaTags,
+    description,
+    dateRange,
+    dateSub,
+    linkUrl
+  }
+`);
+
+export const UPDATE_ARCHIVE_QUERY = defineQuery(`
+  *[_type == "updateArchive"] | order(date desc) {
+    _id,
+    "imageUrl": image.asset->url,
+    "imageAlt": image.alt,
+    tag,
+    tagTone,
+    name,
+    date,
+    dateDisplay,
+    relativeLabel,
+    linkUrl
+  }
+`);
+
+export type DayRow = {
+  time: string | null;
+  today: boolean | null;
+  closed: boolean | null;
+} | null;
+
+export type UpdatesPageDoc = {
+  heroStatusPill: string | null;
+  heroLede: string | null;
+  heroTodayLine: string | null;
+
+  featuredImageUrl: string | null;
+  featuredImageAlt: string | null;
+  featuredStatusTag: string | null;
+  featuredEyebrowMain: string | null;
+  featuredEyebrowEm: string | null;
+  featuredTitle: string | null;
+  featuredBody: string | null;
+  featuredMeta1Label: string | null;
+  featuredMeta1Value: string | null;
+  featuredMeta1Sub: string | null;
+  featuredMeta2Label: string | null;
+  featuredMeta2Value: string | null;
+  featuredMeta2Sub: string | null;
+
+  holidaysUpdatedLabel: string | null;
+
+  hoursAdminChip: string | null;
+  hoursValidUntil: string | null;
+  hoursImageUrl: string | null;
+  hoursImageAlt: string | null;
+  hoursOverlayLabel: string | null;
+  hoursOverlayValue: string | null;
+  hoursOverlayBadge: string | null;
+  hoursSideLede: string | null;
+  hoursDaySunday: DayRow;
+  hoursDayMonday: DayRow;
+  hoursDayTuesday: DayRow;
+  hoursDayWednesday: DayRow;
+  hoursDayThursday: DayRow;
+  hoursDayFriday: DayRow;
+  hoursDaySaturday: DayRow;
+  hoursNoteLead: string | null;
+  hoursNoteBody: string | null;
+
+  theoryImageUrl: string | null;
+  theoryImageAlt: string | null;
+  theoryUpdatedDate: string | null;
+
+  calendarImageUrl: string | null;
+  calendarImageAlt: string | null;
+  calendarAdminChip: string | null;
+  calendarPublishedDate: string | null;
+
+  archiveSummary: string | null;
+
+  subscribeLede: string | null;
+  subscribeEmailPlaceholder: string | null;
+  subscribeSubmitLabel: string | null;
+  subscribeChannelsHeading: string | null;
+  subscribeFacebookLabel: string | null;
+  subscribeFacebookUrl: string | null;
+  subscribeInstagramLabel: string | null;
+  subscribeInstagramUrl: string | null;
+} | null;
+
+export type UpdateHolidayDoc = {
+  _id: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  cornerLabel: string | null;
+  cornerTone: "amber" | "teal" | "default" | null;
+  title: string;
+  metaTags: string[] | null;
+  description: string | null;
+  dateRange: string | null;
+  dateSub: string | null;
+  linkUrl: string | null;
+};
+
+export type UpdateArchiveDoc = {
+  _id: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
+  tag: string;
+  tagTone: "teal" | "amber" | "coral" | "gray" | null;
+  name: string;
+  date: string;
+  dateDisplay: string | null;
+  relativeLabel: string | null;
+  linkUrl: string | null;
+};
