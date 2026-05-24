@@ -71,24 +71,29 @@ export default function Header() {
             );
           })}
         </nav>
-        <Link className="header-cta" href="/conservatory#forms">
-          הרשמה לשנה״ל
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 14 14"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M9 3L4 7l5 4"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Link>
+        <div className="header-ctas">
+          <Link className="header-cta-secondary" href="/updates">
+            מידע ועדכונים
+          </Link>
+          <Link className="header-cta" href="/conservatory#forms">
+            הרשמה לשנה״ל
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M9 3L4 7l5 4"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
         <button
           className="icon-btn mobile-toggle"
           aria-label="פתיחת תפריט"
