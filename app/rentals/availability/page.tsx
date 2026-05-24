@@ -223,25 +223,6 @@ const INCLUSIONS = [
   },
 ];
 
-const PROCESS_STEPS = [
-  {
-    title: "בקשת זמינות",
-    body: "שליחת הטופס — אישור זמינות ראשוני תוך 48 שעות עבודה. אופציה זמנית של 7 ימים נשמרת בלוח.",
-  },
-  {
-    title: "סיור והצעה",
-    body: "פגישה פיזית במקום, מיפוי דרישות טכניות ושליחת הצעת מחיר מותאמת בכתב.",
-  },
-  {
-    title: "חתימה ומקדמה",
-    body: "חתימה על חוזה, תשלום מקדמה של 30% ושריון התאריך באופן סופי בלוח.",
-  },
-  {
-    title: "תכנון וביצוע",
-    body: "פגישות תיאום עם מהנדסי הקול, חזרה כללית ביום שלפני, וצוות הפקה מלא לאורך האירוע.",
-  },
-];
-
 const FAQS = [
   {
     q: "כמה זמן מראש כדאי להזמין?",
@@ -1651,28 +1632,6 @@ export default function AvailabilityPage() {
                 </>
               )}
             </aside>
-          </div>
-        </div>
-      </section>
-
-      <section className="av-process">
-        <div className="container">
-          <div className="sec-head reveal">
-            <div>
-              <h2>מהבקשה ועד יום ההפקה.</h2>
-            </div>
-            <p className="trail">
-              תהליך ברור בארבעה שלבים — ככל שתפנו מוקדם יותר, כך גדל הסיכוי
-              להבטיח תאריך מועדף.
-            </p>
-          </div>
-          <div className="av-steps">
-            {PROCESS_STEPS.map((step) => (
-              <div className="av-step reveal" key={step.title}>
-                <h4>{step.title}</h4>
-                <p>{step.body}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
