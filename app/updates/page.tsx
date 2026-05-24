@@ -53,33 +53,8 @@ const HOURS: HoursRow[] = [
   { day: "שבת", time: "סגור", closed: true },
 ];
 
-const TABLES = [
-  {
-    id: "sched-theory",
-    eyebrow: "מערכת ראשית",
-    title: "שיעורי תאוריה — ימים א׳, ב׳, ד׳, ה׳",
-    badge: { label: "עדכני", tone: "fresh" as const },
-    img: "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1400&q=80&auto=format&fit=crop",
-    foot: "27.08.2025",
-    footLead: "עודכן",
-  },
-  {
-    id: "sched-prep",
-    eyebrow: "מערכת משנית",
-    title: "הכנה לקלאסי ובגרות — ערבי ה׳, ו׳",
-    badge: { label: "בעדכון", tone: "stale" as const },
-    img: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=1400&q=80&auto=format&fit=crop",
-    foot: "14.04.2026",
-    footLead: "בעדכון — חזרה",
-  },
-];
-
-const CALENDAR_LEGEND = [
-  { label: "ימי לימוד רגילים", count: "154", cls: "lg-school" },
-  { label: "חגי ישראל", count: "18", cls: "lg-hol" },
-  { label: "חול המועד", count: "11", cls: "lg-chol" },
-  { label: "סגירה / שבת", count: "52", cls: "lg-close" },
-];
+const THEORY_BOARD_IMG =
+  "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=1600&q=80&auto=format&fit=crop";
 
 const ARCHIVE = [
   {
@@ -193,22 +168,10 @@ export default function UpdatesPage() {
               </p>
             </div>
 
-            <aside className="up-h-stats reveal" aria-label="סטטוס עדכונים">
-              <div className="up-h-stats-row">
-                <div className="up-h-stat">
-                  <div className="up-h-stat-l">עודכן לאחרונה</div>
-                  <div className="up-h-stat-v">
-                    21.03.2026
-                    <small>חופשת פסח תשפ״ו</small>
-                  </div>
-                </div>
-                <div className="up-h-stat">
-                  <div className="up-h-stat-l">עדכונים פעילים</div>
-                  <div className="up-h-stat-v">
-                    7<small>4 חופשות · 3 שינויים</small>
-                  </div>
-                </div>
-              </div>
+            <aside
+              className="up-h-stats up-h-stats-solo reveal"
+              aria-label="שעות פעילות היום"
+            >
               <div className="up-h-quick">
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path
@@ -233,37 +196,6 @@ export default function UpdatesPage() {
         <div className="container">
           {/* Featured update */}
           <section className="up-sec">
-            <header className="up-sec-head reveal">
-              <div>
-                <span className="eyebrow">עדכון מרכזי · מודעה</span>
-                <h2>
-                  פרסום <em>חדש</em> מהמזכירות
-                </h2>
-                <p>
-                  הודעה רשמית של הקונסרבטוריון, בולטת לכל מי שנכנס לעמוד. האדמין
-                  מעלה את המודעה כתמונה — ההודעה מופיעה כפי שעוצבה.
-                </p>
-              </div>
-              <div className="up-sec-meta">
-                <span className="up-admin-chip">
-                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <circle cx="6" cy="4" r="2" stroke="currentColor" strokeWidth="1.3" />
-                    <path
-                      d="M2 11c0-2.2 1.8-4 4-4s4 1.8 4 4"
-                      stroke="currentColor"
-                      strokeWidth="1.3"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  מנוהל ע״י מזכירות המרכז
-                </span>
-                <span className="up-updated">
-                  <span className="dotline" />
-                  פורסם <b>21 במרץ 2026</b>
-                </span>
-              </div>
-            </header>
-
             <article className="up-featured reveal">
               <div
                 className="up-feat-media"
@@ -312,13 +244,6 @@ export default function UpdatesPage() {
             <header className="up-sec-head reveal">
               <div>
                 <span className="eyebrow">חגים, חופשות ואירועים</span>
-                <h2>
-                  מועדים <em>קרובים</em>
-                </h2>
-                <p>
-                  הודעות תקופתיות עבור חגים ואירועים מיוחדים. מתחלפות מעת לעת —
-                  האדמין מחליף את התמונה ואת התאריך.
-                </p>
               </div>
               <div className="up-sec-meta">
                 <span className="up-updated">
@@ -380,13 +305,6 @@ export default function UpdatesPage() {
             <header className="up-sec-head reveal">
               <div>
                 <span className="eyebrow">שעות פעילות</span>
-                <h2>
-                  מתי <em>אנחנו פתוחים</em>
-                </h2>
-                <p>
-                  שעות הפעילות השוטפות של המרכז. המזכירות מעדכנת את התמונה לפי
-                  תקופה — תקופת לימודים, ערבי חג, חופשות.
-                </p>
               </div>
               <div className="up-sec-meta">
                 <span className="up-admin-chip">תמונה דינמית · מתעדכנת לפי תקופה</span>
@@ -441,71 +359,25 @@ export default function UpdatesPage() {
             </div>
           </section>
 
-          {/* Schedule tables */}
+          {/* Theory hours board */}
           <section className="up-sec">
             <header className="up-sec-head reveal">
               <div>
-                <span className="eyebrow">מערכת השיעורים תשפ״ו</span>
-                <h2>
-                  טבלאות <em>שיעורי תאוריה והכנה</em>
-                </h2>
-                <p>
-                  טבלאות המערכת מתעדכנות בתחילת השנה ולעיתים גם בחופשת חגים.
-                  האדמין מעלה צילום של הטבלה ככפי שיצרה — והמערכת מציגה אותה.
-                </p>
+                <span className="eyebrow">מערכת השיעורים</span>
               </div>
               <div className="up-sec-meta">
                 <span className="up-updated">
-                  פתיחת שנה <b>27.08.2025</b>
+                  עודכן <b>27.08.2025</b>
                 </span>
               </div>
             </header>
 
-            <div className="up-tables">
-              {TABLES.map((t) => (
-                <article className="up-table-card reveal" key={t.id}>
-                  <header className="up-table-head">
-                    <div className="t">
-                      <small>{t.eyebrow}</small>
-                      {t.title}
-                    </div>
-                    <span className={`v ${t.badge.tone}`}>{t.badge.label}</span>
-                  </header>
-                  <div
-                    className="up-table-img"
-                    style={{ backgroundImage: `url('${t.img}')` }}
-                    role="img"
-                    aria-label={t.title}
-                  />
-                  <div className="up-table-foot">
-                    <div className="info">
-                      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                        <rect x="2" y="3" width="10" height="9" stroke="currentColor" strokeWidth="1.3" />
-                        <path
-                          d="M2 6h10M5 1.5v2.5M9 1.5v2.5"
-                          stroke="currentColor"
-                          strokeWidth="1.3"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                      {t.footLead} <strong>{t.foot}</strong>
-                    </div>
-                    <a href="#" aria-label="הורד PDF">
-                      <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                        <path
-                          d="M7 1v8m0 0L4 6m3 3l3-3M2 11h10"
-                          stroke="currentColor"
-                          strokeWidth="1.4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      הורד PDF
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <div
+              className="up-theory-board reveal"
+              style={{ backgroundImage: `url('${THEORY_BOARD_IMG}')` }}
+              role="img"
+              aria-label="לוח שעות התאוריה"
+            />
           </section>
 
           {/* Yearly calendar */}
@@ -513,13 +385,6 @@ export default function UpdatesPage() {
             <header className="up-sec-head reveal">
               <div>
                 <span className="eyebrow">לוח שנה</span>
-                <h2>
-                  תוכנית <em>ימי הלימודים והחופשות</em> · תשפ״ו
-                </h2>
-                <p>
-                  תמונת הלוח השנתי המלא — כולל חגים, חופשות, ימי הורים,
-                  וקונצרטים. בדרך כלל מתעדכן פעם בשנה בתחילת ספטמבר.
-                </p>
               </div>
               <div className="up-sec-meta">
                 <span className="up-admin-chip">תמונה שנתית</span>
@@ -529,58 +394,19 @@ export default function UpdatesPage() {
               </div>
             </header>
 
-            <div className="up-cal reveal">
-              <div
-                className="up-cal-img"
-                style={{ backgroundImage: `url('${CALENDAR_POSTER}')` }}
-                role="img"
-                aria-label="לוח השנה השנתי"
-              />
-              <aside className="up-cal-side">
-                <h3>איך לקרוא את הלוח</h3>
-                <p className="lede">
-                  מקרא צבעים תואם את התמונה. אם משהו לא ברור — אפשר להוריד את
-                  הקובץ המקורי כ־PDF.
-                </p>
-
-                <div className="up-cal-legend">
-                  {CALENDAR_LEGEND.map((l) => (
-                    <div className="row" key={l.label}>
-                      <i className={l.cls} />
-                      <span className="lbl">{l.label}</span>
-                      <span className="ct">{l.count}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <a className="btn-download" href="#">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path
-                      d="M7 1v8m0 0L4 6m3 3l3-3M2 12h10"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  הורד לוח שנה PDF
-                </a>
-              </aside>
-            </div>
+            <div
+              className="up-cal-board reveal"
+              style={{ backgroundImage: `url('${CALENDAR_POSTER}')` }}
+              role="img"
+              aria-label="לוח השנה השנתי"
+            />
           </section>
 
           {/* Archive */}
           <section className="up-sec">
             <header className="up-sec-head reveal">
               <div>
-                <span className="eyebrow">היסטוריה</span>
-                <h2>
-                  עדכונים <em>קודמים</em>
-                </h2>
-                <p>
-                  מתעד גרסאות קודמות של מודעות והודעות מהמרכז. שמירה למעקב —
-                  אינו תוקף.
-                </p>
+                <span className="eyebrow">עדכונים קודמים</span>
               </div>
               <div className="up-sec-meta">
                 <span className="up-updated">12 עדכונים · שנת תשפ״ו</span>
@@ -668,19 +494,6 @@ export default function UpdatesPage() {
         </div>
       </section>
 
-      <div className="up-admin-note">
-        <div className="container">
-          <span>
-            <strong>למזכירות:</strong> כל תמונה בעמוד הזה ניתנת להחלפה ע״י
-            גרירה ושחרור. הגדלים האידיאליים מוצגים בכל שלוט. שינויים נשמרים
-            אוטומטית.
-          </span>
-          <span className="pill">
-            <span className="dot" />
-            גרור תמונה לכל אזור כדי להחליף
-          </span>
-        </div>
-      </div>
     </>
   );
 }
