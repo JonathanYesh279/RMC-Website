@@ -19,18 +19,7 @@ const FALLBACK = {
       "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=1600&q=80&auto=format&fit=crop",
     imageAlt: "מודעת חופשת פסח",
   },
-  holidaysUpdatedLabel: "לפני 5 ימים",
   hours: {
-    adminChip: "תמונה דינמית · מתעדכנת לפי תקופה",
-    validUntil: "31.03.2026",
-    image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1400&q=80&auto=format&fit=crop",
-    imageAlt: "תמונת שעות הפעילות לתקופה הנוכחית",
-    overlayLabel: "תוקף התמונה",
-    overlayValue: "תקופת חג פסח",
-    overlayBadge: "21.03 → 08.04",
-    sideLede:
-      "שעות עזר טקסטואליות לשעת חירום, כאשר התמונה עוד לא נטענה או המבקר זקוק לנגישות מהירה.",
     noteLead: "שימו לב:",
     noteBody:
       "בתקופת החופשה (01.04–08.04) המזכירות פעילה רק בימי ב׳ ו־ד׳ בשעות 10:00–13:00.",
@@ -257,23 +246,8 @@ export default function UpdatesContent({
   const featImg = page?.featuredImageUrl ?? FALLBACK.featured.image;
   const featAlt = page?.featuredImageAlt ?? FALLBACK.featured.imageAlt;
 
-  const holidaysUpdated =
-    page?.holidaysUpdatedLabel ?? FALLBACK.holidaysUpdatedLabel;
-
-  const hoursAdminChip = page?.hoursAdminChip ?? FALLBACK.hours.adminChip;
-  const hoursValidUntil = page?.hoursValidUntil ?? FALLBACK.hours.validUntil;
-  const hoursImg = page?.hoursImageUrl ?? null;
-  const hoursImgAlt = page?.hoursImageAlt ?? FALLBACK.hours.imageAlt;
-  const hoursOverlayLabel =
-    page?.hoursOverlayLabel ?? FALLBACK.hours.overlayLabel;
-  const hoursOverlayValue =
-    page?.hoursOverlayValue ?? FALLBACK.hours.overlayValue;
-  const hoursOverlayBadge =
-    page?.hoursOverlayBadge ?? FALLBACK.hours.overlayBadge;
-  const hoursSideLede = page?.hoursSideLede ?? FALLBACK.hours.sideLede;
   const hoursNoteLead = page?.hoursNoteLead ?? FALLBACK.hours.noteLead;
   const hoursNoteBody = page?.hoursNoteBody ?? FALLBACK.hours.noteBody;
-  const hasHoursImage = Boolean(hoursImg);
 
   const theoryImg = page?.theoryImageUrl ?? FALLBACK.theory.image;
   const theoryImgAlt = page?.theoryImageAlt ?? FALLBACK.theory.imageAlt;
@@ -365,11 +339,7 @@ export default function UpdatesContent({
               <div>
                 <span className="eyebrow">חגים, חופשות ואירועים</span>
               </div>
-              <div className="up-sec-meta">
-                <span className="up-updated">
-                  עודכן <b>{holidaysUpdated}</b>
-                </span>
-              </div>
+              <div className="up-sec-meta" />
             </header>
 
             <div className="up-cards">
@@ -434,53 +404,18 @@ export default function UpdatesContent({
             </div>
           </section>
 
-          {/* Activity hours (image is optional) */}
+          {/* Activity hours — table only */}
           <section className="up-sec">
             <header className="up-sec-head reveal">
               <div>
                 <span className="eyebrow">שעות פעילות</span>
               </div>
-              <div className="up-sec-meta">
-                {hoursAdminChip && (
-                  <span className="up-admin-chip">{hoursAdminChip}</span>
-                )}
-                {hoursValidUntil && (
-                  <span className="up-updated">
-                    בתוקף עד <b>{hoursValidUntil}</b>
-                  </span>
-                )}
-              </div>
+              <div className="up-sec-meta" />
             </header>
 
-            <div className={`up-hours${hasHoursImage ? "" : " up-hours--solo"}`}>
-              {hasHoursImage && (
-                <div
-                  className="up-hours-img reveal"
-                  style={{ backgroundImage: `url('${hoursImg}')` }}
-                  role="img"
-                  aria-label={hoursImgAlt}
-                >
-                  {(hoursOverlayLabel || hoursOverlayValue || hoursOverlayBadge) && (
-                    <div className="up-hours-overlay">
-                      <div>
-                        {hoursOverlayLabel && (
-                          <div className="l">{hoursOverlayLabel}</div>
-                        )}
-                        {hoursOverlayValue && (
-                          <div className="v">{hoursOverlayValue}</div>
-                        )}
-                      </div>
-                      {hoursOverlayBadge && (
-                        <span className="badge">{hoursOverlayBadge}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
+            <div className="up-hours up-hours--solo">
               <div className="up-hours-side reveal">
                 <h3>שעות פתיחה — שבוע נוכחי</h3>
-                {hoursSideLede && <p className="lede">{hoursSideLede}</p>}
 
                 <div className="up-hours-list">
                   {DAY_ORDER.map((d, i) => {

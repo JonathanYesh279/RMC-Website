@@ -267,16 +267,6 @@ export const UPDATES_PAGE_QUERY = defineQuery(`
     "featuredImageUrl": featuredImage.asset->url,
     "featuredImageAlt": featuredImage.alt,
 
-    holidaysUpdatedLabel,
-
-    hoursAdminChip,
-    hoursValidUntil,
-    "hoursImageUrl": hoursImage.asset->url,
-    "hoursImageAlt": hoursImage.alt,
-    hoursOverlayLabel,
-    hoursOverlayValue,
-    hoursOverlayBadge,
-    hoursSideLede,
     hoursDaySunday ${DAY_ROW_PROJECTION},
     hoursDayMonday ${DAY_ROW_PROJECTION},
     hoursDayTuesday ${DAY_ROW_PROJECTION},
@@ -349,16 +339,6 @@ export type UpdatesPageDoc = {
   featuredImageUrl: string | null;
   featuredImageAlt: string | null;
 
-  holidaysUpdatedLabel: string | null;
-
-  hoursAdminChip: string | null;
-  hoursValidUntil: string | null;
-  hoursImageUrl: string | null;
-  hoursImageAlt: string | null;
-  hoursOverlayLabel: string | null;
-  hoursOverlayValue: string | null;
-  hoursOverlayBadge: string | null;
-  hoursSideLede: string | null;
   hoursDaySunday: DayRow;
   hoursDayMonday: DayRow;
   hoursDayTuesday: DayRow;
