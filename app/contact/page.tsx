@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import TopicSelect from "./TopicSelect";
 import {
   accessibilityColumns,
@@ -73,29 +72,8 @@ export default function ContactPage() {
 
   return (
     <>
-      {/* ================= HERO ================= */}
-      <section className="ct-hero">
-        <div className="container">
-          <div className="reveal">
-            <div className="crumbs">
-              <Link href="/">דף הבית</Link> · <span>צור קשר</span>
-            </div>
-            <h1>
-              נשמח לעמוד
-              <br />
-              <em>לרשותכם.</em>
-            </h1>
-          </div>
-          <p className="lede reveal">
-            מרכז פיס למוסיקה רעננה פתוח לקהל ולתלמידים שישה ימים בשבוע. צוות המשרד
-            ישמח לסייע בכל שאלה בנושאי לימודים, הרשמה, שכירויות, אבדות ומציאות או
-            רכישת כרטיסים — בטלפון, בדוא״ל או בהגעה למשרדים בקומה הראשונה.
-          </p>
-        </div>
-      </section>
-
       {/* ================= MAP + DETAILS ================= */}
-      <section className="ct-anchor">
+      <section className="ct-anchor ct-anchor--lead">
         <div className="container">
           <div className="ct-anchor-grid">
             <div className="ct-map reveal">
