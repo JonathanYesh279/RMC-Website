@@ -6776,9 +6776,8 @@ body.home-locked .site-footer {
 }
 .ct-hero .container {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 48px;
-  align-items: end;
+  grid-template-columns: 1fr;
+  gap: 28px;
   position: relative;
 }
 .ct-hero .crumbs {
@@ -6799,7 +6798,7 @@ body.home-locked .site-footer {
   color: var(--ink);
 }
 .ct-hero h1 {
-  font-size: clamp(52px, 6.4vw, 88px);
+  font-size: clamp(44px, 5.2vw, 72px);
   letter-spacing: -0.02em;
   font-weight: 500;
   line-height: 0.98;
@@ -6813,16 +6812,7 @@ body.home-locked .site-footer {
   color: var(--ink-2);
   font-size: 18px;
   line-height: 1.75;
-  max-width: 520px;
-  justify-self: end;
-}
-@media (max-width: 900px) {
-  .ct-hero .container {
-    grid-template-columns: 1fr;
-  }
-  .ct-hero .lede {
-    justify-self: start;
-  }
+  max-width: 640px;
 }
 
 /* ---------- Map + contact two-column ---------- */
