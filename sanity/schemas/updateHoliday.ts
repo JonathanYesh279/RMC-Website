@@ -57,16 +57,6 @@ export default defineType({
       validation: (r) => r.required().max(80),
     }),
     defineField({
-      name: "metaTags",
-      title: "תגיות מטא",
-      description:
-        "התגיות הקצרות שמופיעות מתחת לכותרת, מופרדות בנקודות. למשל: ״חופשה״, ״8 ימים״, ״כל המחלקות״.",
-      type: "array",
-      of: [{ type: "string" }],
-      options: { layout: "tags" },
-      validation: (r) => r.max(5),
-    }),
-    defineField({
       name: "description",
       title: "תיאור קצר",
       description: "פסקה קצרה בגוף הכרטיסייה.",
@@ -78,14 +68,6 @@ export default defineType({
       name: "dateRange",
       title: "תאריכים",
       description: "טקסט חופשי לתאריכים. למשל: ״01.04 – 08.04״.",
-      type: "string",
-      validation: (r) => r.max(60),
-    }),
-    defineField({
-      name: "dateSub",
-      title: "תווית תאריכים משנית",
-      description:
-        "השורה הקטנה מתחת לתאריך. למשל: ״חופשה רשמית״, ״יום שבת · 19:00״.",
       type: "string",
       validation: (r) => r.max(60),
     }),

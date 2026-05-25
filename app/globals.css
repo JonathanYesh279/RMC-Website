@@ -6525,12 +6525,6 @@ body.home-locked .site-footer {
   line-height: 1.2;
   letter-spacing: -.005em;
 }
-.up-card-meta {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 12px; color: var(--ink-3);
-  margin-block-start: 2px;
-}
-.up-card-meta .sep { width: 2px; height: 2px; background: var(--ink-4); border-radius: 999px; }
 .up-card-text {
   color: var(--ink-2);
   font-size: 13.5px; line-height: 1.55;
@@ -6545,11 +6539,6 @@ body.home-locked .site-footer {
 .up-card-foot .date {
   font-family: var(--serif);
   font-size: 13.5px; color: var(--ink); font-weight: 500;
-}
-.up-card-foot .date small {
-  font-family: var(--sans);
-  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--ink-3); font-weight: 700; display: block;
 }
 .up-card-foot a {
   display: inline-flex; align-items: center; gap: 6px;

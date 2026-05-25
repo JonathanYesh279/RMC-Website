@@ -304,10 +304,8 @@ export const UPDATE_HOLIDAYS_QUERY = defineQuery(`
     cornerLabel,
     cornerTone,
     title,
-    metaTags,
     description,
     dateRange,
-    dateSub,
     linkUrl
   }
 `);
@@ -374,10 +372,8 @@ export type UpdateHolidayDoc = {
   cornerLabel: string | null;
   cornerTone: "amber" | "teal" | "default" | null;
   title: string;
-  metaTags: string[] | null;
   description: string | null;
   dateRange: string | null;
-  dateSub: string | null;
   linkUrl: string | null;
 };
 

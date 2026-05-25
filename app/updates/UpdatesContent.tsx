@@ -56,10 +56,8 @@ const FALLBACK_HOLIDAYS: UpdateHolidayDoc[] = [
     cornerTone: "amber",
     cornerLabel: "פעיל",
     title: "חופשת פסח תשפ״ו",
-    metaTags: ["חופשה", "8 ימים", "כל המחלקות"],
     description: "שיעורים פרטיים עד 31/03 כולל. חזרה ביום חמישי 09/04.",
     dateRange: "01.04 – 08.04",
-    dateSub: "חופשה רשמית",
     linkUrl: null,
   },
   {
@@ -70,11 +68,9 @@ const FALLBACK_HOLIDAYS: UpdateHolidayDoc[] = [
     cornerTone: "teal",
     cornerLabel: "בעוד 5 שבועות",
     title: "חופשת שבועות",
-    metaTags: ["חופשה", "3 ימים", "כל המחלקות"],
     description:
       "המרכז סגור בערב החג וביום החג. החזרות יחודשו כרגיל למחרת.",
     dateRange: "21.05 – 23.05",
-    dateSub: "חופשת חג",
     linkUrl: null,
   },
   {
@@ -85,11 +81,9 @@ const FALLBACK_HOLIDAYS: UpdateHolidayDoc[] = [
     cornerTone: "default",
     cornerLabel: "קונצרט סיום",
     title: "קונצרט הסיום השנתי",
-    metaTags: ["אירוע מיוחד", "אודיטוריום"],
     description:
       "לרגל קונצרט הסיום, האולם הקאמרי יישאר סגור להשכרה ביום זה.",
     dateRange: "28.06.2026",
-    dateSub: "יום שבת · 19:00",
     linkUrl: null,
   },
 ];
@@ -371,24 +365,11 @@ export default function UpdatesContent({
                   </div>
                   <div className="up-card-body">
                     <div className="up-card-title">{h.title}</div>
-                    {h.metaTags && h.metaTags.length > 0 && (
-                      <div className="up-card-meta">
-                        {h.metaTags.map((m, i) => (
-                          <span key={`${m}-${i}`} style={{ display: "contents" }}>
-                            <span>{m}</span>
-                            {i < h.metaTags!.length - 1 && <span className="sep" />}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                     {h.description && (
                       <p className="up-card-text">{h.description}</p>
                     )}
                     <div className="up-card-foot">
-                      <div className="date">
-                        {h.dateRange}
-                        {h.dateSub && <small>{h.dateSub}</small>}
-                      </div>
+                      <div className="date">{h.dateRange}</div>
                       {h.linkUrl ? (
                         <a href={h.linkUrl}>
                           קרא עוד
