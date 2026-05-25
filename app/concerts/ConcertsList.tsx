@@ -19,8 +19,6 @@ export type ConcertCard = {
   venue: string;
   shortDescription: string;
   priceLabel: string;
-  availability: "open" | "hot" | "full";
-  availabilityLabel: string;
   imageUrl: string;
   imageAlt: string;
 };
@@ -102,20 +100,6 @@ export default function ConcertsList({
     [filter, concerts],
   );
 
-  const counts = useMemo(() => {
-    const map: Record<Filter, number> = {
-      all: concerts.length,
-      classical: 0,
-      jazz: 0,
-      israeli: 0,
-      kids: 0,
-    };
-    concerts.forEach((c) => {
-      map[c.genre] += 1;
-    });
-    return map;
-  }, [concerts]);
-
   const grouped = useMemo(() => groupByMonth(filtered), [filtered]);
 
   useEffect(() => {
@@ -158,7 +142,6 @@ export default function ConcertsList({
                     onClick={() => setFilter(f.id)}
                   >
                     {f.label}
-                    <span className="ct">{counts[f.id]}</span>
                   </button>
                 );
               })}
@@ -227,14 +210,7 @@ export default function ConcertsList({
                         <p className="desc">{c.shortDescription}</p>
                       </div>
                       <div className="side">
-                        <div className="price">
-                          <small>החל מ-</small>
-                          {c.priceLabel}
-                        </div>
-                        <div className="soldness" data-state={c.availability}>
-                          <span className="dot" />
-                          {c.availabilityLabel}
-                        </div>
+                        <div className="price">{c.priceLabel}</div>
                         <span
                           className="btn btn--coral"
                           style={{ justifyContent: "center" }}

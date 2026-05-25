@@ -3443,7 +3443,9 @@ body.home-locked .site-footer {
   letter-spacing: -0.01em;
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 8px;
+  text-align: center;
 }
 .concert-row .price small {
   font-family: var(--sans);

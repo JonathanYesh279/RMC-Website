@@ -6,7 +6,6 @@ import {
   type ConcertsPageDoc,
 } from "@/sanity/queries";
 import { formatConcertDate, deriveDateRangeLabel } from "@/lib/concertDate";
-import { availabilityLabel as labelFor } from "@/lib/concertMeta";
 import { sanityImageUrl } from "@/lib/sanityImage";
 import ConcertsList, {
   type ConcertCard,
@@ -28,8 +27,6 @@ function toCard(c: ConcertDoc): ConcertCard {
     venue: c.venue,
     shortDescription: c.shortDescription,
     priceLabel: `₪${c.basePrice}`,
-    availability: c.availability,
-    availabilityLabel: labelFor(c.availability),
     imageUrl: sanityImageUrl(c.image.url, { w: 1200 }),
     imageAlt: c.image.alt ?? c.title,
   };
