@@ -133,7 +133,7 @@ export default async function ConcertsPage() {
                 </div>
                 <div className="cta-row">
                   <a
-                    href={`/concerts/${featuredConcert.slug}#tickets`}
+                    href={`/concerts/${featuredConcert.slug}`}
                     className="btn btn--coral"
                   >
                     {page.primaryCtaLabel ?? "לרכישת כרטיסים"} — ₪

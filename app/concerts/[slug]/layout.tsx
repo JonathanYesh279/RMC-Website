@@ -23,7 +23,7 @@ export async function generateMetadata({
   }
   const date = formatConcertDate(concert.date);
   return {
-    title: `${concert.title} · רכישת כרטיסים · מרכז המוסיקה רעננה`,
+    title: `${concert.title} · מרכז המוסיקה רעננה`,
     description: `${concert.shortDescription} ${date.shortDate}, ${date.time} · ${concert.venue}.`,
   };
 }

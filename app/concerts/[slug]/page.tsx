@@ -11,9 +11,12 @@ import {
 import { formatConcertDate } from "@/lib/concertDate";
 import { CONCERT_DEFAULTS } from "@/lib/concertMeta";
 import { sanityImageUrl } from "@/lib/sanityImage";
-import { buildTiers } from "@/lib/concertPricing";
 import { findMockConcertDoc, mockConcertDocs } from "../mock-adapter";
-import TicketPurchase from "./TicketPurchase";
+import ScrollReveal from "@/components/ScrollReveal";
+
+// Placeholder external ticketing URL — replace with the real payment gateway.
+// There is no per-concert ticket link in Sanity yet; see the follow-up note.
+const EXTERNAL_TICKETS_URL = "https://tickets.example.com";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -50,7 +53,6 @@ export default async function ConcertDetailPage({
   if (!concert) notFound();
 
   const date = formatConcertDate(concert.date);
-  const tiers = buildTiers(concert.basePrice);
   const lede = concert.lede || concert.shortDescription;
   const duration = concert.duration ?? CONCERT_DEFAULTS.duration;
   const language = concert.language ?? CONCERT_DEFAULTS.language;
@@ -62,7 +64,6 @@ export default async function ConcertDetailPage({
 
   const heroBg = sanityImageUrl(concert.image.url, { w: 2000, q: 60 });
   const heroImg = sanityImageUrl(concert.image.url, { w: 1600 });
-  const thumbImg = sanityImageUrl(concert.image.url, { w: 240 });
 
   const heroVideoUrl = concert.heroVideoUrl ?? null;
   const videoPosterUrl = heroVideoUrl
@@ -73,6 +74,7 @@ export default async function ConcertDetailPage({
 
   return (
     <>
+      <ScrollReveal />
       <section className="detail-hero">
         <div
           className="detail-bg"
@@ -151,6 +153,32 @@ export default async function ConcertDetailPage({
                   ))}
                 </ul>
               </div>
+
+              <div className="detail-access reveal">
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="4.5" r="1.6" />
+                  <path d="M12 8v5M7.5 10.5h9" />
+                  <path d="M8.5 21.5l3-6 3 6" />
+                </svg>
+                <div>
+                  <div className="detail-access-l">
+                    המקום מותאם נגישות מלאה
+                  </div>
+                  <div className="detail-access-s">
+                    מקומות לכיסאות גלגלים · עזרי שמיעה · לתיאום מראש: 09-7711330
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>
@@ -162,38 +190,48 @@ export default async function ConcertDetailPage({
                 <div className="ddc-mo">{date.monthFull}</div>
                 <div className="ddc-day">{date.dayName}</div>
                 <div className="ddc-time">{date.time}</div>
+
+                <a
+                  className="ddc-cta"
+                  href={EXTERNAL_TICKETS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  מעבר לתשלום
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 5l-6 5 6 5" />
+                  </svg>
+                </a>
+                <div className="ddc-secure">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    aria-hidden="true"
+                  >
+                    <rect x="3" y="6" width="8" height="7" rx="1" />
+                    <path d="M5 6V4a2 2 0 0 1 4 0v2" />
+                  </svg>
+                  תשלום מאובטח באתר חיצוני
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      <TicketPurchase
-        concertTitle={concert.title}
-        thumbUrl={thumbImg}
-        thumbAlt={concert.image.alt || concert.title}
-        shortDate={date.shortDate}
-        time={date.time}
-        tiers={tiers}
-        copy={{
-          purchaseEyebrow: copy?.purchaseEyebrow ?? "רכישת כרטיסים",
-          purchaseTitle:
-            copy?.purchaseTitle ?? "בחרו כרטיסים והשלימו הזמנה",
-          buyerDetailsHeading:
-            copy?.buyerDetailsHeading ?? "פרטי הרוכש",
-          orderSummaryHeading:
-            copy?.orderSummaryHeading ?? "סיכום הזמנה",
-          payCtaLabel:
-            copy?.payCtaLabel ?? "המשך לתשלום בכרטיס אשראי",
-          accessibilityNote:
-            copy?.accessibilityNote ??
-            "המרכז מונגש לבעלי מוגבלויות. לסיוע בהזמנה ניתן לפנות אלינו.",
-          secureNote: copy?.secureNote ?? "תשלום מאובטח בתקן PCI-DSS",
-          cancellationNote:
-            copy?.cancellationNote ??
-            "ניתן לבטל עד 48 שעות לפני המופע ולקבל זיכוי מלא.",
-        }}
-      />
     </>
   );
 }
