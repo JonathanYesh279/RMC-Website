@@ -6494,7 +6494,7 @@ body.home-locked .site-footer {
   box-shadow: var(--shadow-2);
 }
 .up-card-media {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   background-color: var(--ivory-2);
   background-size: cover;
   background-position: center;
@@ -6516,29 +6516,29 @@ body.home-locked .site-footer {
 .up-card-corner.amber { color: #8a5a10; background: rgba(252, 188, 64, 0.92); }
 .up-card-corner.teal  { color: #1f7a7c; background: rgba(60, 186, 189, 0.18); border: 1px solid rgba(60, 186, 189, 0.55); }
 .up-card-body {
-  padding: 18px 20px 22px;
-  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 16px 16px;
+  display: flex; flex-direction: column; gap: 6px;
 }
 .up-card-title {
   font-family: var(--serif);
-  font-size: 19px; font-weight: 500;
+  font-size: 17px; font-weight: 500;
   line-height: 1.2;
   letter-spacing: -.005em;
 }
 .up-card-text {
   color: var(--ink-2);
-  font-size: 13.5px; line-height: 1.55;
+  font-size: 13px; line-height: 1.5;
 }
 .up-card-foot {
   margin-block-start: auto;
-  padding-block-start: 12px;
+  padding-block-start: 10px;
   border-block-start: 1px solid var(--line-2);
   display: flex; justify-content: space-between; align-items: center;
   gap: 10px;
 }
 .up-card-foot .date {
   font-family: var(--serif);
-  font-size: 13.5px; color: var(--ink); font-weight: 500;
+  font-size: 13px; color: var(--ink); font-weight: 500;
 }
 .up-card-foot a {
   display: inline-flex; align-items: center; gap: 6px;
