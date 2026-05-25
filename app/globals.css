@@ -6813,6 +6813,7 @@ body.home-locked .site-footer {
   font-size: 18px;
   line-height: 1.75;
   max-width: 640px;
+  justify-self: start;
 }
 
 /* ---------- Map + contact two-column ---------- */
