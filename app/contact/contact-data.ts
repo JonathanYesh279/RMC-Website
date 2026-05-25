@@ -2,7 +2,7 @@
 // (contact-v1-verbose.html). Kept here so the page component stays markup-only.
 
 export type InfoBlock = {
-  icon: "bus" | "parking" | "clock" | "mail";
+  icon: "parking" | "clock" | "mail";
   title: string;
   // Either prose lines or an hours table — never both.
   lines?: string[];
@@ -12,14 +12,6 @@ export type InfoBlock = {
 };
 
 export const infoBlocks: InfoBlock[] = [
-  {
-    icon: "bus",
-    title: "תחבורה ציבורית",
-    lines: [
-      "תחנת אוטובוס «קונסרבטוריון» ברחוב אחוזה — קווי דן 29, 47, 29 ומטרופולין 920, 921 ו-947.",
-      "תחנת רכבת רעננה-מרכז — 12 דקות הליכה ברחוב אחוזה.",
-    ],
-  },
   {
     icon: "parking",
     title: "חניה",

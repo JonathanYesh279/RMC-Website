@@ -16,14 +16,6 @@ import {
 } from "./contact-data";
 
 const infoIcon: Record<InfoBlock["icon"], React.ReactElement> = {
-  bus: (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4">
-      <rect x="3" y="6" width="14" height="9" rx="1" />
-      <path d="M6 6V4h8v2M6 15v2M14 15v2" />
-      <circle cx="7" cy="11" r=".8" fill="currentColor" stroke="none" />
-      <circle cx="13" cy="11" r=".8" fill="currentColor" stroke="none" />
-    </svg>
-  ),
   parking: (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4">
       <path d="M5 10V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v4" />
