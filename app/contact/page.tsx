@@ -100,7 +100,7 @@ export default function ContactPage() {
           <div className="ct-anchor-grid">
             <div className="ct-map reveal">
               <iframe
-                title="מרכז פיס למוסיקה רעננה — אצטיון 48"
+                title="מרכז פיס למוסיקה רעננה — עציון 48"
                 src={mapEmbedSrc}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -109,7 +109,7 @@ export default function ContactPage() {
               <div className="ct-map-tag">
                 <span className="pin">המיקום שלנו</span>
                 <strong>מרכז פיס למוסיקה</strong>
-                <span>רחוב אצטיון 48, רעננה</span>
+                <span>רחוב עציון 48, רעננה</span>
                 <a href={mapDirectionsUrl} target="_blank" rel="noopener">
                   הצג מסלול הגעה
                   {arrowIcon}

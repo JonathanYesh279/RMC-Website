@@ -16,7 +16,7 @@ export const infoBlocks: InfoBlock[] = [
     icon: "parking",
     title: "חניה",
     lines: [
-      "חניון ציבורי בתשלום בבניין הקונסרבטוריון, גישה דרך רחוב אצטיון.",
+      "חניון ציבורי בתשלום בבניין הקונסרבטוריון, גישה דרך רחוב עציון.",
       "חניות כחול-לבן לאורך רחוב אחוזה ורחוב ירושלים — חינם בערב ובשבת.",
     ],
   },
@@ -149,13 +149,13 @@ export const accessibilityColumns = [
 export const accessibilityRows: AccessibilityRow[] = [
   {
     institution: "מרכז פיס למוסיקה רעננה",
-    address: "אצטיון 48",
+    address: "עציון 48",
     facilities: accessibilityColumns.map((label) => ({ label, available: true })),
   },
 ];
 
-// Google Maps embed for אצטיון 48 רעננה.
+// Google Maps embed for עציון 48 רעננה.
 export const mapEmbedSrc =
-  "https://www.google.com/maps?q=%D7%90%D7%A6%D7%98%D7%99%D7%95%D7%9F%2048%20%D7%A8%D7%A2%D7%A0%D7%A0%D7%94&hl=he&z=16&output=embed";
+  "https://www.google.com/maps?q=%D7%A2%D7%A6%D7%99%D7%95%D7%9F%2048%20%D7%A8%D7%A2%D7%A0%D7%A0%D7%94&hl=he&z=16&output=embed";
 export const mapDirectionsUrl =
   "https://www.google.com/maps/dir/?api=1&destination=Etzion+48+Raanana";
