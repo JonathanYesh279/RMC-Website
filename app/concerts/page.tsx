@@ -27,6 +27,7 @@ function toCard(c: ConcertDoc): ConcertCard {
     venue: c.venue,
     shortDescription: c.shortDescription,
     priceLabel: `₪${c.basePrice}`,
+    ticketsEnabled: c.ticketsEnabled !== false,
     imageUrl: sanityImageUrl(c.image.url, { w: 1200 }),
     imageAlt: c.image.alt ?? c.title,
   };

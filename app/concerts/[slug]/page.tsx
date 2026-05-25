@@ -14,10 +14,6 @@ import { sanityImageUrl } from "@/lib/sanityImage";
 import { findMockConcertDoc, mockConcertDocs } from "../mock-adapter";
 import ScrollReveal from "@/components/ScrollReveal";
 
-// Placeholder external ticketing URL — replace with the real payment gateway.
-// There is no per-concert ticket link in Sanity yet; see the follow-up note.
-const EXTERNAL_TICKETS_URL = "https://tickets.example.com";
-
 export const revalidate = 60;
 export const dynamicParams = true;
 
@@ -191,42 +187,49 @@ export default async function ConcertDetailPage({
                 <div className="ddc-day">{date.dayName}</div>
                 <div className="ddc-time">{date.time}</div>
 
-                <a
-                  className="ddc-cta"
-                  href={EXTERNAL_TICKETS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  מעבר לתשלום
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <path d="M12 5l-6 5 6 5" />
-                  </svg>
-                </a>
-                <div className="ddc-secure">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    aria-hidden="true"
-                  >
-                    <rect x="3" y="6" width="8" height="7" rx="1" />
-                    <path d="M5 6V4a2 2 0 0 1 4 0v2" />
-                  </svg>
-                  תשלום מאובטח באתר חיצוני
-                </div>
+                {concert.ticketsEnabled !== false && concert.ticketUrl ? (
+                  <>
+                    <a
+                      className="ddc-cta"
+                      href={concert.ticketUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      לרכישת כרטיסים
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M12 5l-6 5 6 5" />
+                      </svg>
+                    </a>
+                    <div className="ddc-secure">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        aria-hidden="true"
+                      >
+                        <rect x="3" y="6" width="8" height="7" rx="1" />
+                        <path d="M5 6V4a2 2 0 0 1 4 0v2" />
+                      </svg>
+                      {concert.ticketProviderLabel ||
+                        "תשלום מאובטח באתר העירייה"}
+                    </div>
+                  </>
+                ) : (
+                  <div className="ddc-soon">פרטי רכישת הכרטיסים יתפרסמו בקרוב</div>
+                )}
               </div>
             </div>
           </div>

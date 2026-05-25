@@ -193,6 +193,52 @@ export default defineType({
       group: "tickets",
       validation: (r) => r.required().integer().min(0).max(2000),
     }),
+    defineField({
+      name: "ticketsEnabled",
+      title: "כרטיסים פתוחים למכירה",
+      description:
+        "כשמסומן — מופיע כפתור ״לרכישת כרטיסים״ בכרטיס הקונצרט וגם בעמוד הקונצרט, שמוביל למערכת הכרטיסים של העירייה. בטלו את הסימון כשהמכירה עדיין לא נפתחה או כשהאירוע ללא כרטוס.",
+      type: "boolean",
+      group: "tickets",
+      initialValue: true,
+    }),
+    defineField({
+      name: "ticketUrl",
+      title: "קישור לרכישה במערכת העירונית",
+      description:
+        "הכתובת המדויקת של דף הקונצרט הזה במערכת הכרטיסים של עיריית רעננה. הלחיצה על ״לרכישת כרטיסים״ תוביל לכאן (בלשונית חדשה). העתיקו את הקישור הישיר לאותו קונצרט — לא את הקישור הכללי ללוח המופעים.",
+      type: "url",
+      group: "tickets",
+      // Hidden when sales are off — there is nothing to link to.
+      hidden: ({ parent }) =>
+        (parent as { ticketsEnabled?: boolean } | undefined)
+          ?.ticketsEnabled === false,
+      validation: (r) =>
+        r
+          .uri({ scheme: ["https", "http"] })
+          .custom((url, ctx) => {
+            const parent = ctx.parent as
+              | { ticketsEnabled?: boolean }
+              | undefined;
+            // Required only while sales are open (default on).
+            if (parent?.ticketsEnabled !== false && !url) {
+              return "חובה להזין קישור לרכישה כאשר הכרטיסים פתוחים למכירה";
+            }
+            return true;
+          }),
+    }),
+    defineField({
+      name: "ticketProviderLabel",
+      title: "שם מערכת הכרטיסים (אופציונלי)",
+      description:
+        "טקסט קצר שמופיע ליד כפתור הרכישה בעמוד הקונצרט, כדי להבהיר לאן הקישור מוביל. למשל: ״מערכת הכרטיסים של עיריית רעננה״. אם יישאר ריק, יוצג טקסט ברירת מחדל.",
+      type: "string",
+      group: "tickets",
+      hidden: ({ parent }) =>
+        (parent as { ticketsEnabled?: boolean } | undefined)
+          ?.ticketsEnabled === false,
+      validation: (r) => r.max(80),
+    }),
 
     // ── ו. תוכנית הקונצרט ─────────────────────────────────────────
     defineField({

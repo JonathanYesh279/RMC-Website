@@ -24,6 +24,10 @@ export type Concert = {
   language?: string;
   badge?: string;
   program?: ProgramItem[];
+  // Optional ticketing (falls back to defaults in the mock adapter)
+  ticketsEnabled?: boolean;
+  ticketUrl?: string;
+  ticketProviderLabel?: string;
 };
 
 export const featuredConcertSlug = "brahms-symphony-4";

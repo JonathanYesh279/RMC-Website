@@ -19,6 +19,7 @@ export type ConcertCard = {
   venue: string;
   shortDescription: string;
   priceLabel: string;
+  ticketsEnabled: boolean;
   imageUrl: string;
   imageAlt: string;
 };
@@ -211,12 +212,14 @@ export default function ConcertsList({
                       </div>
                       <div className="side">
                         <div className="price">{c.priceLabel}</div>
-                        <span
-                          className="btn btn--coral"
-                          style={{ justifyContent: "center" }}
-                        >
-                          לרכישת כרטיסים
-                        </span>
+                        {c.ticketsEnabled ? (
+                          <span
+                            className="btn btn--coral"
+                            style={{ justifyContent: "center" }}
+                          >
+                            לרכישת כרטיסים
+                          </span>
+                        ) : null}
                       </div>
                     </a>
                   );

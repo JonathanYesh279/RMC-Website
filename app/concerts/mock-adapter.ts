@@ -1,4 +1,5 @@
 import type { ConcertDoc, ConcertsPageDoc } from "@/sanity/queries";
+import { MUNICIPALITY_TICKETS_URL } from "@/lib/ticketing";
 import type { Concert } from "./concerts-data";
 import {
   concerts as mockConcerts,
@@ -57,6 +58,11 @@ export function mockToConcertDoc(c: Concert): ConcertDoc {
     lede: c.lede ?? c.desc,
     basePrice: c.basePrice,
     availability: c.soldness,
+    // Mock concerts default to "on sale". Without real per-concert municipal
+    // links, they point at the general board so the flow is demonstrable.
+    ticketsEnabled: c.ticketsEnabled ?? true,
+    ticketUrl: c.ticketUrl ?? MUNICIPALITY_TICKETS_URL,
+    ticketProviderLabel: c.ticketProviderLabel ?? null,
     duration: c.duration ?? null,
     language: c.language ?? null,
     program: c.program ?? null,

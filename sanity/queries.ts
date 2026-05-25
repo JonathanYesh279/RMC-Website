@@ -126,6 +126,9 @@ const CONCERT_PROJECTION = `
   lede,
   basePrice,
   availability,
+  ticketsEnabled,
+  ticketUrl,
+  ticketProviderLabel,
   duration,
   language,
   program[]{ work, composer },
@@ -217,6 +220,9 @@ export type ConcertDoc = {
   lede: string;
   basePrice: number;
   availability: "open" | "hot" | "full";
+  ticketsEnabled: boolean | null;
+  ticketUrl: string | null;
+  ticketProviderLabel: string | null;
   duration: string | null;
   language: string | null;
   program: ProgramItemDoc[] | null;

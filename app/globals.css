@@ -3927,6 +3927,13 @@ body.home-locked .site-footer {
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.04em;
 }
+.ddc-soon {
+  margin-block-start: 22px;
+  padding-block-start: 20px;
+  border-block-start: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
 
 /* Accessibility note (inside hero) */
 .detail-access {
@@ -4365,6 +4372,48 @@ body.home-locked .site-footer {
   .form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- Tickets (municipal system) page ---------- */
+.tickets-page {
+  padding-block: 130px clamp(56px, 8vh, 96px);
+}
+.tickets-intro {
+  max-width: 720px;
+  margin-block-end: clamp(28px, 4vh, 44px);
+}
+.tickets-intro h1 {
+  font-size: clamp(34px, 4.4vw, 54px);
+  line-height: 1.05;
+  margin-block: 18px 16px;
+}
+.tickets-intro p {
+  color: var(--ink-2);
+  font-size: 17px;
+  line-height: 1.75;
+  margin-block-end: 26px;
+}
+.tickets-frame-wrap {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: var(--shadow-1);
+}
+.tickets-frame {
+  display: block;
+  width: 100%;
+  height: clamp(680px, 82vh, 1080px);
+  border: 0;
+}
+.tickets-note {
+  margin-block-start: 16px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+.tickets-note a {
+  color: var(--color-coral);
+  text-decoration: underline;
 }
 
 /* ============================================================

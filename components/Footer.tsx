@@ -63,6 +63,9 @@ export default function Footer() {
                 <Link href="/concerts">מופעים וקונצרטים</Link>
               </li>
               <li>
+                <Link href="/tickets">כרטיסים</Link>
+              </li>
+              <li>
                 <a href="#">גלריה</a>
               </li>
               <li>
