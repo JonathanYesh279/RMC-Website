@@ -283,16 +283,7 @@ export const UPDATES_PAGE_QUERY = defineQuery(`
     "calendarImageUrl": calendarImage.asset->url,
     "calendarImageAlt": calendarImage.alt,
 
-    archiveSummary,
-
-    subscribeLede,
-    subscribeEmailPlaceholder,
-    subscribeSubmitLabel,
-    subscribeChannelsHeading,
-    subscribeFacebookLabel,
-    subscribeFacebookUrl,
-    subscribeInstagramLabel,
-    subscribeInstagramUrl
+    archiveSummary
   }
 `);
 
@@ -354,15 +345,6 @@ export type UpdatesPageDoc = {
   calendarImageAlt: string | null;
 
   archiveSummary: string | null;
-
-  subscribeLede: string | null;
-  subscribeEmailPlaceholder: string | null;
-  subscribeSubmitLabel: string | null;
-  subscribeChannelsHeading: string | null;
-  subscribeFacebookLabel: string | null;
-  subscribeFacebookUrl: string | null;
-  subscribeInstagramLabel: string | null;
-  subscribeInstagramUrl: string | null;
 } | null;
 
 export type UpdateHolidayDoc = {

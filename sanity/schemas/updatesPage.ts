@@ -65,7 +65,6 @@ export default defineType({
     { name: "theory", title: "4️⃣ מערכת השיעורים" },
     { name: "calendar", title: "5️⃣ לוח שנה" },
     { name: "archive", title: "6️⃣ עדכונים קודמים" },
-    { name: "subscribe", title: "7️⃣ הרשמה לעדכונים" },
   ],
   fields: [
     // ── 1️⃣ Hero ─────────────────────────────────────────────────────
@@ -153,68 +152,6 @@ export default defineType({
       type: "string",
       group: "archive",
       validation: (r) => r.max(80),
-    }),
-
-    // ── 7️⃣ Subscribe ──────────────────────────────────────────────
-    defineField({
-      name: "subscribeLede",
-      title: "פסקת תיאור ההרשמה",
-      description: "הפסקה שמתחת לכותרת ״קבלו עדכונים ישירות למייל״.",
-      type: "text",
-      rows: 4,
-      group: "subscribe",
-      validation: (r) => r.max(400),
-    }),
-    defineField({
-      name: "subscribeEmailPlaceholder",
-      title: "טקסט בתוך שדה האימייל (placeholder)",
-      description: 'למשל: ״כתובת המייל שלך״.',
-      type: "string",
-      group: "subscribe",
-      validation: (r) => r.max(60),
-    }),
-    defineField({
-      name: "subscribeSubmitLabel",
-      title: "טקסט כפתור ההרשמה",
-      description: 'למשל: ״הירשם״.',
-      type: "string",
-      group: "subscribe",
-      validation: (r) => r.max(30),
-    }),
-    defineField({
-      name: "subscribeChannelsHeading",
-      title: 'כותרת לפני האייקונים החברתיים (למשל: "או עקבו אחרינו:")',
-      type: "string",
-      group: "subscribe",
-      validation: (r) => r.max(60),
-    }),
-    defineField({
-      name: "subscribeFacebookLabel",
-      title: "טקסט לינק פייסבוק",
-      type: "string",
-      group: "subscribe",
-      validation: (r) => r.max(30),
-    }),
-    defineField({
-      name: "subscribeFacebookUrl",
-      title: "כתובת פייסבוק",
-      type: "url",
-      group: "subscribe",
-      validation: (r) => r.uri({ scheme: ["http", "https"] }),
-    }),
-    defineField({
-      name: "subscribeInstagramLabel",
-      title: "טקסט לינק אינסטגרם",
-      type: "string",
-      group: "subscribe",
-      validation: (r) => r.max(30),
-    }),
-    defineField({
-      name: "subscribeInstagramUrl",
-      title: "כתובת אינסטגרם",
-      type: "url",
-      group: "subscribe",
-      validation: (r) => r.uri({ scheme: ["http", "https"] }),
     }),
   ],
   preview: {

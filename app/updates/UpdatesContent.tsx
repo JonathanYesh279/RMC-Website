@@ -35,16 +35,6 @@ const FALLBACK = {
     imageAlt: "לוח השנה השנתי",
   },
   archiveSummary: "12 עדכונים · שנת תשפ״ו",
-  subscribe: {
-    lede: "פעם בחודש, כשמתפרסם משהו חדש — מודעת חג, שינוי במערכת או הודעה חשובה — נשלח אליכם תקציר קצר. ללא ספאם.",
-    emailPlaceholder: "כתובת המייל שלך",
-    submitLabel: "הירשם",
-    channelsHeading: "או עקבו אחרינו:",
-    facebookLabel: "פייסבוק",
-    facebookUrl: "#",
-    instagramLabel: "אינסטגרם",
-    instagramUrl: "#",
-  },
 } as const;
 
 const FALLBACK_HOLIDAYS: UpdateHolidayDoc[] = [
@@ -251,22 +241,6 @@ export default function UpdatesContent({
     page?.calendarImageAlt ?? FALLBACK.calendar.imageAlt;
 
   const archiveSummary = page?.archiveSummary ?? FALLBACK.archiveSummary;
-
-  const subLede = page?.subscribeLede ?? FALLBACK.subscribe.lede;
-  const subPlaceholder =
-    page?.subscribeEmailPlaceholder ?? FALLBACK.subscribe.emailPlaceholder;
-  const subSubmit =
-    page?.subscribeSubmitLabel ?? FALLBACK.subscribe.submitLabel;
-  const subChannelsHeading =
-    page?.subscribeChannelsHeading ?? FALLBACK.subscribe.channelsHeading;
-  const subFbLabel =
-    page?.subscribeFacebookLabel ?? FALLBACK.subscribe.facebookLabel;
-  const subFbUrl =
-    page?.subscribeFacebookUrl ?? FALLBACK.subscribe.facebookUrl;
-  const subIgLabel =
-    page?.subscribeInstagramLabel ?? FALLBACK.subscribe.instagramLabel;
-  const subIgUrl =
-    page?.subscribeInstagramUrl ?? FALLBACK.subscribe.instagramUrl;
 
   return (
     <>
@@ -505,49 +479,6 @@ export default function UpdatesContent({
           </section>
         </div>
       </div>
-
-      {/* Subscribe band */}
-      <section className="up-subscribe">
-        <div className="container up-sub-inner">
-          <div className="up-sub-l reveal">
-            <span className="eyebrow">להישאר מעודכנים</span>
-            <h2>
-              קבלו עדכונים <em>ישירות למייל</em>
-            </h2>
-            <p>{subLede}</p>
-          </div>
-          <form
-            className="up-sub-form reveal"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="up-sub-input">
-              <input
-                type="email"
-                placeholder={subPlaceholder}
-                required
-                aria-label={subPlaceholder}
-              />
-              <button type="submit">{subSubmit}</button>
-            </div>
-            <div className="up-sub-channels">
-              {subChannelsHeading && <span>{subChannelsHeading}</span>}
-              <a href={subFbUrl}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
-                  <path d="M9.3 15v-6h2l.3-2.4H9.3V5c0-.7.2-1.2 1.2-1.2h1.3V1.6c-.2 0-1-.1-1.9-.1-1.9 0-3.2 1.1-3.2 3.3v1.8H4.5V9h2.2v6h2.6z" />
-                </svg>
-                {subFbLabel}
-              </a>
-              <a href={subIgUrl}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-                  <rect x="2" y="2" width="12" height="12" rx="3" />
-                  <circle cx="8" cy="8" r="2.6" />
-                </svg>
-                {subIgLabel}
-              </a>
-            </div>
-          </form>
-        </div>
-      </section>
     </>
   );
 }
