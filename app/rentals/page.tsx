@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import {
   bookingContacts,
   clients,
-  heroStats,
   processSteps,
   services,
   venues,
@@ -108,14 +107,6 @@ export default function RentalsPage() {
             אקוסטיים ברמה הגבוהה ביותר, פתוחים להשכרה למופעים, כנסים, הפקות
             וידאו והקלטות אולפן. תכנון אקוסטי של BBM Akustik.
           </p>
-          <div className="stats-row reveal">
-            {heroStats.map((s) => (
-              <div className="stat" key={s.l}>
-                <span className="n">{s.n}</span>
-                <span className="l">{s.l}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 

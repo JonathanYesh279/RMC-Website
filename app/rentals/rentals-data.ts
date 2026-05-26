@@ -1,5 +1,3 @@
-export type HeroStat = { n: string; l: string };
-
 export type VenueSpec = { dt: string; dd: string };
 export type VenueCta = { label: string; href: string; variant: "ink" | "outline" | "coral" };
 
@@ -28,13 +26,6 @@ export type BookingContact = {
   body: string;
   icon: "pin" | "envelope" | "clock";
 };
-
-export const heroStats: HeroStat[] = [
-  { n: "3", l: "חללים אקוסטיים" },
-  { n: "650", l: "מקומות ישיבה כולל" },
-  { n: "2", l: "פסנתרי קונצרט" },
-  { n: "120+", l: "הפקות בשנה שעברה" },
-];
 
 export const venues: Venue[] = [
   {
