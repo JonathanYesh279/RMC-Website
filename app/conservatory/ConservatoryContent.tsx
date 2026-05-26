@@ -177,10 +177,26 @@ export default function ConservatoryContent({
         localStorage.setItem(STORAGE_KEY, String(idx));
       } catch {}
       if (scroll && stickyRef.current) {
-        const offset =
-          window.scrollY + stickyRef.current.getBoundingClientRect().top;
-        if (force || window.scrollY > offset + 20) {
-          window.scrollTo({ top: offset - 10, behavior: "smooth" });
+        // Natural document position of the sticky bar — stable whether or not
+        // it's currently pinned, since offsetTop ignores the sticky shift.
+        let docTop = 0;
+        for (
+          let el: HTMLElement | null = stickyRef.current;
+          el;
+          el = el.offsetParent as HTMLElement | null
+        ) {
+          docTop += el.offsetTop;
+        }
+        // Land the bar just below the fixed header so the freshly revealed
+        // panel content sits in view beneath it.
+        const header = document.querySelector<HTMLElement>(".site-header");
+        const headerH = header ? header.getBoundingClientRect().height : 0;
+        const target = Math.max(0, docTop - headerH - 12);
+        // Realign on every deliberate tab click (scrolling down to reveal the
+        // panel when the hero is still showing); skip only when we're already
+        // there, to avoid a jarring micro-scroll.
+        if (force || Math.abs(window.scrollY - target) > 24) {
+          window.scrollTo({ top: target, behavior: "smooth" });
         }
       }
     },
