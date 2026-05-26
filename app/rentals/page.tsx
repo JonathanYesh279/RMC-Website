@@ -97,9 +97,9 @@ export default function RentalsPage() {
               דף הבית · <span>שכירויות והקלטות</span>
             </div>
             <h1>
-              חללים שנבנו
+              השכרת
               <br />
-              <em>למוסיקה.</em>
+              <em>חדרים ואולמות</em>
             </h1>
           </div>
           <p className="lede reveal">
