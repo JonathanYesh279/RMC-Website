@@ -842,9 +842,6 @@ export default function ConservatoryContent({
                         aria-selected={activeProg === i}
                         onClick={() => setProg(i)}
                       >
-                        <span className="prog-tab-num">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
                         <span className="prog-tab-body">
                           <span className="prog-tab-title">{p.title}</span>
                           <span className="prog-tab-sub">{p.kicker}</span>
@@ -862,7 +859,7 @@ export default function ConservatoryContent({
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path
-                        d="M15 6l-6 6 6 6"
+                        d="M9 6l6 6-6 6"
                         stroke="currentColor"
                         strokeWidth="1.6"
                         strokeLinecap="round"
@@ -878,7 +875,7 @@ export default function ConservatoryContent({
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path
-                        d="M9 6l6 6-6 6"
+                        d="M15 6l-6 6 6 6"
                         stroke="currentColor"
                         strokeWidth="1.6"
                         strokeLinecap="round"
