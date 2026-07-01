@@ -2409,34 +2409,6 @@ body.home-locked .site-footer {
 }
 
 /* Ensembles panel (Panel 2 — הרכבים) */
-.ens-intro {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  padding: 28px 32px;
-  background: var(--ivory);
-  border: 1px solid var(--line);
-  margin-block-end: 48px;
-}
-.ens-intro-item .n {
-  font-family: var(--serif);
-  font-size: 40px;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  display: block;
-  color: var(--ink);
-}
-.ens-intro-item .l {
-  display: block;
-  font-size: 12.5px;
-  color: var(--ink-3);
-  margin-block-start: 8px;
-}
-@media (max-width: 760px) {
-  .ens-intro {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 .ens-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -684,25 +684,6 @@ export default function ConservatoryContent({
             </p>
           </div>
 
-          <div className="ens-intro">
-            <div className="ens-intro-item">
-              <span className="n">14</span>
-              <span className="l">הרכבים פעילים</span>
-            </div>
-            <div className="ens-intro-item">
-              <span className="n">6</span>
-              <span className="l">סגנונות מוסיקליים</span>
-            </div>
-            <div className="ens-intro-item">
-              <span className="n">10</span>
-              <span className="l">מנחים מקצועיים</span>
-            </div>
-            <div className="ens-intro-item">
-              <span className="n">280+</span>
-              <span className="l">נגנים בעונה</span>
-            </div>
-          </div>
-
           <div className="ens-grid">
             {ensembleCards.map((e, i) => (
               <article
