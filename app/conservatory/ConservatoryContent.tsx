@@ -50,6 +50,7 @@ type EnsembleCard = {
   name: string;
   instructor: string;
   level: string;
+  members: string | null;
   description: string;
 };
 
@@ -325,6 +326,7 @@ export default function ConservatoryContent({
         name: e.name,
         instructor: e.instructor,
         level: e.level,
+        members: e.members,
         description: e.description,
       }))
     : smallEnsembles.map((e) => ({
@@ -336,6 +338,7 @@ export default function ConservatoryContent({
         name: e.name,
         instructor: e.lead,
         level: e.level,
+        members: e.members,
         description: e.desc,
       }));
 
@@ -503,120 +506,37 @@ export default function ConservatoryContent({
             ref={deptOverlayRef}
             className={`dept-overlay ${openDeptKey ? "is-open" : ""}`}
           >
-            <div className="dept-sheet" role="dialog" aria-modal="false">
-              <button
-                type="button"
-                className="dept-close"
-                aria-label="סגירה"
-                onClick={handleCloseDept}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 6l12 12M18 6L6 18"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </button>
-              <div className="dept-hero">
-                <div
-                  className="dept-hero-img"
-                  style={
-                    openDept
-                      ? { backgroundImage: `url('${openDept.img}')` }
-                      : undefined
-                  }
+            <button
+              type="button"
+              className="dept-close"
+              aria-label="סגירה"
+              onClick={handleCloseDept}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M6 6l12 12M18 6L6 18"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
                 />
-                <div className="dept-hero-scrim" />
-                <div className="dept-hero-body">
-                  <span className="eyebrow" style={{ color: "#fcbc40" }}>
-                    <span
-                      className="eyebrow-dot"
-                      style={{ background: "#fcbc40" }}
-                    />
-                    מחלקה
-                  </span>
-                  <h2 className="dept-hero-title">{openDept?.name}</h2>
-                  <p className="dept-hero-desc">{openDept?.desc}</p>
-                  <dl className="dept-facts">
-                    <div>
-                      <dt>ראש המחלקה</dt>
-                      <dd>{openDetail?.lead || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt>גילאים</dt>
-                      <dd>{openDetail?.ages || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt>חללי אימון</dt>
-                      <dd>{openDetail?.rooms || "—"}</dd>
-                    </div>
-                    <div>
-                      <dt>תלמידים</dt>
-                      <dd>{openDept?.count || "—"}</dd>
-                    </div>
-                  </dl>
-                </div>
-              </div>
-
+              </svg>
+            </button>
+            <div className="dept-sheet" role="dialog" aria-modal="false">
               <div className="dept-section">
                 <div className="dept-section-head">
                   <div>
                     <div className="eyebrow">
                       <span className="eyebrow-dot" />
-                      הסגל
+                      {openDept?.name} · הסגל
                     </div>
                     <h3>המורים של המחלקה</h3>
+                    {openDetail?.lead && (
+                      <div className="dept-lead-tag">
+                        <span className="lbl">ראש המחלקה</span>
+                        <span className="nm">{openDetail.lead}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div className="dept-carousel-ctrl dept-carousel-ctrl--center">
-                  <button
-                    type="button"
-                    className="dept-nav"
-                    aria-label="הקודם"
-                    onClick={() => {
-                      stepTeacher(-1);
-                      setAutoPause(false);
-                    }}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        d="M9 6l6 6-6 6"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    type="button"
-                    className="dept-nav"
-                    aria-label="הבא"
-                    onClick={() => {
-                      stepTeacher(1);
-                      setAutoPause(false);
-                    }}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        d="M15 6l-6 6 6 6"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
                 </div>
                 <div
                   className="dept-carousel"
@@ -633,45 +553,68 @@ export default function ConservatoryContent({
                         className={`dept-card-t ${i === teacherIdx ? "is-center" : ""}`}
                       >
                         <div
-                          className="dept-card-img"
+                          className="dept-card-avatar"
                           style={{ backgroundImage: `url('${t.img}')` }}
                         />
-                        <div className="dept-card-body">
-                          <h4>{t.name}</h4>
-                          <span className="dept-card-role">{t.role}</span>
-                          <p>{t.bio}</p>
-                        </div>
+                        <h4>{t.name}</h4>
+                        <span className="dept-card-role">{t.role}</span>
+                        <p>{t.bio}</p>
                       </article>
                     ))}
                   </div>
                 </div>
-                <div className="dept-dots">
-                  {openTeachers.map((t, i) => (
-                    <button
-                      key={`${t.name}-dot-${i}`}
-                      type="button"
-                      className={`dept-dot ${i === teacherIdx ? "is-active" : ""}`}
-                      aria-label={`מורה ${i + 1}`}
-                      onClick={() => {
-                        setTeacherIdx(i);
-                        setAutoPause(false);
-                      }}
-                    />
-                  ))}
+                <div className="dept-carousel-footer">
+                  <button
+                    type="button"
+                    className="dept-nav"
+                    aria-label="הקודם"
+                    onClick={() => {
+                      stepTeacher(-1);
+                      setAutoPause(false);
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M9 6l6 6-6 6"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
+                  <div className="dept-dots">
+                    {openTeachers.map((t, i) => (
+                      <button
+                        key={`${t.name}-dot-${i}`}
+                        type="button"
+                        className={`dept-dot ${i === teacherIdx ? "is-active" : ""}`}
+                        aria-label={`מורה ${i + 1}`}
+                        onClick={() => {
+                          setTeacherIdx(i);
+                          setAutoPause(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="dept-nav"
+                    aria-label="הבא"
+                    onClick={() => {
+                      stepTeacher(1);
+                      setAutoPause(false);
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M15 6l-6 6 6 6"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
                 </div>
-              </div>
-
-              <div className="dept-section dept-highlights-wrap">
-                <div className="eyebrow">
-                  <span className="eyebrow-dot" />
-                  מאפיינים
-                </div>
-                <h3>מה מייחד את המחלקה</h3>
-                <ul className="dept-highlights">
-                  {(openDetail?.highlights ?? []).map((h) => (
-                    <li key={h}>{h}</li>
-                  ))}
-                </ul>
               </div>
             </div>
           </div>
@@ -790,6 +733,12 @@ export default function ConservatoryContent({
                       <dt>רמה</dt>
                       <dd>{e.level}</dd>
                     </div>
+                    {e.members && (
+                      <div>
+                        <dt>מסגרת</dt>
+                        <dd>{e.members}</dd>
+                      </div>
+                    )}
                   </dl>
                   <p>{e.description}</p>
                 </div>
@@ -922,6 +871,9 @@ export default function ConservatoryContent({
                         aria-selected={activeProg === i}
                         onClick={() => setProg(i)}
                       >
+                        <span className="prog-tab-num">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
                         <span className="prog-tab-body">
                           <span className="prog-tab-title">{p.title}</span>
                           <span className="prog-tab-sub">{p.kicker}</span>
@@ -939,7 +891,7 @@ export default function ConservatoryContent({
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path
-                        d="M9 6l6 6-6 6"
+                        d="M15 6l-6 6 6 6"
                         stroke="currentColor"
                         strokeWidth="1.6"
                         strokeLinecap="round"
@@ -955,7 +907,7 @@ export default function ConservatoryContent({
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path
-                        d="M15 6l-6 6 6 6"
+                        d="M9 6l6 6-6 6"
                         stroke="currentColor"
                         strokeWidth="1.6"
                         strokeLinecap="round"

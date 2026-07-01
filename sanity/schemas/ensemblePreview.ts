@@ -24,6 +24,13 @@ export default defineType({
       validation: (r) => r.required().max(60),
     }),
     defineField({
+      name: "members",
+      title: "מסגרת (אופציונלי)",
+      description: "היקף ההרכב — למשל ״4 הרכבים״, ״שתי קבוצות״, ״גיבוש לפי אודישן״.",
+      type: "string",
+      validation: (r) => r.max(60),
+    }),
+    defineField({
       name: "description",
       title: "תיאור קצר",
       type: "text",

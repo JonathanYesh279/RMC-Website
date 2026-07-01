@@ -25,6 +25,7 @@ export const ENSEMBLE_PREVIEWS_QUERY = defineQuery(`
     name,
     instructor,
     level,
+    members,
     description,
     category,
     accent,
@@ -38,6 +39,7 @@ export type EnsemblePreview = {
   name: string;
   instructor: string;
   level: string;
+  members: string | null;
   description: string;
   category: string | null;
   accent: "teal" | "amber" | "coral" | null;
