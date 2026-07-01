@@ -11,21 +11,18 @@ const bgs = [
 
 const portals = [
   {
-    num: "01",
     title: "קונסרבטוריון",
     href: "/conservatory",
     desc: "חינוך מוסיקלי למצוינות — שש מחלקות, חמישה הרכבים ייצוגיים, מגיל 5 ועד בגרות.",
     cta: "לדף הקונסרבטוריון",
   },
   {
-    num: "02",
     title: "שכירויות והקלטות",
     href: "/rentals",
     desc: "אולמות וחללי הקלטה מקצועיים — האודיטוריום, האולם הקאמרי וסטודיו ההקלטות.",
     cta: "לבדיקת זמינות",
   },
   {
-    num: "03",
     title: "מופעים וקונצרטים",
     href: "/concerts",
     desc: "הבמה הפועמת של רעננה — עשרות קונצרטים בעונה, מוסיקה קלאסית, ג׳אז וילדים.",
@@ -95,7 +92,7 @@ export default function Home() {
         <nav className="hl-portals" aria-label="שלוש מחלקות המרכז">
           {portals.map((p, i) => (
             <Link
-              key={p.num}
+              key={p.href}
               href={p.href}
               className={`hl-portal ${
                 hoveredIdx !== null && hoveredIdx !== i ? "dim" : ""
@@ -117,7 +114,6 @@ export default function Home() {
                 setPaused(false);
               }}
             >
-              <span className="hl-num">{p.num}</span>
               <div className="hl-pbody">
                 <h2>{p.title}</h2>
                 <p>{p.desc}</p>

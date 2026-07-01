@@ -675,22 +675,6 @@ body.home-locked .site-footer {
   transform: translateY(0);
 }
 
-.hl-num {
-  font-family: var(--serif);
-  font-size: 14px;
-  letter-spacing: 0.14em;
-  color: rgba(255, 255, 255, 0.65);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.hl-num::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.25);
-}
-
 .hl-pbody {
   display: flex;
   flex-direction: column;
