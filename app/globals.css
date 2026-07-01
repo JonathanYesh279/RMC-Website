@@ -2409,6 +2409,13 @@ body.home-locked .site-footer {
 }
 
 /* Ensembles panel (Panel 2 — הרכבים) */
+.ens-panel-lede {
+  color: var(--ink-3);
+  font-size: 16.5px;
+  line-height: 1.75;
+  max-width: 640px;
+  margin-block-end: 56px;
+}
 .ens-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
