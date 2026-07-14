@@ -45,3 +45,5 @@ next-env.d.ts
 .claude/
 .mcp.json
 *.md
+# intentional documentation is tracked despite the blanket *.md rule above
+!docs/**/*.md
