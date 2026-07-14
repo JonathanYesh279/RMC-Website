@@ -519,11 +519,14 @@ const RULES: Rule[] = [
 // Matching
 // ---------------------------------------------------------------------------
 
+// Adults start at 19 for matching so that youth frameworks capped at 18
+// (jazz ensembles, rock bands, youth orchestra) don't leak into adult
+// results on the shared boundary; adult-facing rules use minimumAge <= 18.
 const AGE_RANGE: Record<WhoKey, [number, number] | null> = {
   child57: [5, 7],
   child812: [8, 12],
   teen: [13, 18],
-  adult: [18, 120],
+  adult: [19, 120],
   unsure: null,
   existing: null,
 };
@@ -576,7 +579,7 @@ function ruleScore(rule: Rule, a: JourneyAnswers): number {
 function reasonsFor(target: RecommendationTarget, a: JourneyAnswers): string[] {
   const reasons: string[] = [];
   if (a.who && WHO_LABEL[a.who]) {
-    reasons.push(`מתאים ${WHO_LABEL[a.who]} — ${target.ages}`);
+    reasons.push(`מתאים ${WHO_LABEL[a.who]} · ${target.ages}`);
   } else {
     reasons.push(target.ages);
   }

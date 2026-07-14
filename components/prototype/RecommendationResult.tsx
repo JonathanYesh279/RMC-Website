@@ -110,7 +110,9 @@ export default function RecommendationResult({ answers }: { answers: JourneyAnsw
             <div className="pt-alts-grid">
               {alternatives.map((alt) => (
                 <Link key={alt.target.id} href={alt.target.exploreHref} className="pt-alt">
-                  <span className="pt-alt-kicker">{alt.target.kicker}</span>
+                  {alt.target.kicker !== alt.target.title ? (
+                    <span className="pt-alt-kicker">{alt.target.kicker}</span>
+                  ) : null}
                   <span className="pt-alt-title">{alt.target.title}</span>
                   <span className="pt-alt-note">{alt.reasons[0]}</span>
                 </Link>
