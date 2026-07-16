@@ -29,6 +29,24 @@ import type {
   LeaderDoc,
 } from "@/sanity/queries";
 import type { SpecialProgramKey } from "@/lib/specialPrograms";
+import ConservatorySearch, {
+  type SearchItem,
+} from "@/components/ConservatorySearch";
+
+// Instrument synonyms per department so a parent typing "חצוצרה" lands on
+// כלי נשיפה מתכת even though the word never appears in the card copy.
+const deptSearchKeywords: Record<string, string> = {
+  piano: "קלאסי ג׳אז מקלדת סוזוקי",
+  strings: "כינור ויולה צ׳לו קונטרבס קאמרי",
+  woodwind: "חליל קלרינט אבוב בסון סקסופון",
+  brass: "חצוצרה קרן יער טרומבון טובה",
+  guitar: "קלאסית חשמלית בס רוק",
+  drums: "סט תופים מרימבה הקשה פרקושן",
+  vocal: "פיתוח קול מקהלה ווקאלי זמרה",
+  conduct: "ניצוח מנצחים",
+  theory: "סולפג׳ הרמוניה קומפוזיציה תאוריה בגרות",
+  rnd: "אולפן הפקה טכנולוגיה מחשב",
+};
 
 const DEFAULT_INSTRUCTOR_IMAGE = "/fallbacks/instructor-portrait.jpg";
 const DEFAULT_LEADER_IMAGE = "/fallbacks/instructor-portrait.jpg";
@@ -105,6 +123,8 @@ export default function ConservatoryContent({
   const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
   const navRef = useRef<HTMLElement | null>(null);
   const stickyRef = useRef<HTMLDivElement | null>(null);
+  const [headerH, setHeaderH] = useState(0);
+  const [condensed, setCondensed] = useState(false);
 
   const [openDeptKey, setOpenDeptKey] = useState<string | null>(null);
   const [teacherIdx, setTeacherIdx] = useState(0);
@@ -204,6 +224,37 @@ export default function ConservatoryContent({
     []
   );
 
+  // The guide band + tabs stick below the fixed header, so measure its height
+  // and condense the band once the user scrolls past the hero.
+  useEffect(() => {
+    const header = document.querySelector<HTMLElement>(".site-header");
+    const measure = () =>
+      setHeaderH(header ? header.getBoundingClientRect().height : 0);
+    const onScroll = () => {
+      const el = stickyRef.current;
+      if (!el) return;
+      const headerNow = header ? header.getBoundingClientRect().height : 0;
+      // Condense exactly while the wrapper is pinned: its client top clamps
+      // to the sticky offset (the header's bottom edge) only when stuck.
+      setCondensed(
+        window.scrollY > 0 &&
+          el.getBoundingClientRect().top <= headerNow + 1,
+      );
+    };
+    const onResize = () => {
+      measure();
+      onScroll();
+    };
+    measure();
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
   useEffect(() => {
     const applyHash = () => {
       const raw = window.location.hash.replace(/^#/, "");
@@ -262,7 +313,13 @@ export default function ConservatoryContent({
     const id = requestAnimationFrame(() => {
       const el = deptOverlayRef.current;
       if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY - 120;
+      // Clear the pinned chrome: fixed header + sticky guide band + tabs.
+      const header = document.querySelector<HTMLElement>(".site-header");
+      const chrome =
+        (header ? header.getBoundingClientRect().height : 0) +
+        (stickyRef.current?.offsetHeight ?? 0) +
+        24;
+      const top = el.getBoundingClientRect().top + window.scrollY - chrome;
       window.scrollTo({ top, behavior: "smooth" });
     });
     return () => cancelAnimationFrame(id);
@@ -284,6 +341,139 @@ export default function ConservatoryContent({
     }, 2800);
     return () => clearInterval(t);
   }, [openDeptKey, openTeachers.length, autoPause]);
+
+  // ===== Smart search index =====
+  // Everything the conservatory page knows, flattened into typed entries the
+  // guide-band search can rank and route: local data + the Sanity docs the
+  // page already fetched.
+  const searchItems = useMemo<SearchItem[]>(() => {
+    const items: SearchItem[] = [];
+
+    for (const d of departments) {
+      items.push({
+        type: "dept",
+        name: d.name,
+        meta: `מחלקה · ${d.count}`,
+        keywords: `${deptSearchKeywords[d.key] ?? ""} ${deptDetails[d.key]?.lead ?? ""}`,
+        action: { kind: "dept", deptKey: d.key },
+      });
+    }
+
+    for (const e of ensembles) {
+      items.push({
+        type: "ens",
+        name: e.name,
+        meta: `${e.badgeText} · ${e.conductor}`,
+        keywords: e.role,
+        action: { kind: "tab", tab: 1 },
+      });
+    }
+
+    const grpEntries = ensemblePreviews.length
+      ? ensemblePreviews.map((e) => ({
+          name: e.name,
+          meta: `${e.category ?? "הרכב"} · ${e.level}`,
+          kw: e.instructor,
+        }))
+      : smallEnsembles.map((e) => ({
+          name: e.name,
+          meta: `${e.catLabel} · ${e.level}`,
+          kw: e.lead,
+        }));
+    for (const g of grpEntries) {
+      items.push({
+        type: "grp",
+        name: g.name,
+        meta: g.meta,
+        keywords: `הרכב אודישן ${g.kw}`,
+        action: { kind: "tab", tab: 2 },
+      });
+    }
+
+    programs.forEach((p, i) => {
+      items.push({
+        type: "prog",
+        name: p.title,
+        meta: `${p.kicker} · ${p.subtitle}`,
+        keywords: p.lede,
+        action: { kind: "prog", index: i },
+      });
+    });
+
+    for (const f of forms) {
+      items.push({
+        type: "form",
+        name: f.title,
+        meta: f.description ?? "PDF להורדה",
+        keywords: "טופס מסמך הרשמה רישום אישור",
+        action: { kind: "url", url: f.fileUrl },
+      });
+    }
+
+    // Staff — leadership first, then department teachers, then ensemble
+    // instructors; first entry wins when the same person appears twice.
+    const seen = new Set<string>();
+    const pushStaff = (
+      name: string,
+      meta: string,
+      keywords: string,
+      action: SearchItem["action"],
+    ) => {
+      if (seen.has(name)) return;
+      seen.add(name);
+      items.push({ type: "staff", name, meta, keywords, action });
+    };
+    const leaders = leaderDocs.length
+      ? leaderDocs.map((p) => ({ name: p.name, meta: p.title }))
+      : fallbackStaff.map((s) => ({ name: s.name, meta: s.title }));
+    for (const l of leaders) {
+      pushStaff(l.name, l.meta, "הנהלה", { kind: "tab", tab: 5 });
+    }
+    for (const [key, list] of Object.entries(deptTeachers)) {
+      const deptName = departments.find((d) => d.key === key)?.name ?? "";
+      for (const t of list) {
+        pushStaff(t.name, t.role, deptName, { kind: "dept", deptKey: key });
+      }
+    }
+    const instructors = ensembleInstructorDocs.length
+      ? ensembleInstructorDocs.map((p) => ({ name: p.name, meta: p.role }))
+      : fallbackEnsembleInstructors.map((p) => ({ name: p.name, meta: p.role }));
+    for (const p of instructors) {
+      pushStaff(p.name, p.meta, "הרכב", { kind: "tab", tab: 2 });
+    }
+
+    for (const a of articles) {
+      items.push({
+        type: "art",
+        name: a.title,
+        meta: `${a.tag} · ${a.author}`,
+        keywords: a.excerpt,
+        action: { kind: "tab", tab: 6 },
+      });
+    }
+
+    return items;
+  }, [forms, ensemblePreviews, ensembleInstructorDocs, leaderDocs]);
+
+  const handleSearchSelect = useCallback(
+    (item: SearchItem) => {
+      const a = item.action;
+      if (a.kind === "url") {
+        window.open(a.url, "_blank", "noopener,noreferrer");
+        activate(4, { force: true });
+      } else if (a.kind === "dept") {
+        // The overlay effect scrolls to the opened department itself.
+        activate(0, { scroll: false });
+        handleOpenDept(a.deptKey);
+      } else if (a.kind === "prog") {
+        setActiveProg(a.index);
+        activate(3, { force: true });
+      } else {
+        activate(a.tab, { force: true });
+      }
+    },
+    [activate, handleOpenDept],
+  );
 
   const stepTeacher = (dir: number) => {
     if (!openTeachers.length) return;
@@ -429,7 +619,16 @@ export default function ConservatoryContent({
         </div>
       </section>
 
-      <div className="tabs-sticky" ref={stickyRef}>
+      <div
+        className="tabs-sticky"
+        ref={stickyRef}
+        style={headerH ? { insetBlockStart: `${headerH}px` } : undefined}
+      >
+        <ConservatorySearch
+          items={searchItems}
+          condensed={condensed}
+          onSelect={handleSearchSelect}
+        />
         <div className="container">
           <nav
             className="tabs-nav"
