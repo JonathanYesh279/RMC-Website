@@ -923,6 +923,10 @@ body.home-locked .site-footer {
   position: relative;
 }
 .tabs-nav {
+  /* Positioning context for .tab-indicator — without it the indicator
+     anchors to the sticky wrapper, escapes this scroller, and widens the
+     page itself (horizontal scroll on iOS for far-left tabs). */
+  position: relative;
   display: flex;
   gap: 2px;
   overflow-x: auto;
@@ -956,6 +960,7 @@ body.home-locked .site-footer {
 }
 .tab-indicator {
   position: absolute;
+  inset-inline-start: 0;
   inset-block-end: -1px;
   height: 2px;
   background: var(--amber);

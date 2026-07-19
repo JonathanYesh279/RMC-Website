@@ -172,10 +172,11 @@ export default function ConservatoryContent({
     const btn = buttonsRef.current[idx];
     const nav = navRef.current;
     if (!btn || !nav) return;
-    const rect = btn.getBoundingClientRect();
-    const navRect = nav.getBoundingClientRect();
-    const right = navRect.right - rect.right;
-    setIndicator({ width: rect.width, tx: -right });
+    // Offset geometry (not viewport rects): the indicator is anchored to the
+    // nav's inline-start edge and scrolls with the strip, so the translate
+    // must be scroll-independent or it drifts when the tabs are swiped.
+    const fromStart = nav.clientWidth - btn.offsetLeft - btn.offsetWidth;
+    setIndicator({ width: btn.offsetWidth, tx: -fromStart });
   }, []);
 
   useEffect(() => {
