@@ -58,6 +58,10 @@ body {
 }
 html {
   scroll-behavior: smooth;
+  /* No elastic overscroll past the page edges (iOS 16+): dragging beyond
+     the footer/header revealed a blank band of page background, and
+     horizontal rubber-banding let the page wobble sideways. Site-wide. */
+  overscroll-behavior: none;
 }
 html,
 body.home-locked {
