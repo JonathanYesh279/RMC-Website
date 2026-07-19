@@ -7940,32 +7940,36 @@ body.home-locked .site-footer {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1120px) {
+  .gchips {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
   .gb-in {
-    flex-wrap: wrap;
-    gap: 10px 12px;
-    padding-block: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding-block: 18px 20px;
   }
   .gb-label {
-    display: none;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
   }
-  .gsearch {
-    flex: 1 1 100%;
+  .gb-tt {
+    font-size: 15px;
+    margin-block-start: 0;
   }
   .gs-bar {
-    height: 48px;
+    height: 50px;
   }
-  .gchips {
-    flex: 1 1 100%;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-block-end: 2px;
-  }
-  .gchips::-webkit-scrollbar {
+  .gs-kbd {
     display: none;
   }
-  .guide-band.condensed .gchips {
-    display: none;
+  .gs-ph {
+    inset-inline-end: 56px;
   }
   .gs-dd {
     max-height: 60vh;

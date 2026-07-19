@@ -226,9 +226,10 @@ export default function ConservatorySearch({
     setAct(-1);
   }, [q]);
 
-  // Rotating guidance prompt — paused while the input has a value.
+  // Rotating guidance prompt — paused while the input has a value or the
+  // dropdown is open (matching the design's idle-only rotation).
   useEffect(() => {
-    if (q) return;
+    if (q || open) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = window.setInterval(() => {
       setPromptOut(true);
@@ -238,7 +239,7 @@ export default function ConservatorySearch({
       }, 420);
     }, 3600);
     return () => window.clearInterval(id);
-  }, [q]);
+  }, [q, open]);
 
   // "/" focuses the search from anywhere on the page.
   useEffect(() => {
