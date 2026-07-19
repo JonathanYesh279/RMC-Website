@@ -131,30 +131,40 @@ export default function ConservatoryContent({
   const [activeProg, setActiveProg] = useState(0);
   const deptOverlayRef = useRef<HTMLDivElement | null>(null);
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoBlocked, setVideoBlocked] = useState(false);
 
-  // iOS blocks video autoplay in Low Power / Data Saver mode, and the native
-  // play overlay it draws is unreachable behind the hero content. Retry
-  // play() after mount, and again on the first touch anywhere — a user
-  // gesture is allowed to start playback even when autoplay was refused.
+  // iOS blocks <video> autoplay outright in Low Power / Data Saver mode, and
+  // the native play overlay it draws is unreachable behind the hero content.
+  // Retry play() after mount; if it's refused, reveal an animated-WebP loop
+  // of the same footage (images are exempt from the autoplay ban) so the
+  // hero moves with zero interaction. A later touch still swaps in the real
+  // video, since a user gesture is always allowed to start playback.
   useEffect(() => {
     const v = heroVideoRef.current;
     if (!v) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     v.muted = true;
-    v.play().catch(() => {});
+    const attempt = () =>
+      v
+        .play()
+        .then(() => setVideoBlocked(false))
+        .catch(() => setVideoBlocked(true));
+    attempt();
     const onGesture = () => {
-      if (v.paused) v.play().catch(() => {});
+      if (v.paused) attempt();
     };
-    const detach = () => {
+    const onPlaying = () => {
+      setVideoBlocked(false);
       window.removeEventListener("touchend", onGesture);
       window.removeEventListener("pointerdown", onGesture);
     };
     window.addEventListener("touchend", onGesture, { passive: true });
     window.addEventListener("pointerdown", onGesture, { passive: true });
-    v.addEventListener("playing", detach);
+    v.addEventListener("playing", onPlaying);
     return () => {
-      detach();
-      v.removeEventListener("playing", detach);
+      window.removeEventListener("touchend", onGesture);
+      window.removeEventListener("pointerdown", onGesture);
+      v.removeEventListener("playing", onPlaying);
     };
   }, [hero?.videoUrl]);
 
@@ -626,6 +636,15 @@ export default function ConservatoryContent({
               playsInline
               preload="metadata"
             />
+            {videoBlocked && (
+              // Regenerate public/fallbacks/conservatory-hero.webp if the
+              // hero video in Sanity is replaced (7s slice, 720w, 12fps).
+              <img
+                className="page-hero-motion-fallback"
+                src="/fallbacks/conservatory-hero.webp"
+                alt=""
+              />
+            )}
             <div className="page-hero-scrim" />
           </div>
         ) : null}
