@@ -1359,14 +1359,16 @@ export default function AvailabilityPage() {
                 onSubmit={submitInquiry}
               >
                 <h3>איש הקשר וההפקה</h3>
+                {/* Honeypot: clip-hidden in place — an offscreen left offset
+                    would widen the RTL page into horizontal scroll on iOS. */}
                 <div
                   aria-hidden="true"
                   style={{
                     position: "absolute",
-                    left: "-9999px",
                     width: 1,
                     height: 1,
                     overflow: "hidden",
+                    clipPath: "inset(50%)",
                   }}
                 >
                   <label>

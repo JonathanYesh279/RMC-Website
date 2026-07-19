@@ -313,7 +313,7 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="reveal">
+          <div className="reveal ct-access-scroll">
             <table
               className="ct-access-table"
               aria-label="טבלת הסדרי נגישות במרכז המוסיקה רעננה"

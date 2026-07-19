@@ -4818,7 +4818,10 @@ body.home-locked .site-footer {
 .cal-nav-btn:disabled { color: var(--ink-4); cursor: default; }
 .cal-dows {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  /* minmax(0,…): 1fr's auto minimum would let the pill text dictate cell
+     width and push the 7-column grid past narrow viewports (clipped
+     Saturday column on phones). */
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
   margin-block-end: 6px;
 }
@@ -4833,7 +4836,7 @@ body.home-locked .site-footer {
 }
 .cal-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
 }
 .cal-cell {
@@ -5674,6 +5677,19 @@ body.home-locked .site-footer {
   .slot { grid-template-columns: auto 1fr; }
   .slot-price { grid-column: 2; text-align: start; }
   .slot-price small { text-align: start; }
+}
+@media (max-width: 480px) {
+  /* ~41px calendar cells: trim chrome so the status pills fit inside */
+  .cal { padding: 14px 12px 16px; }
+  .cal-cell { padding: 4px 5px; overflow: hidden; }
+  .cal-cell .d { font-size: 13px; }
+  .cal-cell .pill {
+    font-size: 7.5px;
+    letter-spacing: 0.02em;
+    padding: 1.5px 3px;
+    max-width: 100%;
+    white-space: nowrap;
+  }
 }
 
 /* ============================================================
@@ -7469,12 +7485,27 @@ body.home-locked .site-footer {
     justify-self: start;
   }
 }
+/* The table can't shrink below its columns on phones — scroll it inside
+   its own container instead of letting it widen the page. */
+.ct-access-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .ct-access-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
   border: 1px solid var(--line);
   overflow: hidden;
+}
+@media (max-width: 700px) {
+  .ct-access-table thead th {
+    padding: 14px 16px;
+  }
+  .ct-access-table tbody td {
+    padding: 16px;
+    font-size: 14px;
+  }
 }
 .ct-access-table thead th {
   text-align: start;
