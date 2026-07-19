@@ -130,6 +130,33 @@ export default function ConservatoryContent({
   const [teacherIdx, setTeacherIdx] = useState(0);
   const [activeProg, setActiveProg] = useState(0);
   const deptOverlayRef = useRef<HTMLDivElement | null>(null);
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  // iOS blocks video autoplay in Low Power / Data Saver mode, and the native
+  // play overlay it draws is unreachable behind the hero content. Retry
+  // play() after mount, and again on the first touch anywhere — a user
+  // gesture is allowed to start playback even when autoplay was refused.
+  useEffect(() => {
+    const v = heroVideoRef.current;
+    if (!v) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    v.muted = true;
+    v.play().catch(() => {});
+    const onGesture = () => {
+      if (v.paused) v.play().catch(() => {});
+    };
+    const detach = () => {
+      window.removeEventListener("touchend", onGesture);
+      window.removeEventListener("pointerdown", onGesture);
+    };
+    window.addEventListener("touchend", onGesture, { passive: true });
+    window.addEventListener("pointerdown", onGesture, { passive: true });
+    v.addEventListener("playing", detach);
+    return () => {
+      detach();
+      v.removeEventListener("playing", detach);
+    };
+  }, [hero?.videoUrl]);
 
   const positionIndicator = useCallback((idx: number) => {
     const btn = buttonsRef.current[idx];
@@ -589,6 +616,7 @@ export default function ConservatoryContent({
               />
             ) : null}
             <video
+              ref={heroVideoRef}
               className="page-hero-video"
               src={hero.videoUrl}
               poster={hero.posterUrl ?? undefined}
